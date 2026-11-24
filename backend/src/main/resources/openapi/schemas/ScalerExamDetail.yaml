@@ -1,0 +1,50 @@
+type: object
+description: |
+  Full exam/upgrade (training) record as returned in a scaler GET/POST/PUT response.
+  Maps to `scs_scaler_training_pkg`.
+properties:
+  scalerLicenceNo:
+    type: string
+    nullable: true
+    description: Parent scaler licence number
+    example: "1234"
+  scalerTrainingTypeId:
+    type: string
+    nullable: true
+    description: Training type identifier
+    example: "SCEX"
+  scalerTrainingClassCode:
+    type: string
+    nullable: true
+    description: Training class code derived from the training type
+    example: "SC"
+  completionDate:
+    type: string
+    format: date
+    nullable: true
+    description: Date the exam or upgrade was completed
+    example: "2025-01-10"
+  entryTimestamp:
+    type: string
+    format: date-time
+    nullable: true
+    description: Audit field — record creation timestamp
+  entryUserid:
+    type: string
+    nullable: true
+    description: Audit field — userid that created the record
+  updateTimestamp:
+    type: string
+    format: date-time
+    nullable: true
+    description: Audit field — last update timestamp
+  updateUserid:
+    type: string
+    nullable: true
+    description: Audit field — userid that last updated the record
+  revisionCount:
+    type: integer
+    format: int64
+    nullable: true
+    description: Optimistic locking revision counter
+

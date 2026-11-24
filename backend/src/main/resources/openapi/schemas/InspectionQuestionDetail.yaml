@@ -1,0 +1,18 @@
+allOf:
+  - $ref: ./InspectionQuestion.yaml
+  - type: object
+    properties:
+      inspectionTypeCodes:
+        type: array
+        items:
+          type: string
+      scalingMethodTypeCodes:
+        type: array
+        items:
+          type: string
+      validResponseCodes:
+        type: array
+        items:
+          type: string
+      questionUsed:
+        type: boolean

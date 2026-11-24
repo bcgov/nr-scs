@@ -1,0 +1,23 @@
+type: object
+description: |
+  Record returned from `SCS_SCALE_METHOD_TYP_CD_VW_PKG.search_recs`.
+properties:
+  code:
+    type: string
+    nullable: true
+    description: Legacy scale method type code.
+  description:
+    type: string
+    nullable: true
+    description: User-facing scale method type description.
+  effectiveDate:
+    type: string
+    format: date
+    nullable: true
+    description: Effective date for the code.
+  expiryDate:
+    type: string
+    format: date
+    nullable: true
+    description: Expiry date for the code.
+

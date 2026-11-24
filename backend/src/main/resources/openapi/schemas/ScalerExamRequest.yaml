@@ -1,0 +1,24 @@
+type: object
+description: |
+  Request payload for creating or updating a per-scaler exam / upgrade (training) record from
+  the scaler Exams/Upgrades tab. Backs `POST`/`PUT /scalers/{scalerLicenceNo}/exams`.
+
+  This payload is specific to exam maintenance and intentionally excludes `scalerLicenceNo`
+  (supplied in the request path) and `scalerTrainingClassCode`, which the server derives from
+  the selected training type LOV entry (`scs_scty_lov_vw_pkg`); any client-supplied class code
+  would be ignored, so it is omitted from the contract entirely. On update the training type is
+  immutable — the path id identifies the record and a differing body value is rejected.
+required:
+  - scalerTrainingTypeId
+properties:
+  scalerTrainingTypeId:
+    type: string
+    description: |
+      Training type identifier selected from the exam type LOV
+      (`SCS_STATIC_LOV_PKG` key `SCALER_TRAINING_TYPE`).
+    example: "SCEX"
+  completionDate:
+    type: string
+    format: date
+    description: Date the exam or upgrade was completed
+    example: "2025-01-10"

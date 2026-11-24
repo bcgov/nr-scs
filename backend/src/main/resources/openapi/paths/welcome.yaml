@@ -1,0 +1,22 @@
+get:
+  tags:
+    - Welcome
+  summary: Get welcome page data
+  description: Returns the data required to render the welcome page.
+  operationId: getWelcome
+  parameters:
+    - name: orgUnitNo
+      in: query
+      description: Optional org unit number to resolve organization display text.
+      required: false
+      schema:
+        type: integer
+        format: int64
+  responses:
+    '200':
+      description: Welcome data
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/WelcomeSummary'
+  security: []

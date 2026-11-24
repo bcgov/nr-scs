@@ -1,0 +1,76 @@
+parameters:
+  - name: riskQuestionnaireId
+    in: path
+    description: Risk questionnaire / assessment identifier
+    required: true
+    schema:
+      type: integer
+      format: int64
+      example: 12345
+
+get:
+  tags:
+    - ScaleSiteRiskAssessment
+  summary: Get a scale site risk assessment by ID
+  description: |
+    Retrieve the full detail of a scale site risk assessment record.
+    Based on `scs_risk_scale_site_vw_pkg.search_recs`.
+  operationId: getScaleSiteRiskAssessment
+  responses:
+    '200':
+      description: Risk assessment record found
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/ScaleSiteRiskAssessmentDetail'
+    '404':
+      description: Risk assessment not found
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+    '500':
+      description: Server error
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+
+put:
+  tags:
+    - ScaleSiteRiskAssessment
+  summary: Update a scale site risk assessment
+  description: |
+    Save assessment field values for a scale site risk assessment record.
+  operationId: updateScaleSiteRiskAssessment
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: '../root.yaml#/components/schemas/RiskAssessmentSaveRequest'
+  responses:
+    '200':
+      description: Risk assessment updated successfully
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/ScaleSiteRiskAssessmentDetail'
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+    '404':
+      description: Risk assessment not found
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+    '500':
+      description: Server error
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'

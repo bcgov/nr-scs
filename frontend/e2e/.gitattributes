@@ -1,0 +1,5 @@
+# Scoped to e2e/ because nr-scs has no repo-root .gitattributes pinning *.sh. The scripts
+# under scripts/ must stay LF to run under bash on any OS — a clone with core.autocrlf=true
+# would otherwise check them out as CRLF and bash fails with `$'
+': command not found`.
+*.sh text eol=lf

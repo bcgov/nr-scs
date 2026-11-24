@@ -1,0 +1,31 @@
+type: object
+description: |
+  A valid licence attribute record that defines which scaler appointment types are
+  valid for a given scale grading system code.
+  Maps to `SCS_SCALER_VALD_LCNC_TTRBT_PKG`.
+  Primary key is the composite of `scaleGradingSystemCode` + `scalerAppointmentType`.
+properties:
+  scaleGradingSystemCode:
+    type: string
+    nullable: true
+    maxLength: 4
+    description: Scale grading system code. Part of the primary key.
+    example: "BC"
+  scalerAppointmentType:
+    type: string
+    nullable: true
+    maxLength: 4
+    description: Scaler appointment type code. Part of the primary key.
+    example: "O"
+  effectiveDate:
+    type: string
+    format: date
+    nullable: true
+    description: Date from which this valid licence attribute is effective.
+    example: "2023-01-01"
+  expiryDate:
+    type: string
+    format: date
+    nullable: true
+    description: Date on which this valid licence attribute expires. Optional.
+    example: "2030-12-31"

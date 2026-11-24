@@ -1,0 +1,83 @@
+get:
+  tags:
+    - SignatureBlock
+  summary: Get a signature block
+  operationId: getSignatureBlock
+  parameters:
+    - name: scaleSignatoryBlockId
+      in: path
+      required: true
+      schema:
+        type: integer
+        format: int64
+  responses:
+    '200':
+      description: Signature block found
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/ScaleSignatoryBlock'
+    '404':
+      description: Signature block not found
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+put:
+  tags:
+    - SignatureBlock
+  summary: Update a signature block
+  operationId: updateSignatureBlock
+  parameters:
+    - name: scaleSignatoryBlockId
+      in: path
+      required: true
+      schema:
+        type: integer
+        format: int64
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: '../root.yaml#/components/schemas/ScaleSignatoryBlockUpdateRequest'
+  responses:
+    '200':
+      description: Signature block updated
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/ScaleSignatoryBlock'
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+    '404':
+      description: Signature block not found
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+delete:
+  tags:
+    - SignatureBlock
+  summary: Delete a signature block
+  operationId: deleteSignatureBlock
+  parameters:
+    - name: scaleSignatoryBlockId
+      in: path
+      required: true
+      schema:
+        type: integer
+        format: int64
+  responses:
+    '204':
+      description: Signature block deleted
+    '404':
+      description: Signature block not found
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'

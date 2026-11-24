@@ -1,0 +1,21 @@
+type: object
+description: Welcome page summary data.
+properties:
+  applicationVersion:
+    type: string
+    nullable: true
+  applicationEnvironment:
+    type: string
+    nullable: true
+  serverName:
+    type: string
+    nullable: true
+  userDisplayName:
+    type: string
+    nullable: true
+  userOrganization:
+    type: string
+    nullable: true
+  currentNews:
+    type: string
+    nullable: true

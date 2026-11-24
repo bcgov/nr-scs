@@ -1,0 +1,9 @@
+type: object
+description: Update payload for a system setting value.
+required:
+  - systemSettingValue
+properties:
+  systemSettingValue:
+    type: string
+    maxLength: 4000
+    description: System setting value. HTML markup is allowed for the current news message.

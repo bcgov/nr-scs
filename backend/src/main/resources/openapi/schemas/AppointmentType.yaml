@@ -1,0 +1,31 @@
+description: Scaler appointment type record.
+allOf:
+  - $ref: ./AuditDetail.yaml
+  - type: object
+    properties:
+      code:
+        type: string
+        maxLength: 10
+        description: Appointment type code.
+      description:
+        type: string
+        maxLength: 120
+        description: Appointment type description.
+      actingInd:
+        type: string
+        description: Acting indicator.
+        enum: [Y, N]
+      effectiveDate:
+        type: string
+        format: date
+        description: Effective date.
+      expiryDate:
+        type: string
+        format: date
+        description: Expiry date.
+    required:
+      - code
+      - description
+      - actingInd
+      - effectiveDate
+      - expiryDate

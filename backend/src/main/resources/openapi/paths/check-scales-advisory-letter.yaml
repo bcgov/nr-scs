@@ -1,0 +1,51 @@
+post:
+  tags:
+    - CheckScale
+  summary: Create check scale advisory letter
+  description: Generate the check scale advisory letter report (legacy R004 / SCS_REP004).
+  operationId: createCheckScaleAdvisoryLetter
+  parameters:
+    - in: path
+      name: checkScaleId
+      required: true
+      schema:
+        type: integer
+        format: int64
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: '../root.yaml#/components/schemas/CheckScaleAdvisoryLetterReportRequest'
+  responses:
+    '200':
+      description: Letter generated and returned inline
+      content:
+        application/pdf:
+          schema:
+            type: string
+            format: binary
+    '202':
+      description: Letter request accepted (email delivery)
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/ReportAckResponse'
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+    '500':
+      description: Server error
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'

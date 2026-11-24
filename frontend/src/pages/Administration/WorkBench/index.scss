@@ -1,0 +1,112 @@
+.workbench-page {
+  padding-bottom: 2rem;
+}
+
+.workbench-page__banner {
+  margin: 1rem 0 1.5rem;
+}
+
+.workbench-page__section {
+  margin-bottom: 2rem;
+}
+
+.workbench-page__section-title {
+  margin-bottom: 0.75rem;
+}
+
+.workbench-page__empty {
+  padding: 0.5rem 0;
+}
+
+/* Allow WorkBench tables to size columns to fit action buttons */
+.workbench-page .table-resource table.cds--data-table {
+  table-layout: auto;
+}
+
+/* Ensure action buttons in WorkBench tables don't get clipped by table styles */
+.workbench-page .table-resource table td .action-cell {
+  white-space: nowrap;
+  display: inline-flex;
+  gap: 0.25rem;
+  align-items: center;
+  justify-content: flex-end;
+  overflow: visible;
+}
+
+.workbench-page .table-resource table td .action-cell .cds--btn {
+  min-width: 0 !important;
+  width: auto !important;
+  padding: 6px 10px !important;
+  font-size: 0.875rem !important;
+  line-height: 1.25rem !important;
+  white-space: nowrap !important;
+}
+
+/* Give the last two columns in WorkBench tables extra min-width to avoid squeezing */
+.workbench-page .table-resource__header-addAction,
+.workbench-page .table-resource__cell-addAction,
+.workbench-page .table-resource__header-removeAction,
+.workbench-page .table-resource__cell-removeAction,
+.workbench-page .table-resource__header-actions,
+.workbench-page .table-resource__cell-actions {
+  width: 300px !important;
+  min-width: 300px !important;
+  max-width: 360px !important;
+  text-align: right;
+}
+
+/* Ensure inline action buttons render side-by-side */
+.workbench-page .table-resource table td .action-cell .scs__table-actions {
+  display: inline-flex;
+  gap: 0.5rem;
+  align-items: center;
+  flex-wrap: nowrap;
+}
+
+.workbench-page .table-resource table td .action-cell .scs__table-actions .bx--btn {
+  min-width: 0 !important;
+  width: auto !important;
+  padding: 6px 10px !important;
+  font-size: 0.875rem !important;
+  line-height: 1.25rem !important;
+  white-space: nowrap !important;
+}
+
+.workbench-page .table-resource table td .action-cell .workbench-page__table-action--remove:hover,
+.workbench-page .table-resource table td .action-cell .workbench-page__table-action--remove:focus-visible {
+  background-color: var(--cds-support-error, #da1e28) !important;
+  border-color: var(--cds-support-error, #da1e28) !important;
+  color: var(--cds-text-on-color, #ffffff) !important;
+}
+
+.workbench-page .table-resource table td .action-cell .workbench-page__table-action--add:hover,
+.workbench-page .table-resource table td .action-cell .workbench-page__table-action--add:focus-visible {
+  background-color: var(--cds-interactive-01, #0f62fe) !important;
+  border-color: var(--cds-interactive-01, #0f62fe) !important;
+  color: var(--cds-text-on-color, #ffffff) !important;
+}
+
+.workbench-page .table-resource table td .action-cell .workbench-page__table-action--remove:hover svg,
+.workbench-page .table-resource table td .action-cell .workbench-page__table-action--remove:focus-visible svg,
+.workbench-page .table-resource table td .action-cell .workbench-page__table-action--add:hover svg,
+.workbench-page .table-resource table td .action-cell .workbench-page__table-action--add:focus-visible svg {
+  fill: currentColor !important;
+}
+
+/* Ensure the cell content doesn't wrap the action container */
+.workbench-page .table-resource__cell-content--actions {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  overflow: visible;
+}
+
+.workbench-page .table-resource__cell-content--addAction,
+.workbench-page .table-resource__cell-content--removeAction {
+  overflow: visible;
+  text-overflow: unset;
+}
+
+.workbench-page .table-resource__cell-content--actions {
+  overflow: visible;
+}

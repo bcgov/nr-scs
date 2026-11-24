@@ -1,0 +1,39 @@
+type: object
+required:
+  - clientContactId
+  - contactRoleDescription
+  - primaryContactInd
+  - siteInformationAccessInd
+  - effectiveDate
+properties:
+  clientContactId:
+    type: integer
+    format: int64
+    description: The client contact to associate with this scale site
+    example: 12345
+  contactRoleDescription:
+    type: string
+    maxLength: 40
+    description: Role of the contact at the scale site
+    example: "Site Manager"
+  primaryContactInd:
+    type: string
+    enum: [Y, N]
+    description: Whether this is the primary contact
+    example: "Y"
+  siteInformationAccessInd:
+    type: string
+    enum: [Y, N]
+    description: Whether the contact has access to site information
+    example: "Y"
+  effectiveDate:
+    type: string
+    format: date
+    description: Date the contact assignment becomes effective
+    example: "2024-01-01"
+  expiryDate:
+    type: string
+    format: date
+    nullable: true
+    description: Date the contact assignment expires (optional)
+    example: "2026-01-01"

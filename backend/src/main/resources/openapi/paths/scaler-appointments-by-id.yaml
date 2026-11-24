@@ -1,0 +1,136 @@
+parameters:
+  - name: scalerLicenceNo
+    in: path
+    description: Scaler licence number
+    required: true
+    schema:
+      type: string
+      maxLength: 4
+      example: "1234"
+  - name: scalerLicenceAttributeId
+    in: path
+    description: Appointment (licence attribute) primary key
+    required: true
+    schema:
+      type: integer
+      format: int64
+      example: 5001
+
+put:
+  tags:
+    - ScalerAppointment
+  summary: Update a scaler appointment
+  description: |
+    Update an existing appointment (licence attribute) record for a scaler.
+    This matches the legacy scaler Appointments tab edit flow.
+    Based on `SCS_SCALER_LICENCE_ATTRIBT_PKG.update_rec`.
+
+    Business rules enforced server-side:
+    * `scalerAppointmentType` and `scaleGradingSystemCode` must come from the selected
+      `GET /grading-code-appointment-type-lov` row.
+    * `orgUnitNo` is required when `provinceWideInd` is `N`.
+    * `orgUnitNo` must be omitted when `provinceWideInd` is `Y`.
+    * `expiryDate` must be on or after `issuedDate` when provided.
+    * `cancellationDate` and `cancellationReasonTxt` must both be supplied or both omitted.
+    * When supplied, `cancellationDate` must be on or after `issuedDate` and on or before
+      `expiryDate` when an expiry date exists.
+    * Maximum appointment length depends on `scalerAppointmentType` (legacy rules:
+      `A` = 1 year, `L` = 2 years, `O` = 5 years).
+  operationId: updateScalerAppointment
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: '../root.yaml#/components/schemas/ScalerAppointmentUpdateRequest'
+        example:
+          scalerAppointmentType: "A"
+          scaleGradingSystemCode: "BC"
+          orgUnitNo: 1234
+          provinceWideInd: "N"
+          issuedDate: "2025-01-15"
+          expiryDate: "2026-01-15"
+          cancellationDate: "2025-11-01"
+          cancellationReasonTxt: "Appointment superseded"
+  responses:
+    '200':
+      description: Appointment updated successfully
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/ScalerAppointmentDetail'
+          example:
+            scalerLicenceAttributeId: 5001
+            scalerLicenceNo: "1234"
+            scalerAppointmentType: "A"
+            scaleGradingSystemCode: "BC"
+            orgUnitNo: 1234
+            provinceWideInd: "N"
+            issuedDate: "2025-01-15"
+            expiryDate: "2026-01-15"
+            cancellationDate: "2025-11-01"
+            cancellationReasonTxt: "Appointment superseded"
+            entryTimestamp: "2025-01-15T10:30:00Z"
+            entryUserid: "JSMITH"
+            updateTimestamp: "2026-03-17T10:30:00Z"
+            updateUserid: "BJONES"
+            revisionCount: 2
+    '400':
+      description: Bad request — validation failure
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+          example:
+            code: "VALIDATION_ERROR"
+            message: "cancellationDate and cancellationReasonTxt must be provided together"
+    '404':
+      description: Scaler or appointment not found
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+          example:
+            code: "NOT_FOUND"
+            message: "No appointment 5001 found for scaler 1234"
+    '500':
+      description: Server error
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+          example:
+            code: "ORA-12345"
+            message: "Database connection error"
+
+delete:
+  tags:
+    - ScalerAppointment
+  summary: Delete a scaler appointment
+  description: |
+    Delete an appointment (licence attribute) record from a scaler.
+    This matches the legacy scaler Appointments tab delete flow.
+    Based on `SCS_SCALER_LICENCE_ATTRIBT_PKG.delete_rec`.
+  operationId: deleteScalerAppointment
+  responses:
+    '204':
+      description: Appointment deleted successfully
+    '404':
+      description: Scaler or appointment not found
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+          example:
+            code: "NOT_FOUND"
+            message: "No appointment 5001 found for scaler 1234"
+    '500':
+      description: Server error
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+          example:
+            code: "ORA-12345"
+            message: "Database connection error"
+

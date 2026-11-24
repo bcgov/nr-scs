@@ -1,0 +1,51 @@
+allOf:
+  - $ref: ./AuditDetail.yaml
+  - type: object
+    properties:
+      scalerAuthorizationId:
+        type: integer
+        format: int64
+      scalerLicenceNo:
+        type: string
+      orgUnitNo:
+        type: integer
+        format: int64
+      districtWideInd:
+        type: string
+
+      letterArcsFileNumber:
+        type: string
+      authorizationEffectiveDate:
+        type: string
+        format: date
+      authorizationExpiryDate:
+        type: string
+        format: date
+      expiryNotificationInd:
+        type: string
+
+      cancellationDate:
+        type: string
+        format: date
+      cancellationReasonTxt:
+        type: string
+      status:
+        type: string
+      letterExists:
+        type: boolean
+      jobFunctions:
+        type: array
+        items:
+          type: string
+      authForestProducts:
+        type: array
+        items:
+          type: string
+      scaleSites:
+        type: array
+        items:
+          $ref: '../root.yaml#/components/schemas/ScaleSiteSearchResult'
+      conditions:
+        type: array
+        items:
+          $ref: '../root.yaml#/components/schemas/ScaleAuthCondition'

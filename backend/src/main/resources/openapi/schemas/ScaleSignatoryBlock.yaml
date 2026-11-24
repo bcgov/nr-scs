@@ -1,0 +1,22 @@
+allOf:
+  - $ref: ./AuditDetail.yaml
+  - type: object
+    properties:
+      scaleSignatoryBlockId:
+        type: integer
+        format: int64
+      orgUnitNo:
+        type: integer
+        format: int64
+      orgUnitDescription:
+        type: string
+      firstName:
+        type: string
+      middleName:
+        type: string
+      lastName:
+        type: string
+      signatureTitle:
+        type: string
+      fullName:
+        type: string

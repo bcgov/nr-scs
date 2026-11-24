@@ -1,0 +1,87 @@
+type: object
+description: |
+  Read-only scaler contact and address record for the Address tab.
+  Sourced from `scs_scaler_address_vw_pkg.search_recs` (single row per scaler licence).
+  Phone numbers are returned as stored; display formatting is applied by the client.
+properties:
+  scalerLicenceNo:
+    type: string
+    maxLength: 4
+    nullable: true
+    description: Scaler licence number
+    example: "1234"
+  company:
+    type: string
+    nullable: true
+    description: Company name
+    example: "Coastal Logging Ltd."
+  lastName:
+    type: string
+    nullable: true
+    description: Scaler last name
+    example: "Smith"
+  firstName:
+    type: string
+    nullable: true
+    description: Scaler first name
+    example: "Jordan"
+  businessPhone:
+    type: string
+    nullable: true
+    description: Business phone number (unformatted)
+    example: "2505551234"
+  homePhone:
+    type: string
+    nullable: true
+    description: Residence phone number (unformatted)
+    example: "2505555678"
+  cellPhone:
+    type: string
+    nullable: true
+    description: Cell phone number (unformatted)
+    example: "2505559012"
+  faxNumber:
+    type: string
+    nullable: true
+    description: Fax number (unformatted)
+    example: "2505553456"
+  emailAddress:
+    type: string
+    nullable: true
+    description: Email address
+    example: "jordan.smith@example.com"
+  address1:
+    type: string
+    nullable: true
+    description: Address line 1
+    example: "123 Forest Road"
+  address2:
+    type: string
+    nullable: true
+    description: Address line 2
+    example: "Suite 200"
+  address3:
+    type: string
+    nullable: true
+    description: Address line 3
+    example: null
+  city:
+    type: string
+    nullable: true
+    description: City
+    example: "Victoria"
+  province:
+    type: string
+    nullable: true
+    description: Province
+    example: "BC"
+  country:
+    type: string
+    nullable: true
+    description: Country
+    example: "Canada"
+  postalCode:
+    type: string
+    nullable: true
+    description: Postal code
+    example: "V8V 1A1"

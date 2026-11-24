@@ -1,0 +1,8 @@
+/* Carbon's .cds--inline-loading is inline-size: 100% by default, which makes the Reset
+   spinner consume the whole action row and push Save/Delete to the right. Pin it to its
+   content width so the buttons stay put while resetting. */
+.scaler-form__reset-loading.cds--inline-loading {
+  inline-size: auto;
+  width: auto;
+  flex: 0 0 auto;
+}

@@ -1,0 +1,169 @@
+
+.table-resource { max-width: 110rem; }
+.table-resource__total { margin-bottom: 0.5rem; }
+
+.table-resource table td:last-child button { display: inline-flex !important; visibility: visible !important; }
+
+/* Clickable row styling when TableResource rows have rowOnClick */
+.table-resource__row--clickable { cursor: pointer; }
+.table-resource__row--clickable:hover { background: rgba(15,98,254,0.03); }
+
+/* Header button hover underline */
+.table-resource__header-button:focus {
+	outline: none;
+}
+
+/* Use an inset box-shadow on hover/focus to draw a continuous underline across the full button */
+.table-resource__header-button:hover,
+.table-resource__header-button:focus {
+	text-decoration: none;
+	box-shadow: inset 0 -1px 0 currentColor;
+}
+
+/* Sort indicator (arrows) slightly larger for visibility and baseline-aligned with text */
+.table-resource__sort-indicator {
+	font-size: 1.2em; /* ~20% larger */
+	line-height: 1;
+	margin-left: 0.25rem;
+	display: inline-block;
+	align-self: baseline;
+}
+
+/* Legacy parity: every sortable header shows a visible sort cue — a dim neutral marker when
+   inactive, a solid directional arrow when this is the active sort column. Drawn with ::after so
+   the glyph never enters the header's textContent or accessible name (header-text assertions and
+   screen readers see only the label). */
+.table-resource__sort-indicator::after {
+	content: '\2195'; /* ↕ */
+	opacity: 0.35;
+}
+
+.table-resource__sort-indicator[data-direction='ASC']::after {
+	content: '\2191'; /* ↑ */
+	opacity: 1;
+}
+
+.table-resource__sort-indicator[data-direction='DESC']::after {
+	content: '\2193'; /* ↓ */
+	opacity: 1;
+}
+
+/* Remove buttons are pinned to one explicit size in every table.
+   They used to be `width: 100%` of their cell, which made the identical button 320px
+   wide in a 3-column table (only `remove` has a width rule, so Chrome's fixed layout
+   splits the columns evenly) but 99px in the 5-column Conditions table (all widths
+   specified, so `remove` resolves to a true 10%). Content-sizing equalised them but
+   still drifted with font metrics, so the width is now fixed outright and the column
+   below is sized to hold it. */
+.table-resource__cell-remove button {
+	width: 5.5rem !important;
+	min-width: 5.5rem !important;
+	max-width: 5.5rem !important;
+	box-sizing: border-box;
+	display: inline-flex !important;
+	align-items: center;
+	justify-content: center;
+	white-space: nowrap !important;
+	overflow: hidden;
+	margin: 0 !important;
+	padding: 6px 8px;
+	font-size: 0.875rem !important;
+}
+
+.table-resource .cds--data-table-container,
+.table-resource .cds--table-container { max-width: 100%; overflow-x: visible; }
+
+.table-resource table.cds--data-table { table-layout: fixed; width: 100%; }
+
+/* Column width rules to prevent Description from squishing other columns */
+.table-resource__header-scaleAuthConditionId,
+.table-resource__cell-scaleAuthConditionId { width: 10%; min-width: 80px; max-width: 120px; }
+
+/* Allow the header label to wrap so the '#' character isn't clipped */
+.table-resource__header-scaleAuthConditionId {
+	white-space: normal;
+	word-break: break-word;
+}
+
+.table-resource__header-scaleAuthConditionTitle,
+.table-resource__cell-scaleAuthConditionTitle { width: 25%; min-width: 160px; }
+
+.table-resource__header-ministryStandardInd,
+.table-resource__cell-ministryStandardInd { width: 10%; min-width: 80px; max-width: 120px; }
+
+.table-resource__header-scaleAuthConditionDesc,
+.table-resource__cell-scaleAuthConditionDesc { width: 41%; min-width: 220px; }
+
+.table-resource__header-remove,
+.table-resource__cell-remove { width: 8rem; min-width: 8rem; max-width: 8rem; }
+
+.table-resource table td,
+.table-resource table th {
+	text-align: left;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+/* Allow table headers to wrap so long labels aren't truncated */
+.table-resource table th {
+	white-space: normal;
+	word-break: break-word;
+	overflow-wrap: anywhere;
+}
+
+.table-resource__cell-content {
+	display: block;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+/* Allow description column to wrap if needed but still respect fixed layout */
+.table-resource__cell-content--scaleAuthConditionDesc {
+	white-space: normal;
+	overflow-wrap: anywhere;
+}
+
+/* Allow Title column cells to wrap so content doesn't force other columns to shrink */
+.table-resource__cell-scaleAuthConditionTitle .table-resource__cell-content {
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+/* Ensure remove column and its cell content are allowed to overflow (override generic td rule) */
+.table-resource__header-remove,
+.table-resource__cell-remove {
+  /* keep content clipped to cell so buttons don't overhang */
+  overflow: hidden !important;
+  text-align: right;
+}
+
+.table-resource__cell-remove .table-resource__cell-content {
+  overflow: hidden;
+}
+
+/* When viewport is narrow, allow horizontal scrolling for tables so content isn't clipped */
+@media (max-width: 1200px) {
+	.table-resource {
+		overflow-x: auto;
+		-webkit-overflow-scrolling: touch;
+	}
+
+	/* Ensure the table keeps a sensible min width so columns keep their space and horizontal scrollbar appears */
+	.table-resource table.cds--data-table,
+	.table-resource table {
+		min-width: 720px;
+	}
+
+	.table-resource__cell-remove,
+	.table-resource__cell-remove .table-resource__cell-content {
+		box-sizing: border-box;
+		padding: 0 8px;
+	}
+
+	/* Slightly reduce title and description widths to compensate */
+	.table-resource__header-scaleAuthConditionTitle,
+	.table-resource__cell-scaleAuthConditionTitle { width: 22% !important; min-width: 140px !important; }
+
+	.table-resource__header-scaleAuthConditionDesc,
+	.table-resource__cell-scaleAuthConditionDesc { width: 40% !important; min-width: 180px !important; }
+}

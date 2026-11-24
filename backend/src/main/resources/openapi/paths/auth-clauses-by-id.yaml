@@ -1,0 +1,104 @@
+get:
+  tags:
+    - AuthorizationClause
+  summary: Get an authorization clause
+  operationId: getAuthorizationClause
+  parameters:
+    - name: scaleMethodTypeCode
+      in: path
+      required: true
+      schema:
+        type: string
+    - name: scaleMethodAuthClauseId
+      in: path
+      required: true
+      schema:
+        type: integer
+        format: int64
+  responses:
+    '200':
+      description: Authorization clause found
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/ScaleMethodAuthClause'
+    '404':
+      description: Authorization clause not found
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+put:
+  tags:
+    - AuthorizationClause
+  summary: Update an authorization clause
+  operationId: updateAuthorizationClause
+  parameters:
+    - name: scaleMethodTypeCode
+      in: path
+      required: true
+      schema:
+        type: string
+    - name: scaleMethodAuthClauseId
+      in: path
+      required: true
+      schema:
+        type: integer
+        format: int64
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: '../root.yaml#/components/schemas/ScaleMethodAuthClauseUpdateRequest'
+  responses:
+    '200':
+      description: Authorization clause updated
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/ScaleMethodAuthClause'
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+    '404':
+      description: Authorization clause not found
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+delete:
+  tags:
+    - AuthorizationClause
+  summary: Delete an authorization clause
+  operationId: deleteAuthorizationClause
+  parameters:
+    - name: scaleMethodTypeCode
+      in: path
+      required: true
+      schema:
+        type: string
+    - name: scaleMethodAuthClauseId
+      in: path
+      required: true
+      schema:
+        type: integer
+        format: int64
+  responses:
+    '204':
+      description: Authorization clause deleted
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+    '404':
+      description: Authorization clause not found
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'

@@ -1,0 +1,86 @@
+get:
+  tags:
+    - MarkSiteDesignation
+  summary: Get mark site designation detail
+  description: |
+    Returns the data needed by the Mark Site Designation view page.
+  operationId: getMarkSiteDesignation
+  parameters:
+    - in: path
+      name: authorizationId
+      required: true
+      schema:
+        type: integer
+        format: int64
+        minimum: 1
+  responses:
+    '200':
+      description: Mark site designation found
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/MarkSiteDesignationDetail'
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+    '500':
+      description: Server error
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+put:
+  tags:
+    - MarkSiteDesignation
+  summary: Update a mark site designation
+  description: |
+    Updates an existing mark site designation authorization.
+
+    When a letter has already been issued (`letterExists = true`), only the expiry date may be
+    changed. All other fields and associations are locked.
+
+    When no letter exists, all fields and associations (scale sites, species content, conditions)
+    are replaced with the values in the request body.
+  operationId: updateMarkSiteDesignation
+  parameters:
+    - in: path
+      name: authorizationId
+      required: true
+      schema:
+        type: integer
+        format: int64
+        minimum: 1
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: '../root.yaml#/components/schemas/MarkSiteDesignationUpdateRequest'
+  responses:
+    '200':
+      description: Mark site designation updated successfully
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/MarkSiteDesignationDetail'
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+    '500':
+      description: Server error
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'

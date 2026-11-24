@@ -1,0 +1,58 @@
+parameters:
+  - name: scaleSiteIdNmbr
+    in: path
+    description: Scale site id number
+    required: true
+    schema:
+      type: string
+      example: "A12345"
+
+get:
+  tags:
+    - ScaleSiteSoftware
+  summary: List scaling software used at a scale site
+  description: |
+    Retrieve the scaling software products/versions used to submit returns at a scale site, for the
+    legacy Software tab on the scale site view page. Read-only. Based on
+    `scs_site_software_vw_pkg.search_recs` (search by `scale_site_id_nmbr`).
+  operationId: getScaleSiteSoftware
+  responses:
+    '200':
+      description: Scale site software list found
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: '../root.yaml#/components/schemas/ScaleSiteSoftwareSummary'
+          example:
+            - scalingProgram: "HarvestPro"
+              version: "12"
+              revision: "3"
+              returnType: "Weight"
+              returnCount: 42
+              lastUsedDate: "2026-06-30"
+            - scalingProgram: "ScaleMaster"
+              version: "8"
+              revision: "1"
+              returnType: "Piece"
+              returnCount: 7
+              lastUsedDate: "2026-05-15"
+    '404':
+      description: Scale site not found
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+          example:
+            code: "NOT_FOUND"
+            message: "No scale site found with number A12345"
+    '500':
+      description: Server error
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+          example:
+            code: "ORA-12345"
+            message: "Database connection error"

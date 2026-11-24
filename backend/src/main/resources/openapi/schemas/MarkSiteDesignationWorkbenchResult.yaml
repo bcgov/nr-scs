@@ -1,0 +1,26 @@
+type: object
+description: Record returned from `scs_mark_site_des_wb_vw_pkg.search_recs`.
+properties:
+  haulingMarkAuthorizationId:
+    type: integer
+    format: int64
+    nullable: true
+  effectiveDate:
+    type: string
+    format: date
+    nullable: true
+  expiryDate:
+    type: string
+    format: date
+    nullable: true
+  timberMark:
+    type: string
+    nullable: true
+  regionId:
+    type: integer
+    format: int64
+    nullable: true
+  districtId:
+    type: integer
+    format: int64
+    nullable: true

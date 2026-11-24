@@ -1,0 +1,188 @@
+parameters:
+  - name: scaleSiteIdNmbr
+    in: path
+    description: Scale site number
+    required: true
+    schema:
+      type: string
+      maxLength: 8
+      example: "SITE001"
+
+get:
+  tags:
+    - ScaleSiteInspection
+  summary: Get a list of inspection summaries for a scale site to be displayed on the Scale Site Inspections tab
+  description: |
+    Retrieve the inspection rows used to render the `Inspections` tab on the Scale Site view page.
+
+    This endpoint is distinct from:
+    * `GET /scale-sites/inspection/search`, which performs direct inspection-id lookup and validation.
+    * `GET /scale-sites/inspection/{inspectionId}`, which returns the full inspection detail payload.
+
+    This list is based on the legacy Scale Site `Inspections` tab flow, loaded in a scale-site context
+    through `SCS_SCALE_SITE_INSPCTNS_VW_PKG.search_recs` using the legacy tab sort order.
+  operationId: getScaleSiteInspectionSummaries
+  responses:
+    '200':
+      description: Inspection list found
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: '../root.yaml#/components/schemas/ScaleSiteInspectionSummary'
+          example:
+            - inspectionId: 12345
+              inspectionTypeDescription: "Compliance"
+              siteTypeDisplay: "Weight Scale"
+              inspectionDate: "2026-03-10"
+              inspector: "A1B2C3D4-E5F6-7890-1234-56789ABCDEF0"
+              followUpInspectionIndicator: "Y"
+            - inspectionId: 12346
+              inspectionTypeDescription: "Audit"
+              siteTypeDisplay: "Piece Scale"
+              inspectionDate: "2026-02-05"
+              inspector: "B2C3D4E5-F678-9012-3456-789ABCDEF012"
+              followUpInspectionIndicator: "N"
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+          example:
+            code: "BAD_REQUEST"
+            message: "Scale site number is required."
+    '404':
+      description: Scale site not found
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+          example:
+            code: "NOT_FOUND"
+            message: "No scale site found with scale site number SITE001"
+    '500':
+      description: Server error
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+          example:
+            code: "ORA-12345"
+            message: "Database connection error"
+
+post:
+  tags:
+    - ScaleSiteInspection
+  summary: Create a scale site inspection
+  description: |
+    Create a new Scale Site inspection in the context of an existing scale site.
+
+    This operation is intended for the staged inspection create workflow and is distinct from:
+    * `GET /scale-sites/{scaleSiteIdNmbr}/inspections`, which returns the inspection summary rows
+      for the scale-site `Inspections` tab.
+    * `GET /scale-sites/{scaleSiteIdNmbr}/inspections/create`, which returns the aggregated
+      create-init payload after the stage-1 create selections are made.
+
+    Expected backend orchestration:
+    1. Validate the create request and selected stage-1 context.
+    2. Create the base inspection record.
+    3. Insert the selected inspected scaling methods.
+    4. Insert the submitted inspection question responses.
+    5. Read back and return the created inspection detail payload.
+  operationId: createScaleSiteInspection
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: '../root.yaml#/components/schemas/ScaleSiteInspectionCreateRequest'
+        example:
+          inspectionTypeCode: "COM"
+          siteTypeCodes: ["W", "P"]
+          inspectionDate: "2026-03-11"
+          inspector: "A1B2C3D4-E5F6-7890-1234-56789ABCDEF0"
+          previousInspectionId: 12001
+          recipient: "1001"
+          siteOperatorPresentInd: "Y"
+          comments: "Initial inspection created from the scale-site record."
+          questionResponses:
+            - inspectionQuestionId: 501
+              inspectionAnswerCode: "N"
+              commentsText: "Seal missing."
+              followUpRequiredInd: "Y"
+              followUpActionText: "Issue corrective action request."
+              followUpDueDate: "2026-03-20"
+              followUpCompletedInd: "N"
+  responses:
+    '201':
+      description: Scale site inspection created successfully
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/ScaleSiteInspectionDetail'
+          example:
+            inspectionId: 12347
+            inspectionTypeCode: "COM"
+            inspectionTypeDescription: "Compliance"
+            inspectionDate: "2026-03-11"
+            inspector: "A1B2C3D4-E5F6-7890-1234-56789ABCDEF0"
+            scaleSiteIdNmbr: "SITE001"
+            siteName: "MAIN YARD"
+            siteLocation: "Nanaimo"
+            siteOwnerName: "ACME FOREST PRODUCTS LTD."
+            siteTypeDisplay: "Weight Scale, Piece Scale"
+            previousInspectionId: 12001
+            recipient: "Jordan Smith"
+            siteOperatorPresentInd: "Y"
+            siteOperatorPresentDescription: "Yes"
+            comments: "Initial inspection created from the scale-site record."
+            questionResponses:
+              - questionText: "Was the scale head sealed?"
+                inspectionAnswerCode: "N"
+                inspectionAnswerDescription: "No"
+                commentsText: "Seal missing."
+                followUpRequiredInd: "Y"
+                followUpRequiredDescription: "Yes"
+                followUpActionText: "Issue corrective action request."
+                followUpDueDate: "2026-03-20"
+                followUpCompletedInd: "N"
+                followUpCompletedDescription: "No"
+    '400':
+      description: Bad request — validation failure
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+          example:
+            code: "VALIDATION_ERROR"
+            message: "inspectionTypeCode is required."
+    '404':
+      description: Scale site not found
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+          example:
+            code: "NOT_FOUND"
+            message: "No scale site found with scale site number SITE001"
+    '409':
+      description: Conflict — the inspection could not be created because of a conflicting create state
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+          example:
+            code: "CONFLICT"
+            message: "A conflicting inspection create state was detected."
+    '500':
+      description: Server error
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+          example:
+            code: "ORA-12345"
+            message: "Database connection error"
+

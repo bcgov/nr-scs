@@ -1,0 +1,157 @@
+get:
+  tags:
+    - ScaleSiteRiskAssessment
+  summary: Search for scale site risk assessments
+  description: |
+    Search for scale site risk assessment records in the SCS system using the same
+    legacy package as the original Scale Site Risk Assessment query page.
+    Based on `scs_risk_scale_site_vw_pkg.search_recs`.
+
+    Notes:
+    * Text fields support wildcard matching using `%`.
+    * For `siteName`, wildcard inputs are normalized to contains matching (for example, `siteName=scale%` matches names containing `SCALE`).
+    * `methodTypes` are mapped to the legacy `ws`, `ps`, and `sf` flags.
+    * Multiple criteria are combined with AND logic.
+  operationId: searchScaleSiteRiskAssessments
+  parameters:
+    - name: riskQuestionnaireId
+      in: query
+      required: false
+      description: Risk questionnaire / assessment identifier. Supports wildcard matching — the position of `%` is respected (for example, `10%` matches IDs starting with `10`, `%10` matches IDs ending with `10`).
+      schema:
+        type: string
+        example: "1001"
+
+    - name: riskTypeCode
+      in: query
+      required: false
+      description: Risk level code
+      schema:
+        type: string
+        example: MED
+
+    - name: completeInd
+      in: query
+      required: false
+      description: Completion flag
+      schema:
+        type: string
+        enum: [Y, N]
+
+    - name: scaleSiteIdNmbr
+      in: query
+      required: false
+      description: Scale site number
+      schema:
+        type: string
+        maxLength: 8
+        example: SITE001
+
+    - name: orgUnitNo
+      in: query
+      required: false
+      description: Region / district organization unit number
+      schema:
+        type: integer
+        format: int64
+        example: 100
+
+    - name: methodTypes
+      in: query
+      required: false
+      description: |
+        Selected site types:
+        * `W` - Weight Scale
+        * `P` - Piece Scale
+        * `S` - Special Forest Product
+      style: form
+      explode: true
+      schema:
+        type: array
+        items:
+          type: string
+          enum: [W, P, S]
+
+    - name: siteName
+      in: query
+      required: false
+      description: Scale site name
+      schema:
+        type: string
+        maxLength: 40
+        example: MAIN YARD
+
+    - name: ownerClientNumber
+      in: query
+      required: false
+      description: Site owner client number
+      schema:
+        type: string
+        maxLength: 8
+        example: 12345678
+
+    - name: ownerClientLocnCode
+      in: query
+      required: false
+      description: Site owner location code
+      schema:
+        type: string
+        maxLength: 2
+        example: "00"
+
+    - name: primarySort
+      in: query
+      required: false
+      description: |
+        Primary sort field:
+        * `1` - Assessment ID
+        * `8` - Level
+        * `4` - Ver.
+        * `3` - Scale Site #
+        * `21` - Site Name
+        * `22` - Reg / Dist
+        * `19` - Site Owner(Client/Loc)
+      schema:
+        type: integer
+        enum: [1, 8, 4, 3, 21, 22, 19]
+        default: 1
+
+    - name: secondarySort
+      in: query
+      required: false
+      description: |
+        Secondary sort field:
+        * `0` - No secondary sort
+        * `1` - Assessment ID
+        * `8` - Level
+        * `4` - Ver.
+        * `3` - Scale Site #
+        * `21` - Site Name
+        * `22` - Reg / Dist
+        * `19` - Site Owner(Client/Loc)
+      schema:
+        type: integer
+        enum: [0, 1, 8, 4, 3, 21, 22, 19]
+        default: 0
+
+  responses:
+    '200':
+      description: Successful search operation
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: '../root.yaml#/components/schemas/ScaleSiteRiskAssessmentSearchResult'
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+    '500':
+      description: Server error
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'

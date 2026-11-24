@@ -1,0 +1,118 @@
+parameters:
+  - name: scalerLicenceNo
+    in: path
+    description: Scaler licence number
+    required: true
+    schema:
+      type: string
+      maxLength: 4
+      example: "1234"
+  - name: scalerTrainingTypeId
+    in: path
+    description: |
+      Exam / upgrade training type identifier. Unique per scaler; the training
+      class code is resolved server-side from the training type LOV.
+    required: true
+    schema:
+      type: string
+      example: "SCEX"
+
+put:
+  tags:
+    - ScalerExam
+  summary: Update a scaler exam / upgrade
+  description: |
+    Update an existing exam / upgrade (training) record for a scaler.
+    This matches the legacy scaler Exams/Upgrades tab edit flow.
+    Based on `scs_scaler_training_pkg.update_rec`.
+
+    Business rules enforced server-side:
+    * The training type is immutable — only `completionDate` may change. The
+      `scalerTrainingTypeId` in the path identifies the record; any differing
+      value in the body is rejected.
+    * `scalerTrainingClassCode` is derived server-side from the training type LOV.
+  operationId: updateScalerExam
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: '../root.yaml#/components/schemas/ScalerExamRequest'
+        example:
+          scalerTrainingTypeId: "SCEX"
+          completionDate: "2025-02-20"
+  responses:
+    '200':
+      description: Exam / upgrade updated successfully
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/ScalerExamDetail'
+          example:
+            scalerLicenceNo: "1234"
+            scalerTrainingTypeId: "SCEX"
+            scalerTrainingClassCode: "SC"
+            completionDate: "2025-02-20"
+            entryTimestamp: "2025-01-10T10:30:00Z"
+            entryUserid: "JSMITH"
+            updateTimestamp: "2026-03-17T10:30:00Z"
+            updateUserid: "BJONES"
+            revisionCount: 2
+    '400':
+      description: Bad request — validation failure
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+          example:
+            code: "VALIDATION_ERROR"
+            message: "The training type cannot be changed on update"
+    '404':
+      description: Scaler or exam / upgrade not found
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+          example:
+            code: "NOT_FOUND"
+            message: "No exam SCEX found for scaler 1234"
+    '500':
+      description: Server error
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+          example:
+            code: "ORA-12345"
+            message: "Database connection error"
+
+delete:
+  tags:
+    - ScalerExam
+  summary: Delete a scaler exam / upgrade
+  description: |
+    Delete an exam / upgrade (training) record from a scaler.
+    This matches the legacy scaler Exams/Upgrades tab delete flow.
+    Based on `scs_scaler_training_pkg.delete_rec`.
+  operationId: deleteScalerExam
+  responses:
+    '204':
+      description: Exam / upgrade deleted successfully
+    '404':
+      description: Scaler or exam / upgrade not found
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+          example:
+            code: "NOT_FOUND"
+            message: "No exam SCEX found for scaler 1234"
+    '500':
+      description: Server error
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+          example:
+            code: "ORA-12345"
+            message: "Database connection error"

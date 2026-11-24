@@ -1,0 +1,17 @@
+type: object
+description: |
+  Selectable recipient option shown on the Scale Site inspection create form.
+  These options are derived from the scale-site contact list used by the legacy create flow.
+required:
+  - value
+  - label
+properties:
+  value:
+    type: string
+    description: Opaque value posted back by the client when this recipient is selected.
+    example: "1001"
+  label:
+    type: string
+    description: Display label shown to the user for this recipient option.
+    example: "Jordan Smith"
+

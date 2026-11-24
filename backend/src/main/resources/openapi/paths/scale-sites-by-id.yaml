@@ -1,0 +1,132 @@
+put:
+  tags:
+    - ScaleSite
+  summary: Update a scale site record
+  description: |
+    Update an existing scale site record. Matches the legacy `scaleSiteUpdate.do` flow
+    (`ScaleSiteAction.update` → `ScaleSiteDelegate.updateScaleSite`).
+
+    The update operation performs the following writes within a single transaction:
+    1. Updates the parent scale site row via `scs_scale_site_pkg.update_rec`.
+    2. Deletes the existing `scs_site_scaling_method` rows for the scale site, then
+       inserts one row per `scalingMethods` entry via
+       `scs_site_scaling_method_pkg.create_rec`. Delete-then-insert mirrors the
+       authorization conditions reconciliation pattern.
+
+    Business rules enforced server-side (shared with create via `validateForSave`):
+    * `siteName` required, max 40.
+    * `siteLocation` required, max 200.
+    * `ownerClientNumber` + `ownerClientLocnCode` required; the client must exist in
+      the BC Forests client registry.
+    * `orgUnitNo` required.
+    * `scalingMethods` must contain at least one entry, with exactly one row using
+      `scaleSitePriorityCode` `"P"`. Method codes must be distinct.
+    * `timberBrand` optional; if supplied, must match `[A-Z]{3}.*`, 6–7 characters,
+      uppercased before persistence.
+    * `latitude` / `longitude` optional; if any component supplied, the full coordinate
+      must be valid.
+
+    Notes:
+    * Org-unit access validation (legacy `OrgUnitUserValidator`) is **deferred** until
+      the modern app's user-role model lands; same status as create.
+    * The path `scaleSiteIdNmbr` is the source of truth for the record being updated;
+      it is not present in the request body.
+  operationId: updateScaleSite
+  parameters:
+    - in: path
+      name: scaleSiteIdNmbr
+      required: true
+      schema:
+        type: string
+      description: Scale site identifier.
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: '../root.yaml#/components/schemas/ScaleSiteUpdateRequest'
+        example:
+          siteName: "MAIN YARD"
+          ownerClientNumber: "12345678"
+          ownerClientLocnCode: "00"
+          orgUnitNo: 100
+          siteLocation: "Nanaimo, BC"
+          timberBrand: "TB-123"
+          latitude:
+            degrees: 49
+            minutes: 10
+            seconds: 22
+          longitude:
+            degrees: -123
+            minutes: 56
+            seconds: 31
+          scalingMethods:
+            - scaleMethodTypeCode: "W"
+              scaleSitePriorityCode: "P"
+            - scaleMethodTypeCode: "P"
+              scaleSitePriorityCode: "S"
+  responses:
+    '200':
+      description: Scale site updated successfully
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/ScaleSiteSummary'
+          example:
+            scaleSiteIdNmbr: "SITE001"
+            siteName: "MAIN YARD"
+            ownerClientNumber: "12345678"
+            ownerClientLocnCode: "00"
+            orgUnitNo: 100
+            regDistDisplay: "RKB - Selkirk Natural Resource District"
+            timberBrand: "TB-123"
+            siteLocation: "Nanaimo, BC"
+            latitudeDegrees: 49
+            latitudeMinutes: 10
+            latitudeSeconds: 22
+            longitudeDegrees: 123
+            longitudeMinutes: 56
+            longitudeSeconds: 31
+            siteTypes:
+              - priorityCode: "P"
+                scaleMethodTypeCode: "W"
+              - priorityCode: "S"
+                scaleMethodTypeCode: "P"
+    '400':
+      description: Bad request — validation failure
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+          example:
+            code: "VALIDATION_ERROR"
+            message: "siteName is required."
+    '404':
+      description: Not found — no scale site with the given identifier
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+          example:
+            code: "NOT_FOUND"
+            message: "No scale site found with scale site number SITE001."
+    '422':
+      description: |
+        Unprocessable entity — request is structurally valid but cannot be persisted.
+        Examples: owner client does not exist, duplicate scaling-method codes.
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+          example:
+            code: "UNPROCESSABLE_ENTITY"
+            message: "Owner client 12345678 / 00 does not exist."
+    '500':
+      description: Server error
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+          example:
+            code: "ORA-12345"
+            message: "Database connection error"

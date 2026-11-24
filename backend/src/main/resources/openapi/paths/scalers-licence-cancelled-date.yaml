@@ -1,0 +1,65 @@
+parameters:
+  - name: scalerLicenceNo
+    in: path
+    description: Scaler licence number
+    required: true
+    schema:
+      type: string
+      maxLength: 4
+      example: "1234"
+
+patch:
+  tags:
+    - Scaler
+  summary: Update a scaler's licence cancelled date
+  description: |
+    Set (or clear) the scaler's Licence Cancelled Date. This backs the Licence Cancelled Date
+    form on the Performance Remarks tab (legacy `/scalerPerformanceRemarkCancelScaler.do`).
+    The server loads the current scaler row, changes only the cancelled date, and persists via
+    `scs_scaler_pkg.update_rec`, preserving all other columns.
+
+    Business rule enforced server-side:
+    * `licenceCancelledDate` must be on or after the scaler's effective (issued) date when provided.
+  operationId: updateScalerLicenceCancelledDate
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: '../root.yaml#/components/schemas/ScalerLicenceCancelledDateRequest'
+        example:
+          licenceCancelledDate: "2026-06-30"
+  responses:
+    '200':
+      description: Licence cancelled date updated successfully
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/ScalerDetail'
+    '400':
+      description: Bad request — validation failure
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+          example:
+            code: "VALIDATION_ERROR"
+            message: "Licence cancelled date must be on or after the scaler effective date."
+    '404':
+      description: Scaler not found
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+          example:
+            code: "NOT_FOUND"
+            message: "No scaler found with licence number 1234"
+    '500':
+      description: Server error
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+          example:
+            code: "ORA-12345"
+            message: "Database connection error"

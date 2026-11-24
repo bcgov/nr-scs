@@ -1,0 +1,24 @@
+get:
+  tags:
+    - AppointmentType
+  summary: Get scaler create appointment LOV rows
+  description: |
+    Retrieve the rich appointment LOV rows used by the legacy scaler create flow.
+    Based on `scs_sgcd_sapt_lov_vw_pkg.search_recs`.
+  operationId: getScalerAppointmentTypeLov
+  responses:
+    '200':
+      description: Successful search operation
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: '../root.yaml#/components/schemas/ScalerAppointmentTypeLov'
+    '500':
+      description: Server error
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+

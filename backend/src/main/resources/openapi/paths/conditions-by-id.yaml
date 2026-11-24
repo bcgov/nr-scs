@@ -1,0 +1,104 @@
+get:
+  tags:
+    - Condition
+  summary: Get a condition
+  operationId: getCondition
+  parameters:
+    - name: scaleConditionClassCode
+      in: path
+      required: true
+      schema:
+        type: string
+    - name: scaleAuthConditionId
+      in: path
+      required: true
+      schema:
+        type: integer
+        format: int64
+  responses:
+    '200':
+      description: Condition found
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/ScaleAuthConditionDetail'
+    '404':
+      description: Condition not found
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+put:
+  tags:
+    - Condition
+  summary: Update a condition
+  operationId: updateCondition
+  parameters:
+    - name: scaleConditionClassCode
+      in: path
+      required: true
+      schema:
+        type: string
+    - name: scaleAuthConditionId
+      in: path
+      required: true
+      schema:
+        type: integer
+        format: int64
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: '../root.yaml#/components/schemas/ScaleAuthConditionUpdateRequest'
+  responses:
+    '200':
+      description: Condition updated
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/ScaleAuthConditionDetail'
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+    '404':
+      description: Condition not found
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+delete:
+  tags:
+    - Condition
+  summary: Delete a condition
+  operationId: deleteCondition
+  parameters:
+    - name: scaleConditionClassCode
+      in: path
+      required: true
+      schema:
+        type: string
+    - name: scaleAuthConditionId
+      in: path
+      required: true
+      schema:
+        type: integer
+        format: int64
+  responses:
+    '204':
+      description: Condition deleted
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+    '404':
+      description: Condition not found
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'

@@ -1,0 +1,39 @@
+type: object
+required:
+  - questionText
+  - commentRequiredInd
+  - sortOrderNo
+  - effectiveDate
+  - expiryDate
+  - inspectionTypeCodes
+  - scalingMethodTypeCodes
+  - validResponseCodes
+properties:
+  questionText:
+    type: string
+    maxLength: 200
+  commentRequiredInd:
+    type: string
+    maxLength: 1
+  sortOrderNo:
+    type: integer
+    minimum: 0
+    maximum: 9999
+  effectiveDate:
+    type: string
+    format: date
+  expiryDate:
+    type: string
+    format: date
+  inspectionTypeCodes:
+    type: array
+    items:
+      type: string
+  scalingMethodTypeCodes:
+    type: array
+    items:
+      type: string
+  validResponseCodes:
+    type: array
+    items:
+      type: string

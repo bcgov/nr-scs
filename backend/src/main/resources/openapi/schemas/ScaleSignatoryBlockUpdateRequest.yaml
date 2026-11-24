@@ -1,0 +1,22 @@
+type: object
+required:
+  - orgUnitNo
+  - firstName
+  - lastName
+  - signatureTitle
+properties:
+  orgUnitNo:
+    type: integer
+    format: int64
+  firstName:
+    type: string
+    maxLength: 40
+  middleName:
+    type: string
+    maxLength: 40
+  lastName:
+    type: string
+    maxLength: 40
+  signatureTitle:
+    type: string
+    maxLength: 40

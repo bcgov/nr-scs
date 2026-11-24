@@ -1,0 +1,56 @@
+parameters:
+  - name: scalerLicenceNo
+    in: path
+    description: Scaler licence number
+    required: true
+    schema:
+      type: string
+      maxLength: 4
+      example: "1234"
+
+get:
+  tags:
+    - Scaler
+  summary: Get a scaler address by licence number
+  description: |
+    Retrieve the read-only contact and address record for a scaler.
+    Based on `scs_scaler_address_vw_pkg.search_recs`, which returns a single
+    row per scaler licence. Phone numbers are returned as stored (unformatted).
+    A scaler with no address row yields `204 No Content` rather than an error,
+    mirroring the legacy behaviour of rendering the page with no address.
+  operationId: getScalerAddress
+  responses:
+    '200':
+      description: Scaler address found
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/ScalerAddress'
+          example:
+            scalerLicenceNo: "1234"
+            company: "Coastal Logging Ltd."
+            lastName: "Smith"
+            firstName: "Jordan"
+            businessPhone: "2505551234"
+            homePhone: "2505555678"
+            cellPhone: "2505559012"
+            faxNumber: "2505553456"
+            emailAddress: "jordan.smith@example.com"
+            address1: "123 Forest Road"
+            address2: "Suite 200"
+            address3: null
+            city: "Victoria"
+            province: "BC"
+            country: "Canada"
+            postalCode: "V8V 1A1"
+    '204':
+      description: No address on file for this scaler (neutral empty state)
+    '500':
+      description: Server error
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+          example:
+            code: "ORA-12345"
+            message: "Database connection error"

@@ -1,5 +1,14 @@
+---
+# Frontend deploy Template — consumed by `oc process` in reusable-deploy.yml.
+#
+# Caddy (with the Coraza WAF) serves the SPA and proxies /api to the same-zone backend Service.
+# docker-entrypoint.sh writes /srv/amplify-config.js from the Cognito/APP_* env vars below at start,
+# so one image serves every zone. That is why /srv is an emptyDir seeded from the image: the root
+# filesystem is read-only.
 apiVersion: template.openshift.io/v1
 kind: Template
+metadata:
+  name: nr-scs-frontend-deploy
 parameters:
   - name: NAME
     description: Module name
@@ -20,7 +29,7 @@ parameters:
     description: Organization name
     value: bcgov
   - name: DOMAIN
-    value: apps.silver.devops.gov.bc.ca
+    value: apps.gold.devops.gov.bc.ca
   - name: MIN_REPLICAS
     description: The minimum amount of replicas for the horizontal pod autoscaler.
     value: "2"
@@ -37,6 +46,19 @@ parameters:
   - name: LOG_LEVEL
     description: Caddy log level (debug|info|warn|error)
     value: "info"
+  # Runtime auth config (window.amplifyConfig). FAM/Cognito until the Keycloak move. Each zone's
+  # route URL (and /logout) must be registered as a callback on the Cognito app client.
+  - name: APP_ENV
+    description: FAM identity-provider prefix (dev|test|prod); e.g. dev selects DEV-IDIR
+    value: dev
+  - name: COGNITO_REGION
+    value: ca-central-1
+  - name: COGNITO_USER_POOL_ID
+    value: ""
+  - name: COGNITO_USER_POOL_CLIENT_ID
+    value: ""
+  - name: COGNITO_OAUTH_DOMAIN
+    value: ""
 objects:
   - apiVersion: apps/v1
     kind: Deployment
@@ -70,6 +92,30 @@ objects:
                         deployment: ${NAME}-${ZONE}-${COMPONENT}
                     topologyKey: kubernetes.io/hostname
           initContainers:
+            # Copy the built SPA into the writable /srv emptyDir, so the entrypoint can write
+            # amplify-config.js under readOnlyRootFilesystem.
+            - name: seed-srv
+              image: ${REGISTRY}/${ORG_NAME}/${NAME}/${COMPONENT}:${IMAGE_TAG}
+              command: ["sh", "-c", "cp -r /srv/. /srv-rw/"]
+              securityContext:
+                allowPrivilegeEscalation: false
+                runAsNonRoot: true
+                readOnlyRootFilesystem: true
+                capabilities:
+                  drop: ["ALL"]
+                seccompProfile:
+                  type: RuntimeDefault
+              resources:
+                requests:
+                  cpu: "20m"
+                  memory: "32Mi"
+                limits:
+                  memory: "64Mi"
+              volumeMounts:
+                - name: srv
+                  mountPath: /srv-rw
+            # Everything under /api requires a role, so wait on the backend's anonymous readiness
+            # probe rather than an API route.
             - name: wait-for-backend
               image: ${REGISTRY}/${ORG_NAME}/${NAME}/${COMPONENT}:${IMAGE_TAG}
               command:
@@ -77,9 +123,9 @@ objects:
                 - -c
                 - |
                   echo "Waiting for backend to be healthy..."
-                  max_retries=30
+                  max_retries=90
                   attempt=1
-                  until wget -q --spider http://${NAME}-${ZONE}-backend/api/health; do
+                  until wget -q --spider http://${NAME}-${ZONE}-backend/actuator/health/readiness; do
                     if [ "$attempt" -ge "$max_retries" ]; then
                       echo "ERROR: Backend ${NAME}-${ZONE}-backend is not reachable/healthy after ${max_retries} attempts." >&2
                       exit 1
@@ -124,6 +170,18 @@ objects:
                   value: /tmp/caddy
                 - name: TMPDIR
                   value: /tmp/caddy
+                - name: APP_URL
+                  value: https://${NAME}-${ZONE}.${DOMAIN}
+                - name: APP_ENV
+                  value: ${APP_ENV}
+                - name: COGNITO_REGION
+                  value: ${COGNITO_REGION}
+                - name: COGNITO_USER_POOL_ID
+                  value: ${COGNITO_USER_POOL_ID}
+                - name: COGNITO_USER_POOL_CLIENT_ID
+                  value: ${COGNITO_USER_POOL_CLIENT_ID}
+                - name: COGNITO_OAUTH_DOMAIN
+                  value: ${COGNITO_OAUTH_DOMAIN}
               resources:
                 requests:
                   cpu: ${CPU_REQUEST}
@@ -143,6 +201,8 @@ objects:
                   mountPath: /tmp/caddy
                 - name: coraza-tmp
                   mountPath: /tmp/coraza
+                - name: srv
+                  mountPath: /srv
               startupProbe:
                 httpGet:
                   path: /
@@ -166,6 +226,9 @@ objects:
                   exec:
                     command: ["/bin/sleep", "10"]
           volumes:
+            - name: srv
+              emptyDir:
+                sizeLimit: 256Mi
             - name: caddy-data
               emptyDir:
                 medium: Memory
@@ -251,3 +314,21 @@ objects:
       selector:
         matchLabels:
           deployment: ${NAME}-${ZONE}-${COMPONENT}
+  # Ingress to the frontend only from the OpenShift router.
+  - apiVersion: networking.k8s.io/v1
+    kind: NetworkPolicy
+    metadata:
+      labels:
+        app: ${NAME}-${ZONE}
+      name: ${NAME}-${ZONE}-${COMPONENT}-ingress
+    spec:
+      podSelector:
+        matchLabels:
+          deployment: ${NAME}-${ZONE}-${COMPONENT}
+      ingress:
+        - from:
+            - namespaceSelector:
+                matchLabels:
+                  network.openshift.io/policy-group: ingress
+      policyTypes:
+        - Ingress

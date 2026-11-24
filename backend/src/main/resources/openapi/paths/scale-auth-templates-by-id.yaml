@@ -1,0 +1,113 @@
+get:
+  operationId: getScaleAuthTemplate
+  summary: Get a scale auth template by ID
+  description: |
+    Returns the full template record including its assigned conditions.
+    Based on `scs_scale_auth_template_pkg.select_rec`.
+  tags:
+    - ScaleAuthTemplate
+  parameters:
+    - name: templateId
+      in: path
+      required: true
+      schema:
+        type: integer
+        format: int64
+  responses:
+    '200':
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/ScaleAuthTemplate'
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+    '500':
+      description: Server error
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+
+put:
+  operationId: updateScaleAuthTemplate
+  summary: Update a scale auth template
+  description: |
+    Update template fields and replace its condition assignments.
+    Based on `scs_scale_auth_template_pkg.update_rec`.
+  tags:
+    - ScaleAuthTemplate
+  parameters:
+    - name: templateId
+      in: path
+      required: true
+      schema:
+        type: integer
+        format: int64
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: '../root.yaml#/components/schemas/ScaleAuthTemplateSaveRequest'
+  responses:
+    '200':
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/ScaleAuthTemplate'
+    '400':
+      description: Bad request — validation failure
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+    '500':
+      description: Server error
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+
+delete:
+  operationId: deleteScaleAuthTemplate
+  summary: Delete a scale auth template
+  description: |
+    Deletes all condition assignments then deletes the template record.
+    Based on `scs_scale_template_conditn_pkg.delete_rec` and
+    `scs_scale_auth_template_pkg.delete_rec`.
+  tags:
+    - ScaleAuthTemplate
+  parameters:
+    - name: templateId
+      in: path
+      required: true
+      schema:
+        type: integer
+        format: int64
+  responses:
+    '204':
+      description: Deleted successfully
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+    '500':
+      description: Server error
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'

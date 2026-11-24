@@ -1,0 +1,56 @@
+@use '@carbon/react/scss/spacing' as spacing;
+
+.scale-site-inspection-create {
+  &__stage-one-site-type {
+    display: flex;
+    flex-direction: column;
+    gap: spacing.$spacing-03;
+  }
+
+  &__stage-one-fieldset {
+    min-width: 0;
+    margin: 0;
+    padding: 0;
+    border: 0;
+  }
+
+  &__stage-one-legend {
+    margin-bottom: spacing.$spacing-03;
+    color: var(--cds-text-primary, #161616);
+    font-size: 0.875rem;
+    font-weight: 400;
+    line-height: 1.28572;
+  }
+
+  &__stage-one-checkbox-group {
+    display: flex;
+    flex-direction: column;
+    gap: spacing.$spacing-03;
+  }
+
+  &__stage-one-error {
+    margin-top: spacing.$spacing-03;
+    margin-bottom: 0;
+
+    // Reveal + colour it like a Carbon error (a standalone .cds--form-requirement is hidden/uncoloured).
+    &.cds--form-requirement {
+      display: block;
+      max-block-size: none;
+      color: var(--cds-text-error, #da1e28);
+      font-size: 0.75rem;
+      line-height: 1.33333;
+    }
+  }
+
+  &__stage-one-helper {
+    margin-top: spacing.$spacing-03;
+    margin-bottom: 0;
+    color: var(--cds-text-secondary, #525252);
+    font-size: 0.875rem;
+    line-height: 1.28572;
+  }
+
+  &__stage-one-skeleton {
+    margin-top: spacing.$spacing-07;
+  }
+}

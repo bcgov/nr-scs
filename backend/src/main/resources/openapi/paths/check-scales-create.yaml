@@ -1,0 +1,35 @@
+post:
+  tags:
+    - CheckScale
+  summary: Create a check scale record
+  description: |
+    Step 2 (save) of the two-step HBCS check scale create flow
+    (legacy P076 → P078). Persists a new HBCS check scale record
+    (`cksc_type = 'HBCS'`) and returns its id. Frontend navigates
+    to the view page for the new id after success.
+  operationId: createCheckScale
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: '../root.yaml#/components/schemas/CheckScaleCreateRequest'
+  responses:
+    '201':
+      description: Check scale created
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/CheckScaleCreateResponse'
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+    '500':
+      description: Server error
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'

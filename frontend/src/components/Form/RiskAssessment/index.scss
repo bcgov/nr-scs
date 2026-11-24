@@ -1,0 +1,119 @@
+.risk-assessment-form {
+  // The shared .scs__form__grid adds a 15px left indent that the section titles and
+  // tables don't have, leaving the input rows misaligned. Drop it so every section and
+  // component lines up with the wrapper container's left edge.
+  .scs__form__grid {
+    padding-left: 0;
+  }
+
+  // Space between stacked field rows (e.g. the Scaler Record split across two rows).
+  .scs__form__grid + .scs__form__grid {
+    margin-top: 1.5rem;
+  }
+
+  // Inputs/selects/textareas fill their column width.
+  .cds--form-item,
+  .cds--text-input,
+  .cds--text-area,
+  .cds--text-input__field-wrapper,
+  .cds--select,
+  .cds--select-input {
+    width: 100%;
+  }
+}
+
+.risk-assessment__fieldset {
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+.risk-assessment__table {
+  margin-bottom: 1rem;
+
+  .risk-assessment__col-question {
+    width: 35%;
+  }
+
+  .risk-assessment__col-response {
+    width: 45%;
+  }
+
+  .risk-assessment__col-weight {
+    width: 20%;
+  }
+
+  .risk-assessment__weight-cell {
+    text-align: right;
+  }
+
+  .risk-assessment__total-row {
+    background-color: var(--cds-layer-accent, #e0e0e0);
+  }
+
+  // Table cell text matches the rest of the form (not greyed).
+  td {
+    color: var(--cds-text-primary, #161616);
+  }
+
+  // Answer dropdowns render flat in BOTH view and edit mode - transparent background, solid
+  // underline, full-strength text and arrow - so they match the read-only fields and the table
+  // background rather than Carbon's filled/boxed field look.
+  .cds--select-input {
+    background-color: transparent;
+    color: var(--cds-text-primary, #161616);
+    border-bottom: 1px solid var(--cds-border-strong, #8d8d8d);
+  }
+
+  // Disabled (view mode) must beat the global scs__disabled-plain helper's !important fill.
+  .cds--select-input:disabled {
+    background-color: transparent !important;
+    color: var(--cds-text-primary, #161616) !important;
+    -webkit-text-fill-color: var(--cds-text-primary, #161616) !important;
+    cursor: default;
+  }
+
+  .cds--select--disabled {
+    opacity: 1;
+  }
+}
+
+// The dropdown chevron is shown in edit mode (so the selects look interactive) but hidden in view
+// mode, where the disabled selects should read as flat read-only fields.
+.risk-assessment-form--view .risk-assessment__table .cds--select__arrow {
+  display: none;
+}
+
+.risk-assessment__risk-levels-table {
+  max-width: 640px;
+}
+
+.risk-assessment__comments-risk-row {
+  align-items: stretch;
+
+  .risk-assessment__comments-col {
+    display: flex;
+    flex-direction: column;
+
+    .cds--form-item {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .cds--text-area-wrapper {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .cds--text-area__wrapper {
+      flex: 1;
+    }
+
+    .cds--text-area {
+      height: 100%;
+      resize: none;
+    }
+  }
+}

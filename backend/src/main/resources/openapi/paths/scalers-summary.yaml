@@ -1,0 +1,58 @@
+parameters:
+  - name: scalerLicenceNo
+    in: path
+    description: Scaler licence number
+    required: true
+    schema:
+      type: string
+      maxLength: 4
+      example: "1234"
+
+get:
+  tags:
+    - Scaler
+  summary: Get a scaler summary by licence number
+  description: |
+    Retrieve the summary view for a scaler, including licence types and status.
+    Based on `scs_scaler_vw_pkg.search_recs`, `scs_slct_slcd_lov_vw_pkg.search_recs`,
+    and `SCS_SCALER_LICENSE_STTS_VW_PKG.search_recs`.
+  operationId: getScalerSummary
+  responses:
+    '200':
+      description: Scaler summary found
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/ScalerSummary'
+          example:
+            scalerLicenceNo: "1234"
+            clientNumber: "12345678"
+            orgUnitName: "Vancouver Forest District"
+            issuedDate: "2025-01-15"
+            expiryDate: "2027-01-15"
+            oathTakenInd: "Y"
+            licenceStatus: "ACTIVE"
+            licenceTypes:
+              - code: "SCS"
+                description: "Scale Administration and Control System"
+              - code: "WA"
+                description: "Waste Assessment"
+    '404':
+      description: Scaler not found
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+          example:
+            code: "NOT_FOUND"
+            message: "No scaler found with licence number 1234"
+    '500':
+      description: Server error
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+          example:
+            code: "ORA-12345"
+            message: "Database connection error"
+

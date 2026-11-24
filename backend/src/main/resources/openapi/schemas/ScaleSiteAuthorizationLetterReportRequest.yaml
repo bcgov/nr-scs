@@ -1,0 +1,37 @@
+type: object
+required:
+  - regDist
+  - scaleSignatoryBlockId
+  - outputFormat
+  - preview
+properties:
+  regDist:
+    type: string
+    description: Region/district used to select signature blocks.
+  ccField:
+    type: string
+    description: CC text for the letter.
+  showSignatureBlockInd:
+    type: string
+    description: Whether to show the authorization signature block (Y/N).
+  scaleSignatoryBlockId:
+    type: integer
+    format: int64
+    description: Selected signature block identifier.
+  outputFormat:
+    type: string
+    description: Report output format.
+    enum:
+      - PDF
+      - XLS
+  emailRecipient:
+    type: string
+    maxLength: 254
+    description: |
+      Email recipient for report delivery. Capped at the RFC 5321 ceiling (254 octets) so an
+      over-long address is refused by the contract rather than surfacing as a mail-send failure
+      after the request is accepted — `ReportEmailService` only rejects null/blank before handing
+      the address to the mail client.
+  preview:
+    type: boolean
+    description: When true, returns the report content directly.

@@ -1,0 +1,51 @@
+parameters:
+  - name: scaleSiteIdNmbr
+    in: path
+    description: Scale site id number
+    required: true
+    schema:
+      type: string
+      example: "A12345"
+
+get:
+  tags:
+    - ScaleSiteMarkSiteDesignation
+  summary: List mark site designations for a scale site
+  description: |
+    Retrieve the timber marks designated to a scale site, for the legacy MSD tab on the scale site
+    view page. Read-only. Based on `scs_msd_vw_pkg.search_recs` (search by `scale_site_id_nmbr`).
+  operationId: getScaleSiteMarkSiteDesignations
+  responses:
+    '200':
+      description: Mark site designation list found
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: '../root.yaml#/components/schemas/MarkSiteDesignationSummary'
+          example:
+            - timberMark: "AB1234"
+              scaleSiteIdNmbr: "A12345"
+              ownerCliNumber: "00012345"
+            - timberMark: "CD5678"
+              scaleSiteIdNmbr: "A12345"
+              ownerCliNumber: "00067890"
+    '404':
+      description: Scale site not found
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+          example:
+            code: "NOT_FOUND"
+            message: "No scale site found with number A12345"
+    '500':
+      description: Server error
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+          example:
+            code: "ORA-12345"
+            message: "Database connection error"

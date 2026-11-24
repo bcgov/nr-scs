@@ -1,0 +1,27 @@
+/* Sort cue for the hand-rolled Carbon `<Table>` record-view tabs, mirroring TableResource's arrows.
+   Legacy parity: every sortable header showed a visible arrow — a dim neutral marker when inactive,
+   a solid directional arrow when this is the active sort column. Drawn with ::after so the glyph
+   never enters the header's textContent or accessible name (header-text assertions and screen
+   readers see only the label). */
+.scs-sortable-header__indicator {
+	font-size: 1.2em;
+	line-height: 1;
+	margin-left: 0.25rem;
+	display: inline-block;
+	align-self: baseline;
+}
+
+.scs-sortable-header__indicator::after {
+	content: '\2195'; /* ↕ */
+	opacity: 0.35;
+}
+
+.scs-sortable-header__indicator[data-direction='ASC']::after {
+	content: '\2191'; /* ↑ */
+	opacity: 1;
+}
+
+.scs-sortable-header__indicator[data-direction='DESC']::after {
+	content: '\2193'; /* ↓ */
+	opacity: 1;
+}

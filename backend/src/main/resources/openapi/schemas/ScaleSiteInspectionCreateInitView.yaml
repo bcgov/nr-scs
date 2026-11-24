@@ -1,0 +1,76 @@
+type: object
+description: |
+  Aggregated payload used to render the main Scale Site inspection create form after the stage-1
+  inspection type and site type selections have been made.
+properties:
+  scaleSiteIdNmbr:
+    type: string
+    nullable: true
+    description: Scale site number associated with the create flow.
+  siteName:
+    type: string
+    nullable: true
+    description: Scale site name.
+  siteLocation:
+    type: string
+    nullable: true
+    description: Scale site location.
+  siteOwnerName:
+    type: string
+    nullable: true
+    description: Scale site owner display name.
+  inspectionTypeCode:
+    type: string
+    nullable: true
+    description: Selected scale site inspection type code.
+  inspectionTypeDescription:
+    type: string
+    nullable: true
+    description: Display description of `inspectionTypeCode`.
+  siteTypeCodes:
+    type: array
+    description: Selected scale method / site type codes from the stage-1 create flow.
+    items:
+      type: string
+  siteTypeDisplay:
+    type: string
+    nullable: true
+    description: Comma-separated display value of the selected site types.
+  recipientOptions:
+    type: array
+    description: Selectable scale-site contact options available as recipients for the create flow.
+    items:
+      $ref: './ScaleSiteInspectionRecipientOption.yaml'
+  recipient:
+    type: string
+    nullable: true
+    description: Current/default selected recipient value.
+  siteOperatorPresentInd:
+    type: string
+    enum: [Y, N]
+    nullable: true
+    description: Default site operator present indicator for the create form.
+  inspector:
+    type: string
+    nullable: true
+    description: Default inspector identifier for the create form.
+  inspectionDate:
+    type: string
+    format: date
+    nullable: true
+    description: Default inspection date for the create form.
+  previousInspectionId:
+    type: integer
+    format: int64
+    nullable: true
+    description: Follow-up-to inspection identifier supplied on the create form.
+  comments:
+    type: string
+    nullable: true
+    description: Default general comments value for the create form.
+  questionResponses:
+    type: array
+    description: Editable question response holder rows for the create form.
+    items:
+      $ref: './ScaleSiteInspectionEditQuestionResponse.yaml'
+

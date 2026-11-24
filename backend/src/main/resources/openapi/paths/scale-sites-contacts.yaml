@@ -1,0 +1,90 @@
+parameters:
+  - name: scaleSiteIdNmbr
+    in: path
+    required: true
+    description: Scale site identifier
+    schema:
+      type: string
+      maxLength: 4
+      example: "1234"
+
+get:
+  tags:
+    - ScaleSiteContact
+  summary: Get contacts for a scale site
+  description: |
+    Returns all contacts associated with a scale site.
+    Based on scs_scale_site_contact_vw_pkg.search_recs.
+  operationId: getScaleSiteContacts
+  responses:
+    '200':
+      description: Contact list
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: '../root.yaml#/components/schemas/ScaleSiteContact'
+    '404':
+      description: Scale site not found
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+    '500':
+      description: Server error
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+
+post:
+  tags:
+    - ScaleSiteContact
+  summary: Add a contact to a scale site
+  description: |
+    Associates an existing client contact with a scale site.
+    Business rules:
+    * clientContactId must reference an existing CLIENT_CONTACT with bus_contact_code = 'SI'.
+    * Only one primary contact (primaryContactInd = Y) is allowed per scale site.
+    * Cannot add the same client contact twice to the same scale site.
+    * expiryDate must be on or after effectiveDate when provided.
+    Based on scs_scale_site_contact_pkg.insert_rec.
+  operationId: createScaleSiteContact
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: '../root.yaml#/components/schemas/ScaleSiteContactCreateRequest'
+  responses:
+    '201':
+      description: Contact created
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/ScaleSiteContact'
+    '400':
+      description: Validation error
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+    '404':
+      description: Scale site or client contact not found
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+    '409':
+      description: Conflict — duplicate contact or primary already exists
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+    '500':
+      description: Server error
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'

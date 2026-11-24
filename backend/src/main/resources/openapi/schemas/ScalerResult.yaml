@@ -1,0 +1,32 @@
+type: object
+description: Record returned from `scs_queries_scalars_vw_pkg.search_recs`.
+properties:
+  scalerLicenceNo:
+    type: string
+    nullable: true
+    description: Scaler licence number
+  orgUnitName:
+    type: string
+    nullable: true
+    description: Organization unit name
+  clientName:
+    type: string
+    nullable: true
+    description: Client name
+  legalFirstName:
+    type: string
+    nullable: true
+    description: Legal first name
+  legalMiddleName:
+    type: string
+    nullable: true
+    description: Legal middle name
+  licenceType:
+    type: string
+    nullable: true
+    description: Concatenated licence type descriptions (e.g., "Scale Administration and Control System, Waste Assessment")
+  scalerClientLoc:
+    type: string
+    nullable: true
+    description: Scaler client location (client_number / 00)
+

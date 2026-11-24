@@ -1,0 +1,128 @@
+parameters:
+  - name: scaleGradingSystemCode
+    in: path
+    required: true
+    schema:
+      type: string
+      maxLength: 4
+    description: Scale grading system code (part of primary key).
+    example: "BC"
+  - name: scalerAppointmentType
+    in: path
+    required: true
+    schema:
+      type: string
+      maxLength: 4
+    description: Scaler appointment type code (part of primary key).
+    example: "O"
+
+get:
+  tags:
+    - ValidLicenceAttribute
+  summary: Get a valid licence attribute by primary key
+  description: |
+    Retrieve a single valid licence attribute record by its composite primary key using
+    `SCS_SCALER_VALD_LCNC_TTRBT_PKG.search_recs`.
+  operationId: getValidLicenceAttribute
+  responses:
+    '200':
+      description: Valid licence attribute found
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/ValidLicenceAttributeDetail'
+    '404':
+      description: Record not found
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+    '500':
+      description: Server error
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+
+put:
+  tags:
+    - ValidLicenceAttribute
+  summary: Update a valid licence attribute
+  description: |
+    Update the effective and expiry dates of an existing valid licence attribute using
+    `SCS_SCALER_VALD_LCNC_TTRBT_PKG.update_rec`.
+
+    Business rules:
+    * The primary key (`scaleGradingSystemCode` + `scalerAppointmentType`) cannot be changed.
+    * `effectiveDate` is required.
+    * `expiryDate`, when provided, must be on or after `effectiveDate`.
+  operationId: updateValidLicenceAttribute
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: '../root.yaml#/components/schemas/ValidLicenceAttributeUpdateRequest'
+        example:
+          effectiveDate: "2023-01-01"
+          expiryDate: "2035-12-31"
+  responses:
+    '200':
+      description: Valid licence attribute updated successfully
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/ValidLicenceAttributeDetail'
+    '400':
+      description: Bad request — validation failure
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+    '404':
+      description: Record not found
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+    '500':
+      description: Server error
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+
+delete:
+  tags:
+    - ValidLicenceAttribute
+  summary: Delete a valid licence attribute
+  description: |
+    Delete a valid licence attribute record using `SCS_SCALER_VALD_LCNC_TTRBT_PKG.delete_rec`.
+
+    Business rule: deletion is rejected if there are scaler appointment records that
+    reference this grading system / appointment type combination.
+  operationId: deleteValidLicenceAttribute
+  responses:
+    '204':
+      description: Valid licence attribute deleted successfully
+    '400':
+      description: Bad request — dependent child records exist
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+          example:
+            code: "BAD_REQUEST"
+            message: "This valid licence attribute is associated to a Scaler and cannot be deleted."
+    '404':
+      description: Record not found
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+    '500':
+      description: Server error
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'

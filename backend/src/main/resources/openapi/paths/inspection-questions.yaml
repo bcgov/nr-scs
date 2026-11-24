@@ -1,0 +1,83 @@
+get:
+  tags:
+    - InspectionQuestion
+  summary: Search inspection questions
+  description: |
+    Search inspection questions using `scs_inspection_question_pkg.search_recs`.
+  operationId: searchInspectionQuestions
+  parameters:
+    - in: query
+      name: inspectionQuestionId
+      schema:
+        type: integer
+        format: int64
+    - in: query
+      name: questionText
+      schema:
+        type: string
+    - in: query
+      name: commentRequiredInd
+      schema:
+        type: string
+    - in: query
+      name: sortOrderNo
+      schema:
+        type: integer
+    - in: query
+      name: effectiveDate
+      schema:
+        type: string
+        format: date
+    - in: query
+      name: expiryDate
+      schema:
+        type: string
+        format: date
+  responses:
+    '200':
+      description: Successful search operation
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: '../root.yaml#/components/schemas/InspectionQuestionSummary'
+    '500':
+      description: Server error
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+post:
+  tags:
+    - InspectionQuestion
+  summary: Create an inspection question
+  description: |
+    Create a new inspection question and its inspection type, scaling method,
+    and valid response mappings.
+  operationId: createInspectionQuestion
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: '../root.yaml#/components/schemas/InspectionQuestionCreateRequest'
+  responses:
+    '201':
+      description: Inspection question created
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/InspectionQuestionDetail'
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+    '500':
+      description: Server error
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'

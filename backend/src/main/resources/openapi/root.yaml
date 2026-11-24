@@ -1,0 +1,603 @@
+openapi: 3.0.3
+info:
+  title: SCS API
+  description: |
+    Scale Administration and Control System (SCS) API
+
+  version: 1.0.0
+  contact:
+    name: BC Ministry of Forests
+    email: nrs.support@gov.bc.ca
+
+servers:
+  - url: https://api.gov.bc.ca/scs/v1
+    description: Production server
+  - url: https://test-api.gov.bc.ca/scs/v1
+    description: Test server
+  - url: https://dev-api.gov.bc.ca/scs/v1
+    description: Development server
+
+tags:
+  - name: Client
+    description: Client search and query operations
+  - name: HaulMarkAuthorization
+    description: Haul mark authorization search and query operations
+  - name: Lov
+    description: List-of-values lookup operations
+  - name: CheckScale
+    description: Check scale search and query operations
+  - name: SummaryCheckScale
+    description: Summary check scale create operations
+  - name: Scaler
+    description: Scaler search, create, and update operations
+  - name: ScaleSite
+    description: Scale site search, summary, and tombstone operations
+  - name: ScaleSiteInspection
+    description: Scale site inspection list, query, and maintenance operations
+  - name: ScalerAppointment
+    description: Scaler appointment list and maintenance operations
+  - name: ScalerExam
+    description: Scaler exam / upgrade (training) list and maintenance operations
+  - name: ScalerPerformanceRemark
+    description: Scaler performance remark list operations
+  - name: ScalerAuthorization
+    description: Scaler authorization create and query operations
+  - name: ScaleSiteAuthorization
+    description: Scale site authorization create and query operations
+  - name: ScaleAuthTemplate
+    description: Scale auth template maintenance operations
+  - name: Welcome
+    description: Welcome page data
+  - name: SystemSetting
+    description: System setting maintenance operations
+  - name: SystemStatus
+    description: System availability (enable/disable) status
+  - name: MarkSiteDesignation
+    description: Mark site designation operations
+  - name: Workbench
+    description: Expiring authorization operations for workbench (renewal of expiring authorizations)
+  - name: InspectionQuestion
+    description: Inspection question maintenance operations
+  - name: Condition
+    description: Condition maintenance operations
+  - name: AuthorizationClause
+    description: Authorization clause maintenance operations
+  - name: SignatureBlock
+    description: Signature block maintenance operations
+  - name: ValidLicenceAttribute
+    description: Valid licence attribute maintenance operations
+  - name: ExamUpgrade
+    description: Exam/upgrade (training type) maintenance operations
+  - name: ScaleSiteRiskAssessment
+    description: Scale site risk assessment query operations
+  - name: AppointmentType
+    description: Appointment type maintenance operations
+  - name: ScaleSiteContact
+    description: Scale site contact management operations
+  - name: ScalerRiskAssessment
+    description: Scaler risk assessment query operations
+  - name: ScaleSiteSoftware
+    description: Scale site software query operations
+
+paths:
+  /exam-upgrades:
+    $ref: ./paths/exam-upgrades.yaml#/exam-upgrades
+  /exam-upgrades/{classCode}/{typeId}:
+    $ref: ./paths/exam-upgrades.yaml#/exam-upgrades~1{classCode}~1{typeId}
+  /welcome:
+    $ref: ./paths/welcome.yaml
+  /system-settings/{settingKey}:
+    $ref: ./paths/system-settings-by-key.yaml
+  /system-status:
+    $ref: ./paths/system-status.yaml
+  /clients/search:
+    $ref: ./paths/clients-search.yaml
+  /haul-mark-authorizations/search:
+    $ref: ./paths/haul-mark-authorizations-search.yaml
+  /timber-marks/exists:
+    $ref: ./paths/timber-marks-exists.yaml
+  /scaler-authorizations/workbench:
+    $ref: ./paths/scaler-authorizations-search.yaml
+  /scale-site-authorizations/workbench:
+    $ref: ./paths/scale-site-authorizations-search.yaml
+  /mark-site-designations/workbench:
+    $ref: ./paths/mark-site-designations-workbench.yaml
+  /mark-site-designations/search:
+    $ref: ./paths/mark-site-designations-search.yaml
+  /mark-site-designations:
+    $ref: ./paths/mark-site-designations.yaml
+  /mark-site-designations/{authorizationId}:
+    $ref: ./paths/mark-site-designations-by-id.yaml
+  /scaler-authorizations/{authorizationId}/renew:
+    $ref: ./paths/scaler-authorizations-renew.yaml
+  /scaler-authorizations/{authorizationId}/workbench/remove:
+    $ref: ./paths/scaler-authorizations-workbench-remove.yaml
+  /scale-site-authorizations/{authorizationId}/renew:
+    $ref: ./paths/scale-site-authorizations-renew.yaml
+  /scale-site-authorizations/{authorizationId}/workbench/remove:
+    $ref: ./paths/scale-site-authorizations-workbench-remove.yaml
+  /mark-site-designations/{authorizationId}/renew:
+    $ref: ./paths/mark-site-designations-renew.yaml
+  /mark-site-designations/{authorizationId}/workbench/remove:
+    $ref: ./paths/mark-site-designations-workbench-remove.yaml
+  /mark-site-designations/{authorizationId}/letter:
+    $ref: ./paths/mark-site-designations-letter.yaml
+  /region-district-lov:
+    $ref: ./paths/region-district-lov.yaml
+  /region-district-rollup-lov:
+    $ref: ./paths/region-district-rollup-lov.yaml
+  /appointment-types:
+    $ref: ./paths/appointment-types.yaml
+  /appointment-types/{appointmentTypeCode}:
+    $ref: ./paths/appointment-types-by-code.yaml
+  /appointment-type-lov:
+    $ref: ./paths/appointment-type-lov.yaml
+  /scale-method-type-lov:
+    $ref: ./paths/scale-method-type-lov.yaml
+  /grading-code-appointment-type-lov:
+    $ref: ./paths/grading-code-appointment-type-lov.yaml
+  /static-lov:
+    $ref: ./paths/static-lov.yaml
+  /templates/{filterField}:
+    $ref: ./paths/api-templates-filter.yaml
+  /inspection-questions:
+    $ref: ./paths/inspection-questions.yaml
+  /inspection-questions/{inspectionQuestionId}:
+    $ref: ./paths/inspection-questions-by-id.yaml
+  /conditions:
+    $ref: ./paths/conditions.yaml
+  /conditions/{scaleConditionClassCode}/{scaleAuthConditionId}:
+    $ref: ./paths/conditions-by-id.yaml
+  /auth-clauses:
+    $ref: ./paths/auth-clauses.yaml
+  /auth-clauses/{scaleMethodTypeCode}/{scaleMethodAuthClauseId}:
+    $ref: ./paths/auth-clauses-by-id.yaml
+  /signature-blocks:
+    $ref: ./paths/signature-blocks.yaml
+  /signature-blocks/{scaleSignatoryBlockId}:
+    $ref: ./paths/signature-blocks-by-id.yaml
+  /letter-signature-blocks:
+    $ref: ./paths/letter-signature-blocks.yaml
+  /scaler-training-type-lov:
+    $ref: ./paths/scaler-training-type-lov.yaml
+  /species-product-grade-xref-lov:
+    $ref: ./paths/species-product-grade-xref-lov.yaml
+  /check-scales/search:
+    $ref: ./paths/check-scales-search.yaml
+  /check-scales/validate:
+    $ref: ./paths/check-scales-validate.yaml
+  /check-scales/create:
+    $ref: ./paths/check-scales-create.yaml
+  /check-scales/{checkScaleId}:
+    $ref: ./paths/check-scales-update.yaml
+  /check-scales/{checkScaleId}/advisory-letter:
+    $ref: ./paths/check-scales-advisory-letter.yaml
+  /summary-check-scales/create:
+    $ref: ./paths/summary-check-scales-create.yaml
+  /summary-check-scales/{checkScaleId}:
+    $ref: ./paths/summary-check-scales-by-id.yaml
+  /summary-check-scales/{checkScaleId}/spg-rows:
+    $ref: ./paths/summary-check-scales-spg-rows.yaml
+  /scalers/search:
+    $ref: ./paths/scalers-search.yaml
+  /scaler-risk-assessments/search:
+    $ref: ./paths/scaler-risk-assessments-search.yaml
+  /scaler-risk-assessments/{riskQuestionnaireId}:
+    $ref: ./paths/scaler-risk-assessments-by-id.yaml
+  /scalers/{scalerLicenceNo}/risk-ratings:
+    $ref: ./paths/scaler-risk-ratings.yaml
+  /scalers/{scalerLicenceNo}/risk-assessments:
+    $ref: ./paths/scaler-risk-assessments-by-scaler.yaml
+  /scalers/{scalerLicenceNo}/risk-assessments/create-init:
+    $ref: ./paths/scaler-risk-assessments-create-init.yaml
+  /scale-sites:
+    $ref: ./paths/scale-sites-create.yaml
+  /scale-sites/search:
+    $ref: ./paths/scale-sites-search.yaml
+  /scale-site-risk-assessments/search:
+    $ref: ./paths/scale-site-risk-assessments-search.yaml
+  /scale-site-risk-assessments/{riskQuestionnaireId}:
+    $ref: ./paths/scale-site-risk-assessments-by-id.yaml
+  /scale-sites/{scaleSiteIdNmbr}/risk-assessments:
+    $ref: ./paths/scale-site-risk-assessments-by-scale-site.yaml
+  /scale-sites/{scaleSiteIdNmbr}/risk-assessments/create-init:
+    $ref: ./paths/scale-site-risk-assessments-create-init.yaml
+  /scale-sites/{scaleSiteIdNmbr}:
+    $ref: ./paths/scale-sites-by-id.yaml
+  /scale-sites/{scaleSiteIdNmbr}/tombstone:
+    $ref: ./paths/scale-sites-tombstone.yaml
+  /scale-sites/{scaleSiteIdNmbr}/summary:
+    $ref: ./paths/scale-sites-summary.yaml
+  /scale-sites/{scaleSiteIdNmbr}/inspections:
+    $ref: ./paths/scale-sites-inspections.yaml
+  /scale-sites/{scaleSiteIdNmbr}/check-scales:
+    $ref: ./paths/scale-sites-check-scales.yaml
+  /scale-sites/{scaleSiteIdNmbr}/inspections/create:
+    $ref: ./paths/scale-sites-inspection-create-init.yaml
+  /scale-sites/inspection/search:
+    $ref: ./paths/scale-sites-inspection-search.yaml
+  /scale-sites/inspection/{inspectionId}:
+    $ref: ./paths/scale-sites-inspection-detail.yaml
+  /scale-sites/inspection/{inspectionId}/edit:
+    $ref: ./paths/scale-sites-inspection-edit.yaml
+  /scalers:
+    $ref: ./paths/scalers-create.yaml
+  /scaler-authorizations:
+    $ref: ./paths/scaler-authorizations.yaml
+  /scale-site-authorizations:
+    $ref: ./paths/scale-site-authorizations.yaml
+  /scaler-authorizations/conditions:
+    $ref: ./paths/scaler-authorizations-conditions.yaml
+  /scale-site-authorizations/conditions:
+    $ref: ./paths/scale-site-authorizations-conditions.yaml
+  /scaler-authorizations/templates/{templateId}/conditions:
+    $ref: ./paths/scaler-authorizations-templates-conditions.yaml
+  /scale-site-authorizations/templates/{templateId}/conditions:
+    $ref: ./paths/scale-site-authorizations-templates-conditions.yaml
+  /scalers/{scalerLicenceNo}:
+    $ref: ./paths/scalers-by-id.yaml
+  /scaler-authorizations/{scalerAuthorizationId}:
+    $ref: ./paths/scaler-authorizations-by-id.yaml
+  /scaler-authorizations/{scalerAuthorizationId}/letter:
+    $ref: ./paths/scaler-authorizations-letter.yaml
+  /scale-site-authorizations/{scaleSiteAuthorizationId}:
+    $ref: ./paths/scale-site-authorizations-by-id.yaml
+  /scale-site-authorizations/{scaleSiteAuthorizationId}/letter:
+    $ref: ./paths/scale-site-authorizations-letter.yaml
+  /scalers/{scalerLicenceNo}/authorizations:
+    $ref: ./paths/scalers-authorizations-list.yaml
+  /scalers/{scalerLicenceNo}/appointments:
+    $ref: ./paths/scaler-appointments.yaml
+  /scalers/{scalerLicenceNo}/appointments/{scalerLicenceAttributeId}:
+    $ref: ./paths/scaler-appointments-by-id.yaml
+  /scalers/{scalerLicenceNo}/exams:
+    $ref: ./paths/scaler-exams.yaml
+  /scalers/{scalerLicenceNo}/exams/{scalerTrainingTypeId}:
+    $ref: ./paths/scaler-exams-by-id.yaml
+  /scalers/{scalerLicenceNo}/performance-remarks:
+    $ref: ./paths/scaler-performance-remarks.yaml
+  /scalers/{scalerLicenceNo}/performance-remarks/{scalerPerformanceRemarkId}:
+    $ref: ./paths/scaler-performance-remarks-by-id.yaml
+  /scalers/{scalerLicenceNo}/licence-cancelled-date:
+    $ref: ./paths/scalers-licence-cancelled-date.yaml
+  /scalers/{scalerLicenceNo}/summary:
+    $ref: ./paths/scalers-summary.yaml
+  /scalers/{scalerLicenceNo}/address:
+    $ref: ./paths/scalers-address.yaml
+  /scalers/{scalerLicenceNo}/tombstone:
+    $ref: ./paths/scalers-tombstone.yaml
+  /scalers/{scalerLicenceNo}/check-scales:
+    $ref: ./paths/scalers-check-scales.yaml
+  /scalers/{scalerLicenceNo}/summary-check-scales:
+    $ref: ./paths/scalers-summary-check-scales.yaml
+  /scale-auth-templates:
+    $ref: ./paths/scale-auth-templates.yaml
+  /scale-auth-templates/{templateId}:
+    $ref: ./paths/scale-auth-templates-by-id.yaml
+  /valid-licence-attributes:
+    $ref: ./paths/valid-licence-attributes.yaml
+  /valid-licence-attributes/{scaleGradingSystemCode}/{scalerAppointmentType}:
+    $ref: ./paths/valid-licence-attributes-by-id.yaml
+  /scale-sites/{scaleSiteIdNmbr}/authorizations:
+    $ref: ./paths/scale-sites-authorizations-list.yaml
+  /scale-sites/{scaleSiteIdNmbr}/authorized-scalers:
+    $ref: ./paths/scale-sites-authorized-scalers-list.yaml
+  /scale-sites/{scaleSiteIdNmbr}/mark-site-designations:
+    $ref: ./paths/scale-sites-mark-site-designations-list.yaml
+  /scale-sites/{scaleSiteIdNmbr}/software:
+    $ref: ./paths/scale-sites-software-list.yaml
+  /scale-sites/{scaleSiteIdNmbr}/risk-ratings:
+    $ref: ./paths/scale-sites-risk-ratings.yaml
+  /scale-sites/{scaleSiteIdNmbr}/contacts:
+    $ref: ./paths/scale-sites-contacts.yaml
+  /scale-sites/{scaleSiteIdNmbr}/contacts/{clientContactId}:
+    $ref: ./paths/scale-sites-contacts-by-id.yaml
+  /scale-sites/{scaleSiteIdNmbr}/owner:
+    $ref: ./paths/scale-sites-owner.yaml
+  /client-contacts/search:
+    $ref: ./paths/client-contacts-search.yaml
+  /scale-sites/{scaleSiteIdNmbr}/activity-summary:
+    $ref: ./paths/scale-sites-activity-summary.yaml
+
+components:
+  schemas:
+    AuditDetail:
+      $ref: ./schemas/AuditDetail.yaml
+    ExamUpgrade:
+      $ref: ./schemas/ExamUpgrade.yaml
+    ExamUpgradeCreateRequest:
+      $ref: ./schemas/ExamUpgradeCreateRequest.yaml
+    ExamUpgradeUpdateRequest:
+      $ref: ./schemas/ExamUpgradeUpdateRequest.yaml
+    WelcomeSummary:
+      $ref: ./schemas/WelcomeSummary.yaml
+    SystemSetting:
+      $ref: ./schemas/SystemSetting.yaml
+    SystemSettingUpdateRequest:
+      $ref: ./schemas/SystemSettingUpdateRequest.yaml
+    SystemStatus:
+      $ref: ./schemas/SystemStatus.yaml
+    Client:
+      $ref: ./schemas/Client.yaml
+    HaulMarkAuthorization:
+      $ref: ./schemas/HaulMarkAuthorization.yaml
+    TimberMarkExistsResponse:
+      $ref: ./schemas/TimberMarkExistsResponse.yaml
+    ScalerAuthorizationWorkbenchResult:
+      $ref: ./schemas/ScalerAuthorizationWorkbenchResult.yaml
+    ScaleSiteAuthorizationWorkbenchResult:
+      $ref: ./schemas/ScaleSiteAuthorizationWorkbenchResult.yaml
+    MarkSiteDesignationWorkbenchResult:
+      $ref: ./schemas/MarkSiteDesignationWorkbenchResult.yaml
+    MarkSiteDesignationSearchResult:
+      $ref: ./schemas/MarkSiteDesignationSearchResult.yaml
+    MarkSiteDesignationDetail:
+      $ref: ./schemas/MarkSiteDesignationDetail.yaml
+    MarkSiteDesignationScaleSite:
+      $ref: ./schemas/MarkSiteDesignationScaleSite.yaml
+    MarkSiteDesignationSpeciesContent:
+      $ref: ./schemas/MarkSiteDesignationSpeciesContent.yaml
+    MarkSiteDesignationLetterReportRequest:
+      $ref: ./schemas/MarkSiteDesignationLetterReportRequest.yaml
+    MarkSiteDesignationCreateRequest:
+      $ref: ./schemas/MarkSiteDesignationCreateRequest.yaml
+    MarkSiteDesignationUpdateRequest:
+      $ref: ./schemas/MarkSiteDesignationUpdateRequest.yaml
+    MarkSiteDesignationCreateResponse:
+      $ref: ./schemas/MarkSiteDesignationCreateResponse.yaml
+    MarkSiteDesignationTimberMarkLookup:
+      $ref: ./schemas/MarkSiteDesignationTimberMarkLookup.yaml
+    AuthorizationRenewResult:
+      $ref: ./schemas/AuthorizationRenewResult.yaml
+    RegionDistrictLov:
+      $ref: ./schemas/RegionDistrictLov.yaml
+    RegionDistrictRollupLov:
+      $ref: ./schemas/RegionDistrictRollupLov.yaml
+    AppointmentType:
+      $ref: ./schemas/AppointmentType.yaml
+    AppointmentTypeCreateRequest:
+      $ref: ./schemas/AppointmentTypeCreateRequest.yaml
+    AppointmentTypeUpdateRequest:
+      $ref: ./schemas/AppointmentTypeUpdateRequest.yaml
+    AppointmentTypeLov:
+      $ref: ./schemas/AppointmentTypeLov.yaml
+    ScaleMethodTypeLov:
+      $ref: ./schemas/ScaleMethodTypeLov.yaml
+    GradingCodeAppointmentTypeLov:
+      $ref: ./schemas/GradingCodeAppointmentTypeLov.yaml
+    StaticLov:
+      $ref: ./schemas/StaticLov.yaml
+    ScalerTrainingTypeLov:
+      $ref: ./schemas/ScalerTrainingTypeLov.yaml
+    SpeciesProductGradeXref:
+      $ref: ./schemas/SpeciesProductGradeXref.yaml
+    SpeciesSummaryView:
+      $ref: ./schemas/SpeciesSummaryView.yaml
+    CheckScaleDetail:
+      $ref: ./schemas/CheckScaleDetail.yaml
+    CheckScaleValidationRequest:
+      $ref: ./schemas/CheckScaleValidationRequest.yaml
+    CheckScaleValidationResponse:
+      $ref: ./schemas/CheckScaleValidationResponse.yaml
+    CheckScaleCreateRequest:
+      $ref: ./schemas/CheckScaleCreateRequest.yaml
+    CheckScaleCreateResponse:
+      $ref: ./schemas/CheckScaleCreateResponse.yaml
+    CheckScaleSummaryView:
+      $ref: ./schemas/CheckScaleSummaryView.yaml
+    CheckScaleStatsView:
+      $ref: ./schemas/CheckScaleStatsView.yaml
+    ScalerCheckScaleTabResult:
+      $ref: ./schemas/ScalerCheckScaleTabResult.yaml
+    ScaleSiteCheckScaleTabResult:
+      $ref: ./schemas/ScaleSiteCheckScaleTabResult.yaml
+    SummaryCheckScaleView:
+      $ref: ./schemas/SummaryCheckScaleView.yaml
+    ScalerSummaryCheckScaleTabResult:
+      $ref: ./schemas/ScalerSummaryCheckScaleTabResult.yaml
+    CheckScaleUpdateRequest:
+      $ref: ./schemas/CheckScaleUpdateRequest.yaml
+    ReturnType:
+      $ref: ./schemas/ReturnType.yaml
+    SummaryCheckScaleCreateRequest:
+      $ref: ./schemas/SummaryCheckScaleCreateRequest.yaml
+    SummaryCheckScaleUpdateRequest:
+      $ref: ./schemas/SummaryCheckScaleUpdateRequest.yaml
+    SummaryCheckScaleSpgRow:
+      $ref: ./schemas/SummaryCheckScaleSpgRow.yaml
+    SummaryCheckScaleSpgRowKey:
+      $ref: ./schemas/SummaryCheckScaleSpgRowKey.yaml
+    FieldError:
+      $ref: ./schemas/FieldError.yaml
+    FieldValidationError:
+      $ref: ./schemas/FieldValidationError.yaml
+    ScalerResult:
+      $ref: ./schemas/ScalerResult.yaml
+    ScalerRiskAssessmentSearchResult:
+      $ref: ./schemas/ScalerRiskAssessmentSearchResult.yaml
+    ScalerRiskRatingSummary:
+      $ref: ./schemas/ScalerRiskRatingSummary.yaml
+    ScalerRiskAssessmentDetail:
+      $ref: ./schemas/ScalerRiskAssessmentDetail.yaml
+    RiskAssessmentSaveRequest:
+      $ref: ./schemas/RiskAssessmentSaveRequest.yaml
+    RiskAssessmentSection:
+      $ref: ./schemas/RiskAssessmentSection.yaml
+    RiskAssessmentQuestion:
+      $ref: ./schemas/RiskAssessmentQuestion.yaml
+    RiskAssessmentAnswer:
+      $ref: ./schemas/RiskAssessmentAnswer.yaml
+    RiskAssessmentRiskRating:
+      $ref: ./schemas/RiskAssessmentRiskRating.yaml
+    RiskAssessmentResponseInput:
+      $ref: ./schemas/RiskAssessmentResponseInput.yaml
+    ScaleSiteSearchResult:
+      $ref: ./schemas/ScaleSiteSearchResult.yaml
+    ScaleSiteRiskAssessmentSearchResult:
+      $ref: ./schemas/ScaleSiteRiskAssessmentSearchResult.yaml
+    ScaleSiteRiskRatingSummary:
+      $ref: ./schemas/ScaleSiteRiskRatingSummary.yaml
+    ScaleSiteRiskAssessmentDetail:
+      $ref: ./schemas/ScaleSiteRiskAssessmentDetail.yaml
+    ScaleSiteTombstone:
+      $ref: ./schemas/ScaleSiteTombstone.yaml
+    ScaleSiteSummary:
+      $ref: ./schemas/ScaleSiteSummary.yaml
+    ScaleSiteSummarySiteType:
+      $ref: ./schemas/ScaleSiteSummarySiteType.yaml
+    ScaleSiteCreateRequest:
+      $ref: ./schemas/ScaleSiteCreateRequest.yaml
+    ScaleSiteUpdateRequest:
+      $ref: ./schemas/ScaleSiteUpdateRequest.yaml
+    SiteScalingMethodInput:
+      $ref: ./schemas/SiteScalingMethodInput.yaml
+    Coordinate:
+      $ref: ./schemas/Coordinate.yaml
+    ScaleSiteInspectionSearchResult:
+      $ref: ./schemas/ScaleSiteInspectionSearchResult.yaml
+    ScaleSiteInspectionSummary:
+      $ref: ./schemas/ScaleSiteInspectionSummary.yaml
+    ScaleSiteInspectionDetail:
+      $ref: ./schemas/ScaleSiteInspectionDetail.yaml
+    ScaleSiteInspectionQuestionResponse:
+      $ref: ./schemas/ScaleSiteInspectionQuestionResponse.yaml
+    ScaleSiteInspectionEditView:
+      $ref: ./schemas/ScaleSiteInspectionEditView.yaml
+    ScaleSiteInspectionEditQuestionResponse:
+      $ref: ./schemas/ScaleSiteInspectionEditQuestionResponse.yaml
+    ScaleSiteInspectionAnswerOption:
+      $ref: ./schemas/ScaleSiteInspectionAnswerOption.yaml
+    ScaleSiteInspectionUpdateRequest:
+      $ref: ./schemas/ScaleSiteInspectionUpdateRequest.yaml
+    ScaleSiteInspectionQuestionResponseInput:
+      $ref: ./schemas/ScaleSiteInspectionQuestionResponseInput.yaml
+    ScaleSiteInspectionCreateInitView:
+      $ref: ./schemas/ScaleSiteInspectionCreateInitView.yaml
+    ScaleSiteInspectionRecipientOption:
+      $ref: ./schemas/ScaleSiteInspectionRecipientOption.yaml
+    ScaleSiteInspectionCreateRequest:
+      $ref: ./schemas/ScaleSiteInspectionCreateRequest.yaml
+    ScalerDetail:
+      $ref: ./schemas/ScalerDetail.yaml
+    ScalerTombstone:
+      $ref: ./schemas/ScalerTombstone.yaml
+    ScalerCreate:
+      $ref: ./schemas/ScalerCreate.yaml
+    ScalerAuthorizationCreate:
+      $ref: ./schemas/ScalerAuthorizationCreate.yaml
+    ScalerAuthorizationDetail:
+      $ref: ./schemas/ScalerAuthorizationDetail.yaml
+    ScalerAuthorizationListItem:
+      $ref: ./schemas/ScalerAuthorizationListItem.yaml
+    ScalerAuthorizationSaveRequest:
+      $ref: ./schemas/ScalerAuthorizationSaveRequest.yaml
+    ScaleSiteAuthorizationSaveRequest:
+      $ref: ./schemas/ScaleSiteAuthorizationSaveRequest.yaml
+    ScaleSiteAuthorizationDetail:
+      $ref: ./schemas/ScaleSiteAuthorizationDetail.yaml
+    AuthorizedScalerSummary:
+      $ref: ./schemas/AuthorizedScalerSummary.yaml
+    MarkSiteDesignationSummary:
+      $ref: ./schemas/MarkSiteDesignationSummary.yaml
+    ScaleSiteSoftwareSummary:
+      $ref: ./schemas/ScaleSiteSoftwareSummary.yaml
+    ScalerAuthorizationLetterReportRequest:
+      $ref: ./schemas/ScalerAuthorizationLetterReportRequest.yaml
+    ScaleSiteAuthorizationLetterReportRequest:
+      $ref: ./schemas/ScaleSiteAuthorizationLetterReportRequest.yaml
+    CheckScaleAdvisoryLetterReportRequest:
+      $ref: ./schemas/CheckScaleAdvisoryLetterReportRequest.yaml
+    ReportAckResponse:
+      $ref: ./schemas/ReportAckResponse.yaml
+    ScaleAuthConditionRef:
+      $ref: ./schemas/ScaleAuthConditionRef.yaml
+    ScaleAuthCondition:
+      $ref: ./schemas/ScaleAuthCondition.yaml
+    InspectionQuestion:
+      $ref: ./schemas/InspectionQuestion.yaml
+    InspectionQuestionSummary:
+      $ref: ./schemas/InspectionQuestionSummary.yaml
+    InspectionQuestionDetail:
+      $ref: ./schemas/InspectionQuestionDetail.yaml
+    InspectionQuestionCreateRequest:
+      $ref: ./schemas/InspectionQuestionCreateRequest.yaml
+    InspectionQuestionUpdateRequest:
+      $ref: ./schemas/InspectionQuestionUpdateRequest.yaml
+    ScaleAuthConditionDetail:
+      $ref: ./schemas/ScaleAuthConditionDetail.yaml
+    ScaleAuthConditionCreateRequest:
+      $ref: ./schemas/ScaleAuthConditionCreateRequest.yaml
+    ScaleAuthConditionUpdateRequest:
+      $ref: ./schemas/ScaleAuthConditionUpdateRequest.yaml
+    ScaleMethodAuthClause:
+      $ref: ./schemas/ScaleMethodAuthClause.yaml
+    ScaleMethodAuthClauseCreateRequest:
+      $ref: ./schemas/ScaleMethodAuthClauseCreateRequest.yaml
+    ScaleMethodAuthClauseUpdateRequest:
+      $ref: ./schemas/ScaleMethodAuthClauseUpdateRequest.yaml
+    ScalerAppointmentInput:
+      $ref: ./schemas/ScalerAppointmentInput.yaml
+    ScalerAppointmentDetail:
+      $ref: ./schemas/ScalerAppointmentDetail.yaml
+    ScalerAppointmentCreateRequest:
+      $ref: ./schemas/ScalerAppointmentCreateRequest.yaml
+    ScalerAppointmentUpdateRequest:
+      $ref: ./schemas/ScalerAppointmentUpdateRequest.yaml
+    ScalerExamRequest:
+      $ref: ./schemas/ScalerExamRequest.yaml
+    ScalerExamDetail:
+      $ref: ./schemas/ScalerExamDetail.yaml
+    ScalerPerformanceRemarkDetail:
+      $ref: ./schemas/ScalerPerformanceRemarkDetail.yaml
+    ScalerPerformanceRemarkCreateRequest:
+      $ref: ./schemas/ScalerPerformanceRemarkCreateRequest.yaml
+    ScalerPerformanceRemarkUpdateRequest:
+      $ref: ./schemas/ScalerPerformanceRemarkUpdateRequest.yaml
+    ScalerLicenceCancelledDateRequest:
+      $ref: ./schemas/ScalerLicenceCancelledDateRequest.yaml
+    ScalerAddress:
+      $ref: ./schemas/ScalerAddress.yaml
+    ScalerSummary:
+      $ref: ./schemas/ScalerSummary.yaml
+    ScalerSummaryLicenceType:
+      $ref: ./schemas/ScalerSummaryLicenceType.yaml
+    ScaleAuthTemplate:
+      $ref: ./schemas/ScaleAuthTemplate.yaml
+    ScaleAuthTemplateSaveRequest:
+      $ref: ./schemas/ScaleAuthTemplateSaveRequest.yaml
+    ScaleSignatoryBlock:
+      $ref: ./schemas/ScaleSignatoryBlock.yaml
+    ScaleSignatoryBlockCreateRequest:
+      $ref: ./schemas/ScaleSignatoryBlockCreateRequest.yaml
+    ScaleSignatoryBlockUpdateRequest:
+      $ref: ./schemas/ScaleSignatoryBlockUpdateRequest.yaml
+    ValidLicenceAttribute:
+      $ref: ./schemas/ValidLicenceAttribute.yaml
+    ValidLicenceAttributeDetail:
+      $ref: ./schemas/ValidLicenceAttributeDetail.yaml
+    ValidLicenceAttributeCreateRequest:
+      $ref: ./schemas/ValidLicenceAttributeCreateRequest.yaml
+    ValidLicenceAttributeUpdateRequest:
+      $ref: ./schemas/ValidLicenceAttributeUpdateRequest.yaml
+    ScaleSiteContact:
+      $ref: ./schemas/ScaleSiteContact.yaml
+    ScaleSiteContactCreateRequest:
+      $ref: ./schemas/ScaleSiteContactCreateRequest.yaml
+    ScaleSiteContactUpdateRequest:
+      $ref: ./schemas/ScaleSiteContactUpdateRequest.yaml
+    ScaleSiteOwner:
+      $ref: ./schemas/ScaleSiteOwner.yaml
+    ClientContactSearchResult:
+      $ref: ./schemas/ClientContactSearchResult.yaml
+    ScaleSiteActivitySummary:
+      $ref: ./schemas/ScaleSiteActivitySummary.yaml
+    Error:
+      $ref: ./schemas/Error.yaml
+
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+
+security:
+  - BearerAuth: []

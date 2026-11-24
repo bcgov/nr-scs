@@ -1,0 +1,31 @@
+type: object
+description: |
+  The legacy `Check Scale Statistics` table on the Scaler `Check Scales` tab: volume and value
+  variance percentages over the last 10 checked scales, the past 12 months, and all records.
+  Sourced from `scs_calc_check_scale_pkg.calculate_check_scale`. All fields are null when the
+  scaler has no check scales for the selected filter (legacy renders blank cells).
+properties:
+  last10Volume:
+    type: number
+    nullable: true
+    description: Volume variance % over the last 10 checked scales.
+  last10Value:
+    type: number
+    nullable: true
+    description: Value variance % over the last 10 checked scales.
+  past12Volume:
+    type: number
+    nullable: true
+    description: Volume variance % over the past 12 months.
+  past12Value:
+    type: number
+    nullable: true
+    description: Value variance % over the past 12 months.
+  allVolume:
+    type: number
+    nullable: true
+    description: Volume variance % over all records.
+  allValue:
+    type: number
+    nullable: true
+    description: Value variance % over all records.

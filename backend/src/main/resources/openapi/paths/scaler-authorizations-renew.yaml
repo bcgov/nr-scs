@@ -1,0 +1,35 @@
+post:
+  tags:
+    - Workbench
+  summary: Renew scaler authorization
+  description: |
+    Renews a scaler authorization using `scs_scale_workbench_pkg.renew_scaler_auth`.
+  operationId: renewScalerAuthorization
+  parameters:
+    - name: authorizationId
+      in: path
+      description: Scaler authorization identifier to renew
+      required: true
+      schema:
+        type: integer
+        format: int64
+        minimum: 1
+  responses:
+    '200':
+      description: Renewal completed
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/AuthorizationRenewResult'
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+    '500':
+      description: Server error
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'

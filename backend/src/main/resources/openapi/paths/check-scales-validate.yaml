@@ -1,0 +1,47 @@
+post:
+  tags:
+    - CheckScale
+  summary: Validate a check scale payload without creating it
+  description: |
+    Step 1 of the two-step HBCS check scale create flow (legacy P075 →
+    P076 transition). Validates the supplied DDN/version refs against
+    HBS and the existing check_scale data, and returns either an
+    `errors` array tied to specific form inputs (HTTP 400) or an
+    enriched preview payload (HTTP 200) used to render step 2.
+  operationId: validateCheckScale
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: '../root.yaml#/components/schemas/CheckScaleValidationRequest'
+  responses:
+    '200':
+      description: Validation succeeded — enriched preview payload returned.
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/CheckScaleValidationResponse'
+          example:
+            ok: true
+            errors: []
+    '400':
+      description: |
+        Validation failed — `errors` describes which inputs are at fault.
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/CheckScaleValidationResponse'
+          example:
+            ok: false
+            errors:
+              - field: checkScaleDdn
+                message: "Check Scale DDN '12345' does not exist in HBS."
+              - field: originalScaleDdn
+                message: "Original Scale DDN and Check Scale DDN cannot be the same."
+    '500':
+      description: Server error
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'

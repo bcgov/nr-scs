@@ -1,0 +1,39 @@
+type: object
+description: |
+  Composite key identifying one species/product/grade roll-up row to delete.
+
+  Carried in the request body rather than as query parameters **on purpose**. The product and grade
+  are stored as a single SPACE for the non-applicable legacy cases (the columns are NOT NULL and
+  carry an xref FK), so whitespace here is significant *data*, not padding. Query parameters are
+  bound through `WebDataBinder`, where `RequestParamTrimmingAdvice` registers a
+  `StringTrimmerEditor(true)` that trims every String and converts a whitespace-only value to null —
+  which made a blanked key part arrive as `null` on a `required` parameter. That threw
+  `MissingServletRequestParameterException` before the handler ever ran, and the caller saw a **500**
+  (not the Spring-default 400): `GlobalApiExceptionHandler` does not extend
+  `ResponseEntityExceptionHandler` and has no mapping for that exception, so it fell through to the
+  catch-all `@ExceptionHandler(Exception.class)` → `INTERNAL_SERVER_ERROR`. Request bodies are
+  deserialized by Jackson, which the binder never touches, so the space survives.
+
+  Do not move these back to query parameters.
+
+  The three `maxLength`s deliberately mirror `SummaryCheckScaleSpgRow`, which is where these keys
+  are read from: the generator emits them as `@Size` on the `@Valid` request body, so a key any
+  narrower than the row it was round-tripped from would reject a legitimate delete with a 400. If
+  the real column widths are ever confirmed to be narrower, tighten BOTH schemas together.
+required:
+  - scaleSpeciesCode
+  - scaleProductCode
+  - scaleGradeCode
+properties:
+  scaleSpeciesCode:
+    type: string
+    maxLength: 4
+    description: Species code of the row to delete.
+  scaleProductCode:
+    type: string
+    maxLength: 4
+    description: Product code of the row to delete (a single space for blanked rows).
+  scaleGradeCode:
+    type: string
+    maxLength: 4
+    description: Grade code of the row to delete (a single space for blanked rows).

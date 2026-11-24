@@ -1,0 +1,126 @@
+@use '@carbon/react/scss/spacing' as *;
+
+// Styles for the scale site contact create/edit form and its client-contact lookup.
+// Scoped to this component; imported directly by ScaleSiteContactForm.tsx.
+
+/* Contact search params row: ClientLocSearch renders its inner client/loc inputs
+   with empty (labelText="") Carbon labels. Those empty labels keep their default
+   8px bottom margin, which pushes the client/loc inputs below the adjacent plain
+   TextInput in the same row. Halve that margin here so the Client Contact Id field
+   lines up with the Name field. Scoped to this modal so the shared ClientLocSearch
+   component is unaffected elsewhere. */
+.scs__contact-search__params .client-loc-row .cds--label {
+  margin-bottom: $spacing-02; // 4px — half the default label margin
+}
+
+/* Link-style button used as the Client Contact Id selection control in the
+   search-results table cell. */
+.scs__contact-search__select-link {
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  color: var(--cds-text-link, #0f62fe);
+  text-decoration: underline;
+  cursor: pointer;
+  font: inherit;
+}
+
+/* Modal form grid: provide column gutters for the Carbon Grid inside the modal */
+.scs__modal-grid {
+  row-gap: $spacing-05;
+  column-gap: $spacing-05;
+
+  > .cds--col,
+  > [class*="cds--col-"] {
+    padding-left: 0;
+    padding-right: $spacing-05;
+    box-sizing: border-box;
+    min-width: 0;
+  }
+}
+
+/* Client-contact lookup used by the scale site contact form */
+.scs__contact-lookup {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-04;
+
+  /* Search-by-name field with its attached Search button */
+  &__search-row {
+    display: flex;
+    align-items: flex-start;
+    gap: $spacing-04;
+
+    .cds--text-input-wrapper,
+    .cds--form-item {
+      flex: 1 1 auto;
+      min-width: 0;
+    }
+
+    // Pin the button to the top of the row and push it down past the field label
+    // so it aligns with the input itself. Using flex-start (not flex-end) keeps it
+    // level with the input even when an invalidText message expands the field
+    // wrapper below — flex-end would otherwise follow the error text down.
+    .scs__input-search-button {
+      align-self: flex-start;
+      margin-top: $spacing-06; // 1.5rem — label line height + its bottom margin
+    }
+  }
+
+  &__results {
+    border: 1px solid var(--cds-border-subtle);
+    border-radius: 2px;
+  }
+
+  &__results-label {
+    margin: 0;
+    padding: $spacing-03 $spacing-04;
+    color: var(--cds-text-secondary);
+    background: var(--cds-layer-accent);
+  }
+
+  &__results-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    max-height: 16rem;
+    overflow-y: auto;
+  }
+
+  &__result-item + &__result-item {
+    border-top: 1px solid var(--cds-border-subtle);
+  }
+
+  &__result-btn {
+    display: flex;
+    flex-wrap: wrap;
+    gap: $spacing-02 $spacing-05;
+    align-items: baseline;
+    width: 100%;
+    padding: $spacing-03 $spacing-04;
+    background: none;
+    border: none;
+    text-align: left;
+    cursor: pointer;
+
+    &:hover,
+    &:focus-visible {
+      background: var(--cds-layer-hover);
+    }
+  }
+
+  &__result-id {
+    font-weight: 600;
+  }
+
+  &__result-client,
+  &__result-phone {
+    color: var(--cds-text-secondary);
+  }
+
+  &__selected-note {
+    margin: 0;
+    color: var(--cds-text-secondary);
+  }
+}

@@ -1,0 +1,57 @@
+type: object
+description: Scale site owner details from scs_scale_site_owner_vw.
+properties:
+  scaleSiteIdNmbr:
+    type: string
+    nullable: true
+  clientNumber:
+    type: string
+    nullable: true
+  clientLocnCode:
+    type: string
+    nullable: true
+  companyName:
+    type: string
+    nullable: true
+  lastName:
+    type: string
+    nullable: true
+  firstName:
+    type: string
+    nullable: true
+  businessPhone:
+    type: string
+    nullable: true
+  residentPhone:
+    type: string
+    nullable: true
+  cellPhone:
+    type: string
+    nullable: true
+  fax:
+    type: string
+    nullable: true
+  email:
+    type: string
+    nullable: true
+  address1:
+    type: string
+    nullable: true
+  address2:
+    type: string
+    nullable: true
+  address3:
+    type: string
+    nullable: true
+  city:
+    type: string
+    nullable: true
+  province:
+    type: string
+    nullable: true
+  country:
+    type: string
+    nullable: true
+  postalCode:
+    type: string
+    nullable: true

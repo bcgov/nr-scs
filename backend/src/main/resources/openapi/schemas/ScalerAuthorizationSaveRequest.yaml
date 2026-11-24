@@ -1,0 +1,52 @@
+type: object
+required:
+  - scalerLicenceNo
+  - orgUnitNo
+  - districtWideInd
+  - authorizationEffectiveDate
+  - authorizationExpiryDate
+  - jobFunctions
+properties:
+  scalerLicenceNo:
+    type: string
+    maxLength: 8
+  orgUnitNo:
+    type: integer
+    format: int64
+  districtWideInd:
+    type: string
+    
+  authorizationEffectiveDate:
+    type: string
+    format: date
+  authorizationExpiryDate:
+    type: string
+    format: date
+  letterArcsFileNumber:
+    type: string
+    maxLength: 20
+  expiryNotificationInd:
+    type: string
+    
+  cancellationDate:
+    type: string
+    format: date
+  cancellationReasonTxt:
+    type: string
+    maxLength: 200
+  jobFunctions:
+    type: array
+    items:
+      type: string
+  authForestProducts:
+    type: array
+    items:
+      type: string
+  conditions:
+    type: array
+    items:
+      $ref: '../root.yaml#/components/schemas/ScaleAuthConditionRef'
+  scaleSites:
+    type: array
+    items:
+      type: string

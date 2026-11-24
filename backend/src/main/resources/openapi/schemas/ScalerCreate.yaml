@@ -1,0 +1,77 @@
+type: object
+description: |
+  Request body for creating or updating a scaler record.
+  Maps to `scs_scaler_pkg` (core record), `SCS_SCALER_ASSIGND_LIC_TYP_PKG` (licence types),
+  `SCS_SCALER_LICENCE_ATTRIBT_PKG` (appointment), and `scs_scaler_training_pkg` (exam).
+
+  Business rules:
+  * At least one of `licenceTypes` values must be provided (`SCS` and/or `WA`).
+  * If `SCS` is in `licenceTypes`, exactly one of `appointment` or `exam` must be provided (not both, not neither).
+  * `expiryDate` is required when `WA` is in `licenceTypes`.
+  * `expiryDate` must be after `issuedDate` if both are provided.
+required:
+  - clientNumber
+  - orgUnitNo
+  - issuedDate
+  - oathTakenInd
+  - licenceTypes
+properties:
+  clientNumber:
+    type: string
+    maxLength: 8
+    description: Client number from the BC Forests client registry (location code 00 assumed)
+    example: "12345678"
+  orgUnitNo:
+    type: integer
+    format: int64
+    description: Organization unit number (region/district) for the scaler
+    example: 1234
+  issuedDate:
+    type: string
+    format: date
+    description: Date the scaler licence was issued
+    example: "2025-01-15"
+  expiryDate:
+    type: string
+    format: date
+    nullable: true
+    description: |
+      Licence expiry date. Required when `WA` is in `licenceTypes`.
+      Must be after `issuedDate`.
+    example: "2027-01-15"
+  oathTakenInd:
+    type: string
+    enum: [Y, N]
+    description: Indicates whether the scaler has taken the oath
+    example: "Y"
+  licenceCancelledDate:
+    type: string
+    format: date
+    nullable: true
+    description: Date the licence was cancelled. Must be on or after `issuedDate`.
+    example: null
+  licenceTypes:
+    type: array
+    description: |
+      One or both licence type codes to assign to this scaler.
+      * `SCS` — Scale Administration and Control System
+      * `WA` — Waste Assessment
+    minItems: 1
+    items:
+      type: string
+      enum: [SCS, WA]
+    example: ["SCS"]
+  appointment:
+    nullable: true
+    description: |
+      Appointment details. Required when `SCS` is in `licenceTypes` and `exam` is not provided.
+      Mutually exclusive with `exam`.
+    $ref: '../root.yaml#/components/schemas/ScalerAppointmentInput'
+  exam:
+    nullable: true
+    description: |
+      Exam/upgrade details. Required when `SCS` is in `licenceTypes` and `appointment` is not provided.
+      Mutually exclusive with `appointment`. Shares `ScalerExamRequest` with the Exams/Upgrades tab
+      endpoints — the class code is derived server-side from the training type, never client-supplied.
+    $ref: '../root.yaml#/components/schemas/ScalerExamRequest'
+

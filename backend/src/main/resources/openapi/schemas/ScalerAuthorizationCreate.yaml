@@ -1,0 +1,39 @@
+type: object
+required:
+  - scalerLicenceNo
+  - orgUnitNo
+  - districtWideInd
+  - authorizationEffectiveDate
+  - authorizationExpiryDate
+properties:
+  scalerLicenceNo:
+    type: string
+    description: Authorized scaler licence number
+    maxLength: 8
+  orgUnitNo:
+    type: integer
+    format: int64
+    description: District (org unit) identifier
+  districtWideInd:
+    type: string
+    description: District wide indicator (Y/N)
+    
+  authorizationEffectiveDate:
+    type: string
+    format: date
+  authorizationExpiryDate:
+    type: string
+    format: date
+  letterArcsFileNumber:
+    type: string
+    maxLength: 20
+  expiryNotificationInd:
+    type: string
+    description: Expiry notification indicator (Y/N)
+    
+  cancellationDate:
+    type: string
+    format: date
+  cancellationReasonTxt:
+    type: string
+    maxLength: 200

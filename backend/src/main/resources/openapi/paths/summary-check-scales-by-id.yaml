@@ -1,0 +1,76 @@
+parameters:
+  - name: checkScaleId
+    in: path
+    required: true
+    description: Identifier of the summary check scale.
+    schema:
+      type: integer
+      format: int64
+put:
+  tags:
+    - SummaryCheckScale
+  summary: Update a summary check scale header
+  description: |
+    Header update of an existing summary check scale (legacy
+    `SummaryCheckScaleAction.updateSummaryCheckScale`). Updates the editable header fields only —
+    the SPG roll-up rows are managed through the dedicated SPG add/delete endpoints. The stored
+    `cksc_type` (return type) is preserved; submitting a changed return type is rejected (400).
+    Re-validates the full header (cross-field rules) and returns the freshly persisted record.
+  operationId: updateSummaryCheckScale
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: '../root.yaml#/components/schemas/SummaryCheckScaleUpdateRequest'
+  responses:
+    '200':
+      description: Summary check scale updated
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/CheckScaleDetail'
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+    '404':
+      description: Summary check scale not found
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+    '500':
+      description: Server error
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+delete:
+  tags:
+    - SummaryCheckScale
+  summary: Delete a summary check scale
+  description: |
+    Deletes an entire summary check scale and all its SPG roll-up rows (legacy
+    `SummaryCheckScaleAction.deleteSummaryCheckScale`). The SPG children cascade in the stored
+    procedure (`scs_check_scale_pkg.delete_rec` deletes `check_scale_spg_summary` rows then the
+    `check_scale` header). After a successful delete the frontend navigates to the summary check
+    scale create form.
+  operationId: deleteSummaryCheckScale
+  responses:
+    '204':
+      description: Summary check scale deleted
+    '404':
+      description: Summary check scale not found
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+    '500':
+      description: Server error
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'

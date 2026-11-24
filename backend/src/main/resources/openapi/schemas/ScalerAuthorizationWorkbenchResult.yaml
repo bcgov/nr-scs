@@ -1,0 +1,29 @@
+type: object
+description: Record returned from `scs_scaler_auth_wb_vw_pkg.search_recs`.
+properties:
+  scalerAuthorizationId:
+    type: integer
+    format: int64
+    nullable: true
+  effectiveDate:
+    type: string
+    format: date
+    nullable: true
+  expiryDate:
+    type: string
+    format: date
+    nullable: true
+  scalerLicenceNumber:
+    type: string
+    nullable: true
+  scalerName:
+    type: string
+    nullable: true
+  regionId:
+    type: integer
+    format: int64
+    nullable: true
+  districtId:
+    type: integer
+    format: int64
+    nullable: true

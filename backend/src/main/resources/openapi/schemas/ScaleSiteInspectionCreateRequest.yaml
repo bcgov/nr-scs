@@ -1,0 +1,67 @@
+type: object
+description: |
+  Request payload for creating a new Scale Site inspection from the modern staged create flow.
+  This request includes the stage-1 create selections plus the writable header fields and submitted
+  question responses from the main create form.
+required:
+  - inspectionTypeCode
+  - siteTypeCodes
+  - inspectionDate
+  - siteOperatorPresentInd
+  - questionResponses
+properties:
+  inspectionTypeCode:
+    type: string
+    maxLength: 4
+    description: Selected scale site inspection type code.
+    example: "COM"
+  siteTypeCodes:
+    type: array
+    minItems: 1
+    description: Selected scale method / site type codes.
+    items:
+      type: string
+      maxLength: 1
+      example: "W"
+  inspectionDate:
+    type: string
+    format: date
+    description: Inspection date.
+    example: "2026-03-11"
+  inspector:
+    type: string
+    maxLength: 36
+    nullable: true
+    description: >-
+      The eUSER GUID of the inspector who performed the inspection. The create form defaults it to
+      the current user (see the create-init response) and submits it on every create; the backend
+      honours the submitted value rather than deriving it from the security context, and requires a
+      valid GUID (32 hex characters or a canonical UUID) — a missing or malformed value is rejected.
+    example: "A1B2C3D4-E5F6-7890-1234-56789ABCDEF0"
+  previousInspectionId:
+    type: integer
+    format: int64
+    nullable: true
+    description: Follow-up-to inspection identifier.
+  recipient:
+    type: string
+    maxLength: 30
+    nullable: true
+    description: Selected recipient value posted from the create form.
+  siteOperatorPresentInd:
+    type: string
+    enum: [Y, N]
+    description: Indicates whether the site operator was present during the inspection.
+    example: "Y"
+  comments:
+    type: string
+    maxLength: 2000
+    nullable: true
+    description: General inspection comments.
+  questionResponses:
+    type: array
+    description: >-
+      Submitted question response rows for the new inspection. This array may be empty if the
+      selected inspection context does not produce any applicable question rows.
+    items:
+      $ref: './ScaleSiteInspectionQuestionResponseInput.yaml'

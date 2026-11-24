@@ -1,0 +1,32 @@
+type: object
+description: |
+  A single row in the scaler Authorizations tab list. Carries exactly the columns the
+  legacy `scalerAuthorizationList.jsp` screen shows, enriched server-side with the
+  authorized sites, a computed status, and a letter-exists flag.
+properties:
+  scalerAuthorizationId:
+    type: integer
+    format: int64
+  authorizationEffectiveDate:
+    type: string
+    format: date
+  authorizationExpiryDate:
+    type: string
+    format: date
+  districtWideInd:
+    type: string
+    description: Y when the authorization is district-wide (all sites), otherwise N.
+  orgUnitNo:
+    type: integer
+    format: int64
+    description: Authorized district org-unit number; resolved to a name client-side via the region/district LOV.
+  authorizedSites:
+    type: array
+    description: Authorized scale site id numbers. Empty when district-wide (the UI shows "All").
+    items:
+      type: string
+  status:
+    type: string
+    description: Computed status (Active / Expired / Cancelled / Inactive).
+  letterExists:
+    type: boolean

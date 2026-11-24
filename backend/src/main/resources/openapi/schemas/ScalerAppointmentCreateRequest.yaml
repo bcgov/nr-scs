@@ -1,0 +1,52 @@
+type: object
+description: |
+  Request payload for creating a scaler appointment (licence attribute) record from the
+  scaler Appointments tab.
+
+  This payload is specific to appointment maintenance and intentionally excludes
+  `scalerLicenceNo` and `scalerLicenceAttributeId`, which are supplied in the request path.
+
+  `scalerAppointmentType` and `scaleGradingSystemCode` are derived from the selected
+  appointment LOV entry (`scs_sgcd_sapt_lov_vw_pkg`) and must be resolved by the client
+  before submitting.
+required:
+  - scalerAppointmentType
+  - scaleGradingSystemCode
+  - provinceWideInd
+  - issuedDate
+properties:
+  scalerAppointmentType:
+    type: string
+    maxLength: 4
+    description: Appointment type code derived from the selected appointment LOV row
+    example: "O"
+  scaleGradingSystemCode:
+    type: string
+    maxLength: 4
+    description: Scale grading system code derived from the selected appointment LOV row
+    example: "BC"
+  orgUnitNo:
+    type: integer
+    format: int64
+    nullable: true
+    description: |
+      Appointment Reg / Dist org unit number. Required when `provinceWideInd` is `N` and
+      must be omitted when `provinceWideInd` is `Y`.
+    example: 1234
+  provinceWideInd:
+    type: string
+    enum: [Y, N]
+    description: Province-wide indicator
+    example: "Y"
+  issuedDate:
+    type: string
+    format: date
+    description: Appointment effective date
+    example: "2025-01-15"
+  expiryDate:
+    type: string
+    format: date
+    nullable: true
+    description: Appointment expiry date
+    example: "2030-01-15"
+

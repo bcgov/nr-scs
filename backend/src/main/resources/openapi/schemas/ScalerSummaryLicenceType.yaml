@@ -1,0 +1,14 @@
+type: object
+description: Licence type summary row from `scs_slct_slcd_lov_vw_pkg.search_recs`.
+properties:
+  code:
+    type: string
+    nullable: true
+    description: Licence type code
+    example: "SCS"
+  description:
+    type: string
+    nullable: true
+    description: Licence type description
+    example: "Scale Administration and Control System"
+

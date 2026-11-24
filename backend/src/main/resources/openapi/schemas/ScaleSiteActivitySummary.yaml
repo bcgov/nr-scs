@@ -1,0 +1,34 @@
+type: object
+description: |
+  Read-only activity summary metrics for a scale site, sourced from
+  SCS_SCALE_SITE_ACTIVITY_VW. The volume and sample figures cover the last 12 months.
+required:
+  - scaleSiteIdNmbr
+properties:
+  scaleSiteIdNmbr:
+    type: string
+    maxLength: 4
+    description: Scale site identifier
+    example: "1234"
+  lastScaleDate:
+    type: string
+    format: date
+    nullable: true
+    description: Date of the most recent issued return (primary or sample scale) for the site
+    example: "2024-09-15"
+  numberOfSamples:
+    type: integer
+    format: int64
+    nullable: true
+    description: Number of sample returns issued for the site in the last 12 months
+    example: 42
+  sampleVolume:
+    type: number
+    nullable: true
+    description: Total net sample volume issued for the site in the last 12 months
+    example: 1234.56
+  scaledVolume:
+    type: number
+    nullable: true
+    description: Total scaled volume (log tally net volume plus weight scale segregation volume) in the last 12 months
+    example: 98765.43

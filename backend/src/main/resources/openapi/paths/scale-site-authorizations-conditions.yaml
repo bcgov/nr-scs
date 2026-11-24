@@ -1,0 +1,48 @@
+get:
+  tags:
+    - ScaleSiteAuthorization
+  summary: Search active scale site authorization conditions
+  description: |
+    Search active scale site authorization conditions using `scs_scale_auth_condition_pkg.search_active_recs`.
+  operationId: searchActiveScaleSiteAuthConditions
+  parameters:
+    - in: query
+      name: scaleConditionClassCode
+      schema:
+        type: string
+    - in: query
+      name: scaleAuthConditionId
+      schema:
+        type: integer
+        format: int64
+    - in: query
+      name: scaleAuthConditionTitle
+      schema:
+        type: string
+    - in: query
+      name: scaleAuthConditionDesc
+      schema:
+        type: string
+    - in: query
+      name: ministryStandardInd
+      schema:
+        type: string
+    - in: query
+      name: sortOrderNo
+      schema:
+        type: integer
+  responses:
+    '200':
+      description: Successful search operation
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: '../root.yaml#/components/schemas/ScaleAuthCondition'
+    '500':
+      description: Server error
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'

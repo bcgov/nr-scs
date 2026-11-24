@@ -1,0 +1,35 @@
+allOf:
+  - $ref: ./AuditDetail.yaml
+  - type: object
+    properties:
+      scaleSiteAuthorizationId:
+        type: integer
+        format: int64
+      scaleSiteIdNmbr:
+        type: string
+      letterArcsFileNumber:
+        type: string
+      authorizationEffectiveDate:
+        type: string
+        format: date
+      authorizationExpiryDate:
+        type: string
+        format: date
+      expiryNotificationInd:
+        type: string
+      expectedScaleVolume:
+        type: integer
+        format: int64
+      cancellationDate:
+        type: string
+        format: date
+      cancellationReasonTxt:
+        type: string
+      status:
+        type: string
+      letterExists:
+        type: boolean
+      conditions:
+        type: array
+        items:
+          $ref: '../root.yaml#/components/schemas/ScaleAuthCondition'

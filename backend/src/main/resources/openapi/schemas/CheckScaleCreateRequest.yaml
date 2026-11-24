@@ -1,0 +1,79 @@
+type: object
+description: |
+  Request body for `POST /api/check-scales/create` — step 2 (save) of
+  the two-step HBCS create flow. Combines the DDN/version refs from
+  step 1 with the editable fields from step 2 (legacy P076).
+  The persisted row's `cksc_type` is hardcoded to `HBCS` server-side
+  (matches legacy `CheckScaleAssembler.createBoFromForm`).
+required:
+  - checkScaleTypeCode
+  - followedGoodPracticeInd
+  - originalWithinStandardInd
+  - originalScaleNetValue
+  - checkScaleNetValue
+properties:
+  # DDN / version refs from step 1
+  chkLogTallyDocNo:
+    type: string
+    maxLength: 13
+    nullable: true
+    description: Check log tally document number (Log Tally flavor).
+  chkLogTallyVer:
+    type: integer
+    nullable: true
+  chkSampleLogTallyDocNo:
+    type: string
+    maxLength: 13
+    nullable: true
+    description: Check sample log tally document number (Sample Log Tally flavor).
+  chkSampleLogTallyVer:
+    type: integer
+    nullable: true
+  orgLogTallyDocNo:
+    type: string
+    maxLength: 13
+    nullable: true
+    description: Original log tally document number (Log Tally flavor).
+  orgLogTallyVer:
+    type: integer
+    nullable: true
+  orgSampleLogTallyDocNo:
+    type: string
+    maxLength: 13
+    nullable: true
+    description: Original sample log tally document number (Sample Log Tally flavor).
+  orgSampleLogTallyVer:
+    type: integer
+    nullable: true
+
+  # Editable step-2 fields (legacy P076)
+  checkScaleTypeCode:
+    type: string
+    maxLength: 4
+    description: |
+      Code from the LOV keyed `CHECK_SCALE_TYPE_CODE` (load via
+      `/api/static-lov?tableKey=CHECK_SCALE_TYPE_CODE`). Stored verbatim on
+      the persisted row; the LOV provides the user-facing description.
+  followedGoodPracticeInd:
+    type: string
+    enum: [Y, N]
+    description: Whether the original scaler followed good practices.
+  originalWithinStandardInd:
+    type: string
+    enum: [Y, N]
+    description: Whether the original scale was within standard.
+  chkScalerCommentTxt:
+    type: string
+    maxLength: 4000
+    nullable: true
+    description: Free-text comment by the check scaler.
+  originalScaleNetValue:
+    type: number
+    format: double
+    description: Original scale net value (precision 8.2).
+    example: 1234.56
+  checkScaleNetValue:
+    type: number
+    format: double
+    description: Check scale net value (precision 8.2).
+    example: 1233.45

@@ -1,0 +1,28 @@
+@use '@carbon/react/scss/spacing' as *;
+
+.mark-site-designation-search-page {
+  .mark-site-designation-search-form {
+    margin-top: $spacing-05;
+    margin-bottom: $spacing-09;
+  }
+
+  .mark-site-designation-search-actions {
+    display: flex;
+    gap: $spacing-05;
+    align-items: flex-end;
+    margin-top: $spacing-05;
+  }
+
+  .mark-site-designation-notification {
+    margin-bottom: $spacing-05;
+  }
+
+  .mark-site-designation-search-results {
+    margin-top: $spacing-07;
+  }
+
+  .mark-site-designation-search__required {
+    margin-left: 0.25rem;
+    color: var(--cds-text-error);
+  }
+}

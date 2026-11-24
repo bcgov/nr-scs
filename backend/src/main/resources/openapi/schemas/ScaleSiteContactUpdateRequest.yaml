@@ -1,0 +1,33 @@
+type: object
+required:
+  - contactRoleDescription
+  - primaryContactInd
+  - siteInformationAccessInd
+  - effectiveDate
+properties:
+  contactRoleDescription:
+    type: string
+    maxLength: 40
+    description: Role of the contact at the scale site
+    example: "Site Manager"
+  primaryContactInd:
+    type: string
+    enum: [Y, N]
+    description: Whether this is the primary contact
+    example: "Y"
+  siteInformationAccessInd:
+    type: string
+    enum: [Y, N]
+    description: Whether the contact has access to site information
+    example: "Y"
+  effectiveDate:
+    type: string
+    format: date
+    description: Date the contact assignment becomes effective
+    example: "2024-01-01"
+  expiryDate:
+    type: string
+    format: date
+    nullable: true
+    description: Date the contact assignment expires
+    example: "2026-01-01"

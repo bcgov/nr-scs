@@ -1,54 +1,83 @@
-import { defineConfig } from 'vite'
-import { fileURLToPath, URL } from 'node:url'
-import react from '@vitejs/plugin-react'
-import { tanstackRouter } from '@tanstack/router-plugin/vite'
+import path from 'node:path';
+
+import react from '@vitejs/plugin-react';
+import { defineConfig, loadEnv } from 'vite';
+import { VitePWA } from 'vite-plugin-pwa';
+
+function toPublicUrl(raw?: string): string {
+  if (!raw || raw === '.') {
+    return '/';
+  }
+  const normalized = raw.startsWith('/') ? raw : `/${raw}`;
+  return normalized.endsWith('/') ? normalized : `${normalized}/`;
+}
 
 // https://vitejs.dev/config/
-export default defineConfig({
-  plugins: [
-    tanstackRouter({
-      target: 'react',
-      autoCodeSplitting: true,
-    }),
-    react(),
-  ],
-  server: {
-    port: parseInt(process.env.PORT),
-    fs: {
-      // Allow serving files from one level up to the project root
-      allow: ['..'],
-    },
-    proxy: {
-      // Proxy API requests to the backend
-      '/api': {
-        target: 'http://localhost:3001',
-        changeOrigin: true,
+export default defineConfig(({ mode }) => {
+  const env = loadEnv(mode, process.cwd(), '');
+
+  // Fail closed: mock auth bypasses FAM/Cognito and grants a SYS_ADMIN user, so it must never be
+  // compiled into anything but the local dev server. Refuse the build rather than ship a bypass.
+  if (mode !== 'development' && env.VITE_MOCK_USER === 'true') {
+    throw new Error(
+      `VITE_MOCK_USER=true is not allowed for a non-development build (mode="${mode}"). ` +
+        'Mock auth disables real authentication and must only run on the local dev server.',
+    );
+  }
+
+  const publicUrl = mode === 'development' ? '/' : toPublicUrl(env.PUBLIC_URL);
+
+  return {
+    base: publicUrl,
+    plugins: [
+      react(),
+      VitePWA({
+        registerType: 'autoUpdate',
+        includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'icon.svg'],
+        manifest: {
+          name: 'SCS',
+          short_name: 'SCS',
+          description: 'SCS application.',
+          theme_color: '#ffffff',
+          icons: [
+            {
+              src: 'icons/android-chrome-192x192.png',
+              sizes: '192x192',
+              type: 'image/png',
+            },
+            {
+              src: 'icons/android-chrome-512x512.png',
+              sizes: '512x512',
+              type: 'image/png',
+            },
+          ],
+        },
+        workbox: {
+          maximumFileSizeToCacheInBytes: 6 * 1024 * 1024,
+        },
+      }),
+    ],
+    resolve: {
+      alias: {
+        '@': path.resolve(import.meta.dirname, './src'),
       },
     },
-  },
-  resolve: {
-    // https://vitejs.dev/config/shared-options.html#resolve-alias
-    tsconfigPaths: true,
-    alias: {
-      '~bootstrap': fileURLToPath(new URL('./node_modules/bootstrap', import.meta.url)),
+    build: {
+      outDir: 'build',
     },
-    extensions: ['.js', '.json', '.jsx', '.mjs', '.ts', '.tsx', '.vue'],
-  },
-  build: {
-    // Build Target
-    // https://vitejs.dev/config/build-options.html#build-target
-    target: 'esnext',
-    // Rollup Options
-    // https://vitejs.dev/config/build-options.html#build-rollupoptions
-    rollupOptions: {},
-  },
-  css: {
-    preprocessorOptions: {
-      scss: {
-        // Silence deprecation warnings caused by Bootstrap SCSS
-        // which is out of our control.
-        silenceDeprecations: ['color-functions', 'global-builtin', 'import'],
+    css: {
+      preprocessorOptions: {
+        scss: { quietDeps: true },
       },
     },
-  },
-})
+    server: {
+      port: 3000,
+      proxy: {
+        '/api': {
+          target: 'http://localhost:8080',
+          changeOrigin: true,
+        },
+      },
+    },
+  };
+});

@@ -1,0 +1,9 @@
+type: object
+description: Response returned after creating a check scale.
+required:
+  - checkScaleId
+properties:
+  checkScaleId:
+    type: integer
+    format: int64
+    description: ID of the newly-created check scale.

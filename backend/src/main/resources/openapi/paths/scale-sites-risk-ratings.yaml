@@ -1,0 +1,55 @@
+parameters:
+  - name: scaleSiteIdNmbr
+    in: path
+    description: Scale site id number
+    required: true
+    schema:
+      type: string
+      example: "A12345"
+
+get:
+  tags:
+    - ScaleSiteRiskRating
+  summary: Get risk-assessment summaries for a scale site
+  description: |
+    Retrieve the list of risk-assessment summary rows for a scale site. This backs the read-only
+    "Risk Rating" tab on the scale site view page. Based on `scs_risk_summary_vw_pkg.search_recs`
+    filtered by scale site id number, returning rows ordered by assessment id.
+  operationId: getScaleSiteRiskRatings
+  responses:
+    '200':
+      description: Risk-rating summary list found
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: '../root.yaml#/components/schemas/ScaleSiteRiskRatingSummary'
+          example:
+            - riskQuestionnaireId: 12345
+              entryTimestamp: "2025-01-10T10:30:00Z"
+              riskRating: 24
+              riskTypeCode: "H"
+              codeDescription: "High"
+              rangeLowValue: 20
+              rangeHighValue: 30
+              ratingDescription: "2 checks every 12 months"
+              versionNo: 3
+    '404':
+      description: Scale site not found
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+          example:
+            code: "NOT_FOUND"
+            message: "No scale site found with number A12345"
+    '500':
+      description: Server error
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+          example:
+            code: "ORA-12345"
+            message: "Database connection error"

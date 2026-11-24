@@ -1,0 +1,26 @@
+package ca.bc.gov.nrs.scs.backend.model.report;
+
+import lombok.Getter;
+
+@Getter
+public enum ReportDefinition {
+  SCALER_REGISTER("SCS_REP005.rpt"),
+  SCALER_AUTHORIZATION_LETTER("SCS_REP003.rpt"),
+  SCALE_SITE_REGISTER("SCS_REP007.rpt"),
+  SCALE_SITE_AUTHORIZATION_LETTER("SCS_REP006.rpt"),
+  MARK_SITE_DESIGNATION("SCS_REP010.rpt"),
+  MARK_SITE_DESIGNATION_LETTER("SCS_REP011.rpt"),
+  CHECK_SCALE_ADVISORY_LETTER("SCS_REP004.rpt"),
+  DESIGNATED_MARKS_EXCEPTION("SCS_REP002.rpt"),
+  SCALING_ADMINISTRATION("SCS_REP015.rpt"),
+  SCALING_EXCEPTION("SCS_REP016.rpt"),
+  DISTRICT_CHECK_SCALE_PERFORMANCE("SCS_REP025.rpt"),
+  DISTRICT_SITE_INSPECTION_PERFORMANCE("SCS_REP026.rpt"),
+  SCALE_SITE_COMPLIANCE("SCS_REP014.rpt");
+
+  private final String reportName;
+
+  ReportDefinition(String reportName) {
+    this.reportName = reportName;
+  }
+}

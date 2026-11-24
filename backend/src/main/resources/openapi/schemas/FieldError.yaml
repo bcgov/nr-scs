@@ -1,0 +1,29 @@
+type: object
+description: |
+  A validation error tied to a specific input field on the form.
+  The `field` enum identifies the UI input the error applies to — not
+  the underlying database column — so the frontend can surface the
+  message inline next to the right input. Cross-field rules emit one
+  `FieldError` per affected field (e.g., a "Check DDN ≠ Original DDN"
+  rule emits two entries).
+
+  Tech debt: this enum-based shape and the generic `FieldValidationError` duplicate one concept; the
+  plan is to converge onto the generic open-string shape and retire this enum — see deferred-work.md
+  (CHK-5, 2026-06-24). Until then this remains the detail validate flow's contract.
+required:
+  - field
+  - message
+properties:
+  field:
+    type: string
+    description: Identifier of the form input this error applies to.
+    enum:
+      - returnType
+      - checkScaleDdn
+      - checkScaleDdv
+      - originalScaleDdn
+      - originalScaleDdv
+  message:
+    type: string
+    description: Human-readable error message, suitable for inline display.
+    example: "Check Scale DDN '12345' does not exist in HBS."

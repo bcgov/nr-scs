@@ -1,0 +1,9 @@
+type: object
+description: Scale site associated with a mark site designation.
+properties:
+  scaleSiteIdNmbr:
+    type: string
+    nullable: true
+  siteName:
+    type: string
+    nullable: true

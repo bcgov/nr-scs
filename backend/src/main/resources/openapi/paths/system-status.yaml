@@ -1,0 +1,30 @@
+get:
+  tags:
+    - SystemStatus
+  summary: Get system availability status
+  description: >-
+    Returns whether the SCS system is currently enabled. Public (no auth) so the
+    single-page app can decide to render the "system temporarily disabled"
+    interstitial for non-administrator users before any authenticated call is
+    made. The enable/disable state itself is an operations-controlled deploy-time
+    setting (scs.app.enabled); there is no API to change it.
+  operationId: getSystemStatus
+  responses:
+    '200':
+      description: System availability status
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/SystemStatus'
+          example:
+            enabled: true
+    '500':
+      description: Server error
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+          example:
+            code: "INTERNAL_ERROR"
+            message: "Unexpected error"
+  security: []

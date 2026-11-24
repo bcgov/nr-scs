@@ -1,0 +1,95 @@
+@use '@carbon/react/scss/spacing' as *;
+
+// Page-specific styles for the Scale Site View page. Shared "view a record with tabs"
+// styles live in src/styles/_tab-view.scss under the .scs__tab-view__* namespace.
+
+.view-scale-site {
+  &__table-link {
+    appearance: none;
+    padding: 0;
+    border: none;
+    background: transparent;
+    font: inherit;
+    cursor: pointer;
+    color: var(--cds-link-primary);
+    text-decoration: underline;
+
+    &:hover {
+      color: var(--cds-link-primary-hover);
+    }
+  }
+
+  &__site-location .cds--text-area {
+    background: var(--cds-field);
+    border: 1px solid var(--cds-border-subtle-01);
+  }
+
+  &__site-location .cds--text-area {
+    background: var(--cds-field-disabled);
+    border: 1px solid var(--cds-border-disabled);
+  }
+
+  &__section + &__section {
+    margin-top: $spacing-06;
+  }
+
+  &__section-header {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: $spacing-05;
+    margin-bottom: $spacing-04;
+
+    .view-scale-site__section-title {
+      margin-bottom: 0;
+    }
+  }
+
+  &__section-title {
+    margin-bottom: $spacing-04;
+    margin-top: 0;
+  }
+
+  &__table-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: $spacing-03;
+  }
+
+  // The Primary Site Contact and Additional Site Contacts tables are separate HTML
+  // tables that share the same columns. Fix the layout and pin per-column widths so
+  // both tables compute identical columns and line up with each other regardless of
+  // each table's own content.
+  &__contacts-table {
+    table-layout: fixed;
+    width: 100%;
+
+    th,
+    td {
+      overflow-wrap: anywhere;
+    }
+
+    // Contact Name / Contact Role / Phone # / Fax # / Email Address /
+    // Access to Site Info? / Actions
+    th:nth-child(1),
+    td:nth-child(1) { width: 17%; }
+
+    th:nth-child(2),
+    td:nth-child(2) { width: 15%; }
+
+    th:nth-child(3),
+    td:nth-child(3) { width: 12%; }
+
+    th:nth-child(4),
+    td:nth-child(4) { width: 11%; }
+
+    th:nth-child(5),
+    td:nth-child(5) { width: 20%; }
+
+    th:nth-child(6),
+    td:nth-child(6) { width: 12%; }
+
+    th:nth-child(7),
+    td:nth-child(7) { width: 13%; }
+  }
+}

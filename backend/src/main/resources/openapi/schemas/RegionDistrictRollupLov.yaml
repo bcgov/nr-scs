@@ -1,0 +1,21 @@
+type: object
+description: Record returned from `scs_reg_dist_all_lov_vw`. In this rollup LOV, `code` is the organizational unit number (`org_unit_no`).
+properties:
+  code:
+    type: integer
+    format: int64
+    nullable: true
+    description: Organizational unit number (`org_unit_no`). This is the same value referred to as `orgUnitNo` elsewhere in the API.
+  description:
+    type: string
+    nullable: true
+  rollupRegionNo:
+    type: integer
+    format: int64
+    nullable: true
+    description: Rollup region number (`rollup_region_no`).
+  orgUnitCode:
+    type: string
+    nullable: true
+    description: Organizational unit code (`org_unit_code`), such as the region or district code string.
+

@@ -1,0 +1,14 @@
+type: object
+description: |
+  Request payload for the scaler Licence Cancelled Date form on the Performance Remarks tab
+  (legacy `/scalerPerformanceRemarkCancelScaler.do`). Sets only the scaler's licence-cancelled
+  date; the server preserves every other scaler column and re-applies the legacy rule that the
+  cancelled date must be on or after the scaler effective (issued) date. Omit the field or send
+  `null` to clear the date. Backed by `scs_scaler_pkg.update_rec`.
+properties:
+  licenceCancelledDate:
+    type: string
+    format: date
+    nullable: true
+    description: Date the scaler licence was cancelled; null/omitted clears it
+    example: "2026-06-30"

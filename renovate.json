@@ -3,5 +3,13 @@
   "description": "Presets from https://github.com/bcgov/renovate-config",
   "extends": [
     "github>bcgov/renovate-config#2026.9.26"
+  ],
+  "packageRules": [
+    {
+      "description": "Cap Mockito at 5.22.0: 5.23.0's inline mock maker fails to instrument classes returning generated model.* types, poisoning the surefire JVM and cascading into ~120 unrelated test errors.",
+      "matchManagers": ["maven"],
+      "matchPackageNames": ["org.mockito:**"],
+      "allowedVersions": "<=5.22.0"
+    }
   ]
 }

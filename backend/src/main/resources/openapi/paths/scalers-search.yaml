@@ -1,0 +1,184 @@
+get:
+  tags:
+    - Scaler
+  summary: Search for scalers
+  description: |
+    Search for scaler records in the SCS system using various criteria.
+    Based on `scs_queries_scalars_vw_pkg.search_recs`.
+
+    Notes:
+    * Text fields support partial matching (SQL LIKE semantics with % wildcard).
+    * `orgUnitNo` is an exact match.
+    * `scalerLicenceTypeCode` filters by licence type ('SCS' or 'WA').
+    * `scalerAppointmentType` and `scalarTrainingType` use multiset intersection logic.
+    * Multiple criteria are combined with AND logic.
+  operationId: searchScalers
+  parameters:
+    - name: scalerLicenceNo
+      in: query
+      description: Scaler licence number (partial match supported with %)
+      required: false
+      schema:
+        type: string
+        maxLength: 20
+        example: "LIC%"
+
+    - name: clientNumber
+      in: query
+      description: >-
+        Client number. Digits and the `%` (multi-character) and `_` (single-character) wildcards are
+        accepted, matching the Client query screen; values without `%` are zero-padded to 8 (e.g.
+        "21855" finds "00021855", and "25_0" pads to "000025_0" to match a single stored digit).
+        Non-numeric input is rejected so a mistyped value gives a clear error rather than silently
+        matching nothing.
+      required: false
+      schema:
+        type: string
+        pattern: '^[0-9%_]{1,8}$'
+        maxLength: 8
+        example: "12345%"
+
+    - name: orgUnitNo
+      in: query
+      description: Organization unit number (exact match)
+      required: false
+      schema:
+        type: integer
+        format: int64
+        example: 100
+
+    - name: clientName
+      in: query
+      description: Client name (partial match supported with %)
+      required: false
+      schema:
+        type: string
+        maxLength: 60
+        example: "%Smith%"
+
+    - name: legalFirstName
+      in: query
+      description: Legal first name (partial match supported with %)
+      required: false
+      schema:
+        type: string
+        maxLength: 30
+        example: "John%"
+
+    - name: scalarTrainingType
+      in: query
+      description: >-
+        Exam / upgrade training type identifier — the `code` from the `SCALER_TRAINING_TYPE` LOV
+        (`scs_scty_lov_vw_pkg`), the same `scalerTrainingTypeId` the scaler Exams/Upgrades tab uses.
+        Values look numeric but are held as text: `p_scalar_training_type` on
+        `scs_queries_scalars_vw_pkg.search_recs` is a VARCHAR2, which legacy `QueriesScalarsVwMapper`
+        binds with `java.lang.String.class`. Typing it as an integer made every selection a 500.
+      required: false
+      schema:
+        type: string
+        maxLength: 4
+        example: "2"
+
+    - name: scalerLicenceTypeCode
+      in: query
+      description: |
+        Scaler licence type code:
+        * `SCS` - Scale Administration and Control System
+        * `WA` - Waste Assessment
+      required: false
+      schema:
+        type: string
+        enum: [SCS, WA]
+        example: "SCS"
+
+    - name: scalerAppointmentType
+      in: query
+      description: Scaler appointment type (filters scalers with this appointment type)
+      required: false
+      schema:
+        type: string
+        maxLength: 10
+        example: "CS"
+
+    - name: primarySort
+      in: query
+      description: |
+        Primary sort field:
+        * `1` - Scaler Licence Number
+        * `2` - Org Unit Name
+        * `3` - Client Name
+        * `4` - Legal First Name
+        * `5` - Legal Middle Name
+        * `6` - Legal First Name
+        * `7` - Licence Type
+        * `8` - Scaler Client Location
+      required: false
+      schema:
+        type: integer
+        enum: [1, 2, 3, 4, 5, 6, 7, 8]
+        default: 1
+
+    - name: secondarySort
+      in: query
+      description: |
+        Secondary sort field:
+        * `0` - No secondary sort
+        * `1` - Scaler Licence Number
+        * `2` - Org Unit Name
+        * `3` - Client Name
+        * `4` - Legal First Name
+        * `5` - Legal Middle Name
+        * `6` - Legal First Name
+        * `7` - Licence Type
+        * `8` - Scaler Client Location
+      required: false
+      schema:
+        type: integer
+        enum: [0, 1, 2, 3, 4, 5, 6, 7, 8]
+        default: 0
+
+  responses:
+    '200':
+      description: Successful search operation
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: '../root.yaml#/components/schemas/ScalerResult'
+          example:
+            - scalerLicenceNo: "LIC12345"
+              orgUnitName: "Vancouver Forest District"
+              clientName: "Smith Logging Ltd."
+              legalFirstName: "John"
+              legalMiddleName: "Michael"
+              licenceType: "Scale Administration and Control System, Waste Assessment"
+              scalerClientLoc: "12345678 / 00"
+            - scalerLicenceNo: "LIC67890"
+              orgUnitName: "Victoria Forest District"
+              clientName: "Johnson Timber Co."
+              legalFirstName: "Jane"
+              legalMiddleName: null
+              licenceType: "Scale Administration and Control System"
+              scalerClientLoc: "87654321 / 00"
+
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+          example:
+            code: "INVALID_PARAMETER"
+            message: "Invalid primarySort value"
+
+    '500':
+      description: Server error
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+          example:
+            code: "ORA-12345"
+            message: "Database connection error"
+

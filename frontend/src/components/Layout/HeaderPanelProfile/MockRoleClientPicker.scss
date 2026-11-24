@@ -1,0 +1,48 @@
+@use '@carbon/type';
+@use '@carbon/react/scss/spacing' as *;
+
+.mock-dev-controls {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-05;
+  margin-top: $spacing-05;
+  padding-top: $spacing-05;
+  border-top: 1px solid var(--cds-border-subtle);
+
+  &__banner {
+    display: flex;
+    align-items: center;
+    gap: $spacing-03;
+  }
+
+  &__banner-text {
+    @include type.type-style('heading-compact-01');
+  }
+
+  &__section {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-03;
+  }
+
+  &__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: $spacing-03;
+  }
+
+  &__current {
+    display: flex;
+    flex-wrap: wrap;
+    gap: $spacing-02;
+  }
+
+  &__hint {
+    @include type.type-style('label-01');
+    color: var(--cds-text-secondary);
+
+    code {
+      @include type.type-style('code-01');
+    }
+  }
+}

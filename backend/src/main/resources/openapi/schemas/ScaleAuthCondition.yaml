@@ -1,0 +1,34 @@
+type: object
+properties:
+  scaleConditionClassCode:
+    type: string
+  scaleAuthConditionId:
+    type: integer
+    format: int64
+  scaleAuthConditionTitle:
+    type: string
+  scaleAuthConditionDesc:
+    type: string
+  ministryStandardInd:
+    type: string
+  sortOrderNo:
+    type: integer
+  effectiveDate:
+    type: string
+    format: date
+  expiryDate:
+    type: string
+    format: date
+  entryTimestamp:
+    type: string
+    format: date-time
+  entryUserid:
+    type: string
+  updateTimestamp:
+    type: string
+    format: date-time
+  updateUserid:
+    type: string
+  revisionCount:
+    type: integer
+    format: int64

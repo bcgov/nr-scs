@@ -1,0 +1,64 @@
+description: A contact associated with a scale site, combining SCALE_SITE_CONTACT and CLIENT_CONTACT data.
+allOf:
+  - $ref: ./AuditDetail.yaml
+  - type: object
+    properties:
+      clientContactId:
+        type: integer
+        format: int64
+        description: Client contact identifier (primary key of CLIENT_CONTACT)
+        example: 12345
+      scaleSiteIdNmbr:
+        type: string
+        maxLength: 4
+        description: Scale site identifier
+        example: "1234"
+      primaryContactInd:
+        type: string
+        enum: [Y, N]
+        description: Whether this is the primary contact for the site
+        example: "Y"
+      contactName:
+        type: string
+        description: Contact name from CLIENT_CONTACT
+        example: "John Smith"
+      contactRoleDescription:
+        type: string
+        maxLength: 40
+        description: Role of the contact at the scale site
+        example: "Site Manager"
+      businessPhone:
+        type: string
+        description: Business phone number
+        example: "250-555-1234"
+      cellPhone:
+        type: string
+        nullable: true
+        description: Cell phone number from CLIENT_CONTACT
+        example: "250-555-9012"
+      faxNumber:
+        type: string
+        nullable: true
+        description: Fax number
+        example: "250-555-5678"
+      emailAddress:
+        type: string
+        nullable: true
+        description: Email address
+        example: "john.smith@example.com"
+      siteInformationAccessInd:
+        type: string
+        enum: [Y, N]
+        description: Whether the contact has access to site information
+        example: "Y"
+      effectiveDate:
+        type: string
+        format: date
+        description: Date the contact assignment becomes effective
+        example: "2024-01-01"
+      expiryDate:
+        type: string
+        format: date
+        nullable: true
+        description: Date the contact assignment expires
+        example: "2026-01-01"

@@ -1,0 +1,22 @@
+type: object
+description: Request body for creating an Exam/Upgrade (Training Type). scalerTrainingTypeId is omitted because it is assigned by the database on insert.
+properties:
+  scalerTrainingClassCode:
+    type: string
+    description: Training class code (part of primary key)
+  licenceAccreditInd:
+    type: string
+    description: Licence accreditation indicator
+  description:
+    type: string
+    description: Description of the training type
+  effectiveDate:
+    type: string
+    format: date
+    description: Date the training type becomes effective
+  expiryDate:
+    type: string
+    format: date
+    description: Date the training type expires
+required:
+  - scalerTrainingClassCode

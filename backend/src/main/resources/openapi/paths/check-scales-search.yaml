@@ -1,0 +1,399 @@
+get:
+  tags:
+    - CheckScale
+  summary: check scales api
+  description: |
+    Search for check scale records in the SCS system using various criteria.
+    Based on `scs_check_scale_pkg.search_recs`.
+
+    Notes:
+    * Text fields support partial matching (SQL LIKE semantics).
+    * Multiple criteria are combined with AND logic.
+    * All parameters are optional.
+  operationId: searchCheckScales
+  parameters:
+    - name: checkScaleId
+      in: query
+      description: Check scale identifier (exact match)
+      required: false
+      schema:
+        type: integer
+        format: int64
+        example: 12345
+
+    - name: checkScaleTypeCode
+      in: query
+      description: Check scale type code (partial match supported)
+      required: false
+      schema:
+        type: string
+        maxLength: 10
+        example: "CS"
+
+    - name: ckscType
+      in: query
+      description: Check scale type (partial match supported)
+      required: false
+      schema:
+        type: string
+        maxLength: 50
+        example: "Type%"
+
+    - name: partialInd
+      in: query
+      description: Partial indicator (partial match supported)
+      required: false
+      schema:
+        type: string
+        maxLength: 1
+        example: "Y"
+
+    - name: followedGoodPracticeInd
+      in: query
+      description: Followed good practice indicator (partial match supported)
+      required: false
+      schema:
+        type: string
+        maxLength: 1
+        example: "Y"
+
+    - name: originalWithinStandardInd
+      in: query
+      description: Original within standard indicator (partial match supported)
+      required: false
+      schema:
+        type: string
+        maxLength: 1
+        example: "Y"
+
+    - name: originalScaleNetValue
+      in: query
+      description: Original scale net value (exact match)
+      required: false
+      schema:
+        type: number
+        format: double
+        example: 1234.56
+
+    - name: checkScaleNetValue
+      in: query
+      description: Check scale net value (exact match)
+      required: false
+      schema:
+        type: number
+        format: double
+        example: 1234.56
+
+    - name: chkScalerCommentTxt
+      in: query
+      description: Check scaler comment text (partial match supported)
+      required: false
+      schema:
+        type: string
+        maxLength: 4000
+        example: "%comment%"
+
+    - name: orgLogTallyDocNo
+      in: query
+      description: Original log tally document number (partial match supported)
+      required: false
+      schema:
+        type: string
+        maxLength: 50
+        example: "DOC%"
+
+    - name: orgLogTallyVer
+      in: query
+      description: Original log tally version (exact match)
+      required: false
+      schema:
+        type: integer
+        example: 1
+
+    - name: chkLogTallyDocNo
+      in: query
+      description: Check log tally document number (partial match supported)
+      required: false
+      schema:
+        type: string
+        maxLength: 50
+        example: "CHK%"
+
+    - name: chkLogTallyVer
+      in: query
+      description: Check log tally version (exact match)
+      required: false
+      schema:
+        type: integer
+        example: 1
+
+    - name: orgSampleLogTallyVer
+      in: query
+      description: Original sample log tally version (exact match)
+      required: false
+      schema:
+        type: integer
+        example: 1
+
+    - name: orgSampleLogTallyDocNo
+      in: query
+      description: Original sample log tally document number (partial match supported)
+      required: false
+      schema:
+        type: string
+        maxLength: 50
+        example: "SAMPLE%"
+
+    - name: chkSampleLogTallyVer
+      in: query
+      description: Check sample log tally version (exact match)
+      required: false
+      schema:
+        type: integer
+        example: 1
+
+    - name: chkSampleLogTallyDocNo
+      in: query
+      description: Check sample log tally document number (partial match supported)
+      required: false
+      schema:
+        type: string
+        maxLength: 50
+        example: "CHK%"
+
+    - name: originalScalerLicenceNo
+      in: query
+      description: Original scaler licence number (partial match supported)
+      required: false
+      schema:
+        type: string
+        maxLength: 20
+        example: "LIC%"
+
+    - name: checkScalerLicenceNo
+      in: query
+      description: Check scaler licence number (partial match supported)
+      required: false
+      schema:
+        type: string
+        maxLength: 20
+        example: "LIC%"
+
+    - name: scaleSiteIdNmbr
+      in: query
+      description: Scale site ID number (partial match supported)
+      required: false
+      schema:
+        type: string
+        maxLength: 20
+        example: "SITE%"
+
+    - name: timberMark
+      in: query
+      description: Timber mark (partial match supported)
+      required: false
+      schema:
+        type: string
+        maxLength: 20
+        example: "TMB%"
+
+    - name: loadArrivalNumber
+      in: query
+      description: Load arrival number (partial match supported)
+      required: false
+      schema:
+        type: string
+        maxLength: 20
+        example: "LOAD%"
+
+    - name: weighSlipNumber
+      in: query
+      description: Weigh slip number (exact match)
+      required: false
+      schema:
+        type: integer
+        example: 12345
+
+    - name: checkReplacesOriginalInd
+      in: query
+      description: Check replaces original indicator (partial match supported)
+      required: false
+      schema:
+        type: string
+        maxLength: 1
+        example: "Y"
+
+    - name: population
+      in: query
+      description: Population (partial match supported)
+      required: false
+      schema:
+        type: string
+        maxLength: 50
+        example: "POP%"
+
+    - name: stratum
+      in: query
+      description: Stratum (partial match supported)
+      required: false
+      schema:
+        type: string
+        maxLength: 50
+        example: "STR%"
+
+    - name: samplingYear
+      in: query
+      description: Sampling year (exact match)
+      required: false
+      schema:
+        type: integer
+        example: 2025
+
+    - name: originalScaleDate
+      in: query
+      description: Original scale date (exact match)
+      required: false
+      schema:
+        type: string
+        format: date
+        example: "2025-01-15"
+
+    - name: originalScaleReturnNo
+      in: query
+      description: Original scale return number (exact match)
+      required: false
+      schema:
+        type: integer
+        example: 100
+
+    - name: originalScaleTotalTops
+      in: query
+      description: Original scale total tops (exact match)
+      required: false
+      schema:
+        type: integer
+        example: 50
+
+    - name: originalScaleTotalButts
+      in: query
+      description: Original scale total butts (exact match)
+      required: false
+      schema:
+        type: integer
+        example: 45
+
+    - name: originalScaleTotalLength
+      in: query
+      description: Original scale total length (exact match)
+      required: false
+      schema:
+        type: number
+        format: double
+        example: 1500.5
+
+    - name: chkScaleDate
+      in: query
+      description: Check scale date (exact match)
+      required: false
+      schema:
+        type: string
+        format: date
+        example: "2025-01-20"
+
+    - name: chkScaleReturnNo
+      in: query
+      description: Check scale return number (exact match)
+      required: false
+      schema:
+        type: integer
+        example: 101
+
+    - name: chkScaleTotalTops
+      in: query
+      description: Check scale total tops (exact match)
+      required: false
+      schema:
+        type: integer
+        example: 51
+
+    - name: chkScaleTotalButts
+      in: query
+      description: Check scale total butts (exact match)
+      required: false
+      schema:
+        type: integer
+        example: 46
+
+    - name: chkScaleTotalLength
+      in: query
+      description: Check scale total length (exact match)
+      required: false
+      schema:
+        type: number
+        format: double
+        example: 1510.5
+
+    - name: entryUserid
+      in: query
+      description: Entry user ID (used for filtering)
+      required: false
+      schema:
+        type: string
+        maxLength: 30
+        example: "JSMITH"
+
+    - name: updateUserid
+      in: query
+      description: Update user ID (used for filtering)
+      required: false
+      schema:
+        type: string
+        maxLength: 30
+        example: "JDOE"
+
+  responses:
+    '200':
+      description: Successful search operation
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: '../root.yaml#/components/schemas/CheckScaleDetail'
+          example:
+            - checkScaleId: 12345
+              checkScaleTypeCode: "CS"
+              ckscType: "Standard"
+              partialInd: "N"
+              followedGoodPracticeInd: "Y"
+              originalWithinStandardInd: "Y"
+              originalScaleNetValue: 1234.56
+              checkScaleNetValue: 1240.0
+              chkScalerCommentTxt: "Sample comment"
+              timberMark: "TMB123"
+              scaleSiteIdNmbr: "SITE001"
+              originalScaleDate: "2025-01-15"
+              chkScaleDate: "2025-01-20"
+              entryUserid: "JSMITH"
+              updateUserid: "JDOE"
+              revisionCount: 1
+
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+          example:
+            code: "INVALID_PARAMETER"
+            message: "Invalid parameter value"
+
+    '500':
+      description: Server error
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+          example:
+            code: "ORA-12345"
+            message: "Database connection error"

@@ -1,0 +1,10 @@
+type: object
+description: Species content row for a mark site designation.
+properties:
+  scaleSpeciesCode:
+    type: string
+    nullable: true
+  contentPercent:
+    type: integer
+    format: int32
+    nullable: true

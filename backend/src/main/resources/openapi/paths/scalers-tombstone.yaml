@@ -1,0 +1,23 @@
+---
+parameters:
+  - name: scalerLicenceNo
+    in: path
+    description: Scaler licence number
+    required: true
+    schema:
+      type: string
+
+get:
+  tags:
+    - Scaler
+  summary: Get the tombstone (primary display fields) for a scaler licence
+  operationId: getScalerTombstone
+  responses:
+    '200':
+      description: Scaler tombstone
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/ScalerTombstone'
+    '404':
+      $ref: "../root.yaml#/components/schemas/Error"

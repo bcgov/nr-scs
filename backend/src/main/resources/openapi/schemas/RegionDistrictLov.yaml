@@ -1,0 +1,10 @@
+type: object
+description: Record returned from `scs_reg_dist_lov_vw`.
+properties:
+  code:
+    type: string
+    nullable: true
+  description:
+    type: string
+    nullable: true
+

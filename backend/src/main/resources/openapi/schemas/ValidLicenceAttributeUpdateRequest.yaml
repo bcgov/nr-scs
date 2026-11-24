@@ -1,0 +1,19 @@
+type: object
+description: |
+  Request body for updating an existing valid licence attribute.
+  The primary key (`scaleGradingSystemCode` + `scalerAppointmentType`) is supplied in the
+  URL path and cannot be changed.
+required:
+  - effectiveDate
+properties:
+  effectiveDate:
+    type: string
+    format: date
+    description: Date from which this valid licence attribute is effective.
+    example: "2023-01-01"
+  expiryDate:
+    type: string
+    format: date
+    nullable: true
+    description: Date on which this valid licence attribute expires. Optional.
+    example: "2030-12-31"

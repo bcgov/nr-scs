@@ -1,0 +1,21 @@
+---
+type: object
+properties:
+  scalerLicenceNo:
+    type: string
+    description: System-generated scaler licence number
+  clientName:
+    type: string
+    description: Client / company name
+  legalFirstName:
+    type: string
+    description: Scaler legal first name
+  regionName:
+    type: string
+    description: Region name
+  districtName:
+    type: string
+    description: District name
+required:
+  - scalerLicenceNo
+

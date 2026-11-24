@@ -1,0 +1,125 @@
+@use '@carbon/type';
+
+.scale-site-inspection-questions {
+  &__panel {
+    background: var(--cds-layer);
+    border: 1px solid var(--cds-border-subtle-01);
+    border-radius: 0.25rem;
+    padding: 1.5rem;
+    box-shadow: 0 1px 2px rgb(0 0 0 / 8%);
+  }
+
+  &__question-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  &__question-table {
+    @include type.type-style('body-compact-01');
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+    border: 1px solid var(--cds-border-subtle-01);
+
+    th,
+    td {
+      border: 1px solid var(--cds-border-subtle-01);
+      padding: 0.5rem 0.5rem;
+      text-align: left;
+      vertical-align: top;
+      word-break: break-word;
+    }
+
+    thead th,
+    tbody th {
+      background: var(--cds-layer-accent-01);
+      font-weight: 600;
+    }
+
+    td {
+      background: var(--cds-layer);
+    }
+
+    td.scale-site-inspection-questions__question-index {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  }
+
+  // Column proportions for the fixed-layout table. The four response columns
+  // (a–d) are reused by both the answer/comments rows and the follow-up rows,
+  // so "Action Required" (col b) is given the width it needs as a text area.
+  &__col--index {
+    width: 3rem;
+  }
+
+  &__col--question {
+    width: 30%;
+  }
+
+  &__col--a {
+    width: 11%;
+  }
+
+  &__col--b {
+    width: 30%;
+  }
+
+  &__col--c {
+    width: 16%;
+  }
+
+  &__col--d {
+    width: 13%;
+  }
+
+  &__question-index {
+    font-weight: 600;
+  }
+
+  &__question-text {
+    font-weight: 600;
+    word-break: break-word;
+    white-space: normal;
+  }
+
+  &__question-input-wrap {
+    width: 100%;
+    min-width: 0;
+
+    .cds--select,
+    .cds--text-area,
+    .scs-date-input,
+    .cds--date-picker,
+    .cds--date-picker-container,
+    .cds--date-picker-input__wrapper,
+    .cds--text-input,
+    .cds--select-input {
+      width: 100%;
+    }
+
+    .cds--form-requirement {
+      margin-top: 0.25rem;
+      white-space: normal;
+    }
+  }
+
+  // These wraps intentionally have no pixel min-width: their host cells are
+  // fixed-width table columns, so a min-width wider than the column would push
+  // the control out of its <td>. They fill the column via width: 100% instead.
+  &__question-input-wrap--full,
+  &__question-input-wrap--date {
+    min-width: 0;
+  }
+
+  @media (max-width: 768px) {
+    &__question-table {
+      display: block;
+      overflow-x: auto;
+      white-space: nowrap;
+    }
+  }
+}
+

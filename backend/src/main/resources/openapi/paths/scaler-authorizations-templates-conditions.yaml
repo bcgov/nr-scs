@@ -1,0 +1,21 @@
+get:
+  operationId: getScaleAuthTemplateConditions
+  summary: Get conditions for a template
+  tags:
+    - ScalerAuthorization
+  parameters:
+    - name: templateId
+      in: path
+      required: true
+      schema:
+        type: integer
+        format: int64
+  responses:
+    '200':
+      description: OK
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: ../root.yaml#/components/schemas/ScaleAuthCondition

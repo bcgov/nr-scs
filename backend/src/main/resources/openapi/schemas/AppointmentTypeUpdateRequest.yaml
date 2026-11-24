@@ -1,0 +1,27 @@
+type: object
+description: Payload for updating an appointment type.
+properties:
+  description:
+    type: string
+    description: >-
+      Appointment type description. Maximum 120 characters; the limit is
+      enforced by AppointmentTypeService so that over-length input returns the
+      specific "Appointment Description can not be greater than 120 characters."
+      message rather than a generic bean-validation error.
+  actingInd:
+    type: string
+    description: Acting indicator.
+    enum: [Y, N]
+  effectiveDate:
+    type: string
+    format: date
+    description: Effective date.
+  expiryDate:
+    type: string
+    format: date
+    description: Expiry date.
+required:
+  - description
+  - actingInd
+  - effectiveDate
+  - expiryDate

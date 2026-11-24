@@ -1,0 +1,102 @@
+get:
+  tags:
+    - MarkSiteDesignation
+  summary: Lookup timber mark holder details
+  description: |
+    Returns the mark holder client, location, name, and status for a timber mark.
+    Mirrors the legacy `updateTimberMark` action on the Mark Site Designation create page.
+  operationId: getMarkSiteDesignationTimberMarkLookup
+  parameters:
+    - name: timberMark
+      in: query
+      description: Timber mark to look up
+      required: true
+      schema:
+        type: string
+        maxLength: 20
+  responses:
+    '200':
+      description: Timber mark found
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/MarkSiteDesignationTimberMarkLookup'
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+    '404':
+      description: Timber mark not found
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+    '500':
+      description: Server error
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+post:
+  tags:
+    - MarkSiteDesignation
+  summary: Create a mark site designation
+  description: |
+    Creates a new mark site designation authorization using the values from the legacy
+    create page.
+
+    The request maps to `scs_hauling_mark_authorztn_pkg.insert_rec`.
+    The timber mark must resolve to an existing mark holder before the record is persisted.
+  operationId: createMarkSiteDesignation
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: '../root.yaml#/components/schemas/MarkSiteDesignationCreateRequest'
+        example:
+          timberMark: "TM12345"
+          geographicLocation: "Central interior"
+          population: "1200"
+          effectiveDate: "2025-01-15"
+          expiryDate: "2025-12-31"
+          orgUnitNo: 100
+          districtWideInd: "N"
+          estimatedVolume: 42
+          estimatedTruckLoads: 8
+          timberDescription: "Pine and spruce stand"
+          transportationDateDesc: "Ship as needed"
+          otherRequirements: "Contact office before hauling"
+  responses:
+    '201':
+      description: Mark site designation created successfully
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/MarkSiteDesignationCreateResponse'
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+    '404':
+      description: Timber mark not found
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+    '422':
+      description: Unprocessable entity
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+    '500':
+      description: Server error
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'

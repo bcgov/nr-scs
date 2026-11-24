@@ -1,0 +1,47 @@
+type: object
+description: |
+  Appointment (licence attribute) details for a scaler with `SCS` licence type.
+  Maps to `SCS_SCALER_LICENCE_ATTRIBT_PKG`.
+
+  `scalerAppointmentType` and `scaleGradingSystemCode` are derived from the selected
+  appointment type LOV entry (`scs_sgcd_sapt_lov_vw_pkg`) and must be resolved on the
+  client before submitting. They are not user-entered values.
+required:
+  - scalerAppointmentType
+  - scaleGradingSystemCode
+  - provinceWideInd
+  - issuedDate
+properties:
+  scalerAppointmentType:
+    type: string
+    maxLength: 4
+    description: |
+      Appointment type code derived from the selected appointment LOV entry
+      (`scs_sgcd_sapt_lov_vw_pkg.scaler_appointment_type`).
+    example: "FORS"
+  scaleGradingSystemCode:
+    type: string
+    maxLength: 4
+    description: |
+      Scale grading system code derived from the selected appointment LOV entry
+      (`scs_sgcd_sapt_lov_vw_pkg.scale_grading_system_code`).
+    example: "BC"
+  provinceWideInd:
+    type: string
+    enum: [Y, N]
+    description: |
+      Indicates if the appointment is province-wide (`Y`) or district-specific (`N`).
+      When `N`, the scaler's `orgUnitNo` is automatically applied to this appointment.
+    example: "Y"
+  issuedDate:
+    type: string
+    format: date
+    description: Appointment effective (issued) date
+    example: "2025-01-15"
+  expiryDate:
+    type: string
+    format: date
+    nullable: true
+    description: Appointment expiry date. Must be after `issuedDate` if provided.
+    example: "2027-01-15"
+

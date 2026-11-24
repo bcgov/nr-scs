@@ -11,6 +11,9 @@ concurrency:
 
 permissions: {}
 
+# Adapted from quickstart-openshift: no SchemaSpy (its helper targets the template's Postgres; SCS's
+# schema lives in the shared Oracle) and no k6 load tests (the template's scripts are gone, and 100
+# virtual users would load the shared Oracle).
 jobs:
   stale-branches:
     name: Close Stale Branches & PRs
@@ -89,13 +92,6 @@ jobs:
               echo "No PR deployments found for ${{ github.event.repository.name }}"
             fi
 
-  schema-spy:
-    name: SchemaSpy
-    permissions:
-      contents: write
-      pages: write
-    uses: bcgov/quickstart-openshift-helpers/.github/workflows/.schema-spy.yml@a11ad3d1b9288fb40757c4314a62eb86ff227931 # v1.2.1
-
   # Run sequentially to reduce chances of rate limiting
   zap:
     name: ZAP Scans
@@ -109,21 +105,4 @@ jobs:
           allow_issue_writing: true
           issue_title: "ZAP Security Report"
           token: ${{ secrets.GITHUB_TOKEN }}
-          target: https://${{ github.event.repository.name }}-test.apps.silver.devops.gov.bc.ca
-
-  load-tests:
-    name: Load
-    runs-on: ubuntu-24.04
-    strategy:
-      matrix:
-        name: [backend, frontend]
-    steps:
-      - uses: actions/checkout@v7
-      - uses: grafana/setup-k6-action@43b9fc21641a76002687994433dd586f56e791b1 # v1.2.2
-      - uses: grafana/run-k6-action@4082a08c7e40cf6d65863911077dfb60ae0a4f04 # v1.5.0
-        env:
-          BACKEND_URL: https://${{ github.event.repository.name }}-test.apps.silver.devops.gov.bc.ca/api
-          FRONTEND_URL: https://${{ github.event.repository.name }}-test.apps.silver.devops.gov.bc.ca
-        with:
-          path: ./common/tests/load/${{ matrix.name }}-test.js
-          flags: --vus 100 --duration 300s
+          target: https://${{ github.event.repository.name }}-test.apps.gold.devops.gov.bc.ca

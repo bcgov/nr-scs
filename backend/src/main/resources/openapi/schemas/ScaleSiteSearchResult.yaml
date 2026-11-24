@@ -1,0 +1,33 @@
+type: object
+description: |
+  Record returned from `scs_scale_site_search_vw_pkg.search_recs`.
+properties:
+  scaleSiteIdNmbr:
+    type: string
+    nullable: true
+    description: Scale site number.
+  siteName:
+    type: string
+    nullable: true
+    description: Scale site name.
+  region:
+    type: string
+    nullable: true
+    description: Region name.
+  district:
+    type: string
+    nullable: true
+    description: District name.
+  methodTypeCodeName:
+    type: string
+    nullable: true
+    description: Display name of the site type / scale method.
+  ownerClientNumber:
+    type: string
+    nullable: true
+    description: Site owner client number.
+  ownerClientLocnCode:
+    type: string
+    nullable: true
+    description: Site owner location code.
+

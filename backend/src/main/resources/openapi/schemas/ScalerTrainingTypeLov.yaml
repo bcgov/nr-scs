@@ -1,0 +1,22 @@
+type: object
+description: |
+  Rich training/exam LOV row used by the scaler create flow.
+  Based on `scs_scty_lov_vw_pkg.search_recs`.
+properties:
+  code:
+    type: string
+    nullable: true
+    description: Training type identifier selected by the user.
+  description:
+    type: string
+    nullable: true
+    description: User-facing exam / upgrade description.
+  scalerTrainingClassCode:
+    type: string
+    nullable: true
+    description: Derived training class code for the selected training type.
+  licenceAccreditInd:
+    type: string
+    nullable: true
+    description: Indicates whether the training type is tied to licensing/accreditation.
+

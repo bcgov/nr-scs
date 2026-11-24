@@ -1,0 +1,17 @@
+allOf:
+  - $ref: ./AuditDetail.yaml
+  - type: object
+    properties:
+      scaleMethodAuthClauseId:
+        type: integer
+        format: int64
+      scaleMethodTypeCode:
+        type: string
+      scalerAuthorizationClause:
+        type: string
+      effectiveDate:
+        type: string
+        format: date
+      expiryDate:
+        type: string
+        format: date

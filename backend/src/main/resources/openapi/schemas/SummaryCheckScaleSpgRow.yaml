@@ -1,0 +1,52 @@
+type: object
+description: |
+  A single species/product/grade (SPG) roll-up row of a summary check scale.
+  Persisted via `SCS_CHECK_SCALE_SPG_SUMMRY_PKG.insert_rec`, keyed to the parent
+  check scale id. For Log Tally / Sample Log Tally summaries `scaleProductCode` is
+  blank; for Special Forest Product summaries `scaleGradeCode` is blank unless the
+  product is `XM` (legacy `CheckScaleSpgSummaryBo.addSummarySPG`).
+required:
+  - scaleSpeciesCode
+  - originalScalePieceCnt
+  - originalScaleNetVolume
+  - originalScaleNetValue
+  - checkScalePieceCnt
+  - checkScaleNetVolume
+  - checkScaleNetValue
+properties:
+  scaleSpeciesCode:
+    type: string
+    maxLength: 4
+    description: Species code (e.g. "FI").
+  scaleProductCode:
+    type: string
+    maxLength: 4
+    nullable: true
+    description: Product code; required for Special Forest Product summaries, blank otherwise.
+  scaleGradeCode:
+    type: string
+    maxLength: 4
+    nullable: true
+    description: Grade code; blank for SFP unless product is XM.
+  originalScalePieceCnt:
+    type: integer
+    description: Original scale piece count.
+  originalScaleNetVolume:
+    type: number
+    format: double
+    description: Original scale net volume (precision 7.3).
+  originalScaleNetValue:
+    type: number
+    format: double
+    description: Original scale net value (precision 8.2).
+  checkScalePieceCnt:
+    type: integer
+    description: Check scale piece count.
+  checkScaleNetVolume:
+    type: number
+    format: double
+    description: Check scale net volume (precision 7.3).
+  checkScaleNetValue:
+    type: number
+    format: double
+    description: Check scale net value (precision 8.2).

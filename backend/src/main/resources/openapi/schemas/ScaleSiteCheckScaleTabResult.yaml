@@ -1,0 +1,10 @@
+type: object
+description: |
+  Payload for the Scale Site `Check Scales` tab (P057): the check scale summary rows for the
+  site. Wrapped for shape symmetry with the scaler tab result.
+properties:
+  checkScales:
+    type: array
+    description: Check scale summary rows for the tab table.
+    items:
+      $ref: '../root.yaml#/components/schemas/CheckScaleSummaryView'

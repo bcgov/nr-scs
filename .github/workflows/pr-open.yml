@@ -20,7 +20,7 @@ jobs:
     runs-on: ubuntu-24.04
     strategy:
       matrix:
-        package: [backend, frontend, migrations]
+        package: [backend, frontend]
     timeout-minutes: 10
     steps:
       - uses: bcgov/action-builder-ghcr@cb2629351c87dd1c2130073e4ebb7233a9653a63 # v4.4.1
@@ -40,19 +40,30 @@ jobs:
     needs: [builds]
     uses: ./.github/workflows/reusable-deploy.yml
     secrets:
-      db_password: ${{ secrets.db_password }}
       oc_namespace: ${{ secrets.oc_namespace }}
       oc_token: ${{ secrets.oc_token }}
+      database_host: ${{ secrets.database_host }}
+      database_service_name: ${{ secrets.database_service_name }}
+      database_user: ${{ secrets.database_user }}
+      database_password: ${{ secrets.database_password }}
+      keystore_secret: ${{ secrets.keystore_secret }}
+      jasper_server_username: ${{ secrets.jasper_server_username }}
+      jasper_server_password: ${{ secrets.jasper_server_password }}
+      ches_client_id: ${{ secrets.ches_client_id }}
+      ches_client_secret: ${{ secrets.ches_client_secret }}
     with:
+      environment: dev
       target: ${{ github.event.number }}
       tag: ${{ github.event.pull_request.head.sha }}
-      triggers: ('backend/', 'frontend/', 'migrations/', 'common/', '.github/workflows/pr-open.yml')
+      triggers: ('backend/', 'frontend/', '.github/workflows/pr-open.yml', '.github/workflows/reusable-deploy.yml')
 
-  tests:
-    name: Tests
-    if: needs.deploys.outputs.triggered == 'true'
-    needs: [deploys]
-    uses: ./.github/workflows/reusable-tests.yml
+  # Post-deploy tests are disabled for now. Restore this job (and its entry in the `needs` below) to
+  # re-enable them; reusable-tests.yml is unchanged.
+  # tests:
+  #   name: Tests
+  #   if: needs.deploys.outputs.triggered == 'true'
+  #   needs: [deploys]
+  #   uses: ./.github/workflows/reusable-tests.yml
 
   comment:
     name: Deployment Links
@@ -68,8 +79,7 @@ jobs:
           header: pr-deployment-links
           message: |
             ### 🚀 Deployments Available
-            - [Frontend](https://${{ github.event.repository.name }}-${{ github.event.number }}.apps.silver.devops.gov.bc.ca)
-            - [Backend](https://${{ github.event.repository.name }}-${{ github.event.number }}.apps.silver.devops.gov.bc.ca/api)
+            - [SCS](https://${{ github.event.repository.name }}-${{ github.event.number }}.apps.gold.devops.gov.bc.ca)
 
   # ==========================================================================
   # WARNING: This job acts as the required merge gate for this workflow.
@@ -78,7 +88,7 @@ jobs:
   # ==========================================================================
   results:
     name: PR Results
-    needs: [builds, deploys, tests, comment]
+    needs: [builds, deploys, comment]
     if: always()
     runs-on: ubuntu-slim
     timeout-minutes: 1

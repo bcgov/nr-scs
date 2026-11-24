@@ -1,0 +1,42 @@
+type: object
+description: |
+  Writable question-response row submitted when updating an existing Scale Site inspection.
+required:
+  - inspectionQuestionId
+  - inspectionAnswerCode
+  - followUpRequiredInd
+properties:
+  inspectionQuestionId:
+    type: integer
+    format: int64
+    description: Inspection question identifier.
+    example: 501
+  inspectionAnswerCode:
+    type: string
+    description: Selected legacy inspection answer code.
+    example: "Y"
+  commentsText:
+    type: string
+    maxLength: 4000
+    nullable: true
+    description: Question-level response comments.
+  followUpRequiredInd:
+    type: string
+    enum: [Y, N]
+    description: Indicates whether follow-up is required for this response.
+    example: "N"
+  followUpActionText:
+    type: string
+    maxLength: 4000
+    nullable: true
+    description: Follow-up action required text. Required when `followUpRequiredInd` is `Y`.
+  followUpDueDate:
+    type: string
+    format: date
+    nullable: true
+    description: Follow-up due date. Required when `followUpRequiredInd` is `Y`.
+  followUpCompletedInd:
+    type: string
+    enum: [Y, N]
+    nullable: true
+    description: Follow-up completion indicator. Required when `followUpRequiredInd` is `Y`.

@@ -1,0 +1,17 @@
+description: System setting record.
+allOf:
+  - $ref: ./AuditDetail.yaml
+  - type: object
+    properties:
+      settingKey:
+        type: string
+        description: System setting key.
+        example: "WMSG"
+      description:
+        type: string
+        description: System setting description.
+      systemSettingValue:
+        type: string
+        description: System setting value.
+    required:
+      - settingKey

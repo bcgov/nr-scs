@@ -1,0 +1,10 @@
+allOf:
+  - $ref: ./ScaleAuthCondition.yaml
+  - type: object
+    properties:
+      siteMethodTypeCodes:
+        type: array
+        items:
+          type: string
+      dependentChildExists:
+        type: boolean

@@ -1,0 +1,69 @@
+type: object
+description: |
+  One row of the legacy `Check Scale Summary` table rendered on the Scaler and Scale Site
+  `Check Scales` tabs. Sourced from the check scale summary view packages
+  (`scs_check_scale_summary_vw_pkg` / `scs_cs_site_summry_vw_pkg`), not the base table.
+properties:
+  checkScaleId:
+    type: integer
+    format: int64
+    nullable: true
+    description: Check scale identifier shown as the primary navigation link.
+  scaleSiteIdNmbr:
+    type: string
+    nullable: true
+    description: Scale site number the check scale belongs to.
+  primCheckLicenceNo:
+    type: string
+    nullable: true
+    description: Primary check scaler licence number.
+  secCheckLicenceNo:
+    type: string
+    nullable: true
+    description: Secondary check scaler licence number.
+  primOrigLicenceNo:
+    type: string
+    nullable: true
+    description: Primary original scaler licence number.
+  secOrigLicenceNo:
+    type: string
+    nullable: true
+    description: Secondary original scaler licence number.
+  origScaleDate:
+    type: string
+    format: date
+    nullable: true
+    description: Original scale date.
+  checkScaleDate:
+    type: string
+    format: date
+    nullable: true
+    description: Check scale date.
+  pieceDiff:
+    type: number
+    nullable: true
+    description: Piece count difference between the check and original scales.
+  volumeVariance:
+    type: number
+    nullable: true
+    description: Volume variance percentage (legacy displays to 1 decimal).
+  valueVariance:
+    type: number
+    nullable: true
+    description: Value variance percentage (legacy displays to 1 decimal).
+  replacedInd:
+    type: string
+    nullable: true
+    description: Y/N indicator for the legacy `Replaced?` column.
+  checkScaleTypeCode:
+    type: string
+    nullable: true
+    description: Check scale type code; displayed via the CHECK_SCALE_TYPE_CODE LOV description.
+  followedGoodPracticeInd:
+    type: string
+    nullable: true
+    description: Y/N indicator for the legacy `Good Practices?` column.
+  originalWithinStandardInd:
+    type: string
+    nullable: true
+    description: Y/N indicator for the legacy `Within Standard?` column.

@@ -1,0 +1,88 @@
+get:
+  tags:
+    - Condition
+  summary: Search conditions
+  description: |
+    Search scale authorization conditions using `scs_scale_auth_condition_pkg.search_recs`.
+  operationId: searchConditions
+  parameters:
+    - in: query
+      name: scaleConditionClassCode
+      schema:
+        type: string
+    - in: query
+      name: scaleAuthConditionId
+      schema:
+        type: integer
+        format: int64
+    - in: query
+      name: scaleAuthConditionTitle
+      schema:
+        type: string
+    - in: query
+      name: scaleAuthConditionDesc
+      schema:
+        type: string
+    - in: query
+      name: ministryStandardInd
+      schema:
+        type: string
+    - in: query
+      name: sortOrderNo
+      schema:
+        type: integer
+    - in: query
+      name: effectiveDate
+      schema:
+        type: string
+        format: date
+    - in: query
+      name: expiryDate
+      schema:
+        type: string
+        format: date
+  responses:
+    '200':
+      description: Successful search operation
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: '../root.yaml#/components/schemas/ScaleAuthConditionDetail'
+    '500':
+      description: Server error
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+post:
+  tags:
+    - Condition
+  summary: Create a condition
+  operationId: createCondition
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: '../root.yaml#/components/schemas/ScaleAuthConditionCreateRequest'
+  responses:
+    '201':
+      description: Condition created
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/ScaleAuthConditionDetail'
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+    '500':
+      description: Server error
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'

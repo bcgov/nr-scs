@@ -1,0 +1,30 @@
+@use '@carbon/react/scss/spacing' as spacing;
+
+// Coloured risk-level chip, shared by the risk-assessment search tables (Queries) and the read-only
+// Risk Rating tabs on the scaler / scale site record pages. Kept global so the same chip renders
+// wherever a risk level is shown.
+.risk-level-pill {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 0 spacing.$spacing-03;
+  min-height: 1.5rem;
+  font-weight: 400;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.risk-level-pill--high {
+  background-color: #b70009;
+  color: #ffffff;
+}
+
+.risk-level-pill--medium {
+  background-color: #f57927;
+  color: #161616;
+}
+
+.risk-level-pill--low {
+  background-color: #fdd806;
+  color: #161616;
+}

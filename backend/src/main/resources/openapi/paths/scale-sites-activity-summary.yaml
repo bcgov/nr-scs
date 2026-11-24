@@ -1,0 +1,39 @@
+parameters:
+  - name: scaleSiteIdNmbr
+    in: path
+    required: true
+    description: Scale site identifier
+    schema:
+      type: string
+      maxLength: 4
+      example: "1234"
+
+get:
+  tags:
+    - ScaleSiteActivity
+  summary: Get the activity summary for a scale site
+  description: |
+    Returns the read-only activity summary metrics for a scale site:
+    date of the last return, and the number of samples, sample volume,
+    and scaled volume over the last 12 months.
+    Based on scs_scale_site_activity_vw_pkg.search_recs.
+  operationId: getScaleSiteActivitySummary
+  responses:
+    '200':
+      description: Activity summary
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/ScaleSiteActivitySummary'
+    '404':
+      description: Scale site not found
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+    '500':
+      description: Server error
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'

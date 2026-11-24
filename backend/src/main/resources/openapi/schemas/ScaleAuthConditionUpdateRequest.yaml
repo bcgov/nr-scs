@@ -1,0 +1,29 @@
+type: object
+required:
+  - scaleConditionClassCode
+  - scaleAuthConditionTitle
+  - scaleAuthConditionDesc
+  - ministryStandardInd
+  - sortOrderNo
+  - effectiveDate
+properties:
+  scaleConditionClassCode:
+    type: string
+  scaleAuthConditionTitle:
+    type: string
+  scaleAuthConditionDesc:
+    type: string
+  ministryStandardInd:
+    type: string
+  sortOrderNo:
+    type: integer
+  effectiveDate:
+    type: string
+    format: date
+  expiryDate:
+    type: string
+    format: date
+  siteMethodTypeCodes:
+    type: array
+    items:
+      type: string

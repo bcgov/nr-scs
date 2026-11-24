@@ -1,0 +1,25 @@
+allOf:
+  - $ref: ./ValidLicenceAttribute.yaml
+  - $ref: ./AuditDetail.yaml
+  - type: object
+    description: |
+      Full valid licence attribute record as returned in GET / POST / PUT responses.
+      Includes audit fields and a flag indicating whether the record has dependent child records
+      (scaler appointments referencing this combination) that would prevent deletion.
+    properties:
+      scalerAppointmentTypeDescription:
+        type: string
+        nullable: true
+        description: Human-readable description of the appointment type (derived).
+        example: "Official"
+      scalerAppointmentTypeActing:
+        type: string
+        nullable: true
+        description: Acting indicator for the appointment type (Y/N, derived).
+        example: "N"
+      dependentChildExists:
+        type: boolean
+        nullable: true
+        description: |
+          True if at least one scaler appointment record references this grading system /
+          appointment type combination. When true the record cannot be deleted.

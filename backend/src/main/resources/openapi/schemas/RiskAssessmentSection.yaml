@@ -1,0 +1,24 @@
+type: object
+description: |
+  A section of the risk assessment template (e.g. "Consequences (C)" or "Values (A)"),
+  from `scs_risk_tmplt_qa_vw`. Section headings and structure are defined per template
+  version, so different assessments may show different sections.
+properties:
+  sectionId:
+    type: integer
+    format: int64
+    nullable: true
+    description: risk_template_section_id.
+  sectionDescription:
+    type: string
+    nullable: true
+    description: template_section_heading - displayed verbatim as the section header.
+  sectionOrder:
+    type: integer
+    nullable: true
+    description: section_order - display sort order of the section.
+  questions:
+    type: array
+    description: Questions belonging to this section, in question_order.
+    items:
+      $ref: './RiskAssessmentQuestion.yaml'

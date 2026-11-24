@@ -1,0 +1,18 @@
+type: object
+description: Timber-mark holder details returned for the create page lookup.
+properties:
+  timberMark:
+    type: string
+    nullable: true
+  markHolderClient:
+    type: string
+    nullable: true
+  markHolderLoc:
+    type: string
+    nullable: true
+  markHolderName:
+    type: string
+    nullable: true
+  markStatus:
+    type: string
+    nullable: true

@@ -1,0 +1,8 @@
+type: object
+description: Response returned after creating a mark site designation.
+properties:
+  haulingMarkAuthorizationId:
+    type: integer
+    format: int64
+    nullable: true
+    description: Generated mark site designation identifier.

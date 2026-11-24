@@ -1,0 +1,135 @@
+get:
+  tags:
+    - ScalerRiskAssessment
+  summary: Search for scaler risk assessments
+  description: |
+    Search scaler risk assessment records in the SCS system.
+    Based on `scs_risk_scaler_vw_pkg.search_recs`.
+
+    Notes:
+    * Text fields support partial matching using legacy package behavior.
+    * `orgUnitNo` is an exact match.
+    * `primarySort` and `secondarySort` follow legacy query sort codes.
+  operationId: searchScalerRiskAssessments
+  parameters:
+    - name: riskQuestionnaireId
+      in: query
+      description: Risk questionnaire / assessment identifier. Supports wildcard matching (e.g. `20%`).
+      required: false
+      schema:
+        type: string
+        example: "12345"
+
+    - name: riskTypeCode
+      in: query
+      description: Risk type code / level
+      required: false
+      schema:
+        type: string
+        maxLength: 10
+        example: "H"
+
+    - name: completeInd
+      in: query
+      description: Completion indicator (`Y` or `N`)
+      required: false
+      schema:
+        type: string
+        enum: [Y, N]
+
+    - name: scalerLicenceNo
+      in: query
+      description: Scaler licence number
+      required: false
+      schema:
+        type: string
+        maxLength: 20
+        example: "123456"
+
+    - name: orgUnitNo
+      in: query
+      description: Region / district organization unit number
+      required: false
+      schema:
+        type: integer
+        format: int64
+        example: 100
+
+    - name: clientNumber
+      in: query
+      description: Scaler client number
+      required: false
+      schema:
+        type: string
+        maxLength: 8
+        example: "00012345"
+
+    - name: scalerLicenceTypeCode
+      in: query
+      description: |
+        Scaler licence type code:
+        * `SCS` - Scale Administration and Control System
+        * `WA` - Waste Assessment
+      required: false
+      schema:
+        type: string
+        enum: [SCS, WA]
+
+    - name: primarySort
+      in: query
+      description: |
+        Primary sort field:
+        * `1` - Assessment ID
+        * `8` - Level
+        * `4` - Version
+        * `3` - Licence #
+        * `16` - Scaler (Client / Loc)
+        * `14` - Reg/Dist
+        * `17` - Client Name
+      required: false
+      schema:
+        type: integer
+        enum: [1, 8, 4, 3, 16, 14, 17]
+        default: 1
+
+    - name: secondarySort
+      in: query
+      description: |
+        Secondary sort field:
+        * `0` - No secondary sort
+        * `1` - Assessment ID
+        * `8` - Level
+        * `4` - Version
+        * `3` - Licence #
+        * `16` - Scaler (Client / Loc)
+        * `14` - Reg/Dist
+        * `17` - Client Name
+      required: false
+      schema:
+        type: integer
+        enum: [0, 1, 8, 4, 3, 16, 14, 17]
+        default: 0
+
+  responses:
+    '200':
+      description: Successful search operation
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: '../root.yaml#/components/schemas/ScalerRiskAssessmentSearchResult'
+
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+
+    '500':
+      description: Server error
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'

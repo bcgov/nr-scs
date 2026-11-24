@@ -1,0 +1,149 @@
+description: Record returned from `scs_check_scale_pkg.search_recs`.
+allOf:
+  - $ref: ./AuditDetail.yaml
+  - type: object
+    properties:
+      checkScaleId:
+        type: integer
+        format: int64
+        nullable: true
+      checkScaleTypeCode:
+        type: string
+        nullable: true
+      ckscType:
+        type: string
+        nullable: true
+      partialInd:
+        type: string
+        nullable: true
+      followedGoodPracticeInd:
+        type: string
+        nullable: true
+      originalWithinStandardInd:
+        type: string
+        nullable: true
+      originalScaleNetValue:
+        type: number
+        format: double
+        nullable: true
+      checkScaleNetValue:
+        type: number
+        format: double
+        nullable: true
+      chkScalerCommentTxt:
+        type: string
+        nullable: true
+      orgLogTallyDocNo:
+        type: string
+        nullable: true
+      orgLogTallyVer:
+        type: integer
+        nullable: true
+      chkLogTallyDocNo:
+        type: string
+        nullable: true
+      chkLogTallyVer:
+        type: integer
+        nullable: true
+      orgSampleLogTallyVer:
+        type: integer
+        nullable: true
+      orgSampleLogTallyDocNo:
+        type: string
+        nullable: true
+      chkSampleLogTallyVer:
+        type: integer
+        nullable: true
+      chkSampleLogTallyDocNo:
+        type: string
+        nullable: true
+      originalScalerLicenceNo:
+        type: string
+        nullable: true
+      checkScalerLicenceNo:
+        type: string
+        nullable: true
+      secondScalerLicenceNo:
+        type: string
+        nullable: true
+        description: |
+          Secondary scaler licence number sourced from the HBS check header
+          (`secondary_license_number` on log_tally / sample_log_tally). Read-only
+          display field on the create P076 screen.
+      scaleSiteIdNmbr:
+        type: string
+        nullable: true
+      timberMark:
+        type: string
+        nullable: true
+      loadArrivalNumber:
+        type: string
+        nullable: true
+      weighSlipNumber:
+        type: integer
+        nullable: true
+      checkReplacesOriginalInd:
+        type: string
+        nullable: true
+      population:
+        type: string
+        nullable: true
+      stratum:
+        type: string
+        nullable: true
+      samplingYear:
+        type: integer
+        nullable: true
+      originalScaleDate:
+        type: string
+        format: date
+        nullable: true
+      originalScaleReturnNo:
+        type: integer
+        nullable: true
+      originalScaleTotalTops:
+        type: integer
+        nullable: true
+      originalScaleTotalButts:
+        type: integer
+        nullable: true
+      originalScaleTotalLength:
+        type: number
+        format: double
+        nullable: true
+      chkScaleDate:
+        type: string
+        format: date
+        nullable: true
+      chkScaleReturnNo:
+        type: integer
+        nullable: true
+      chkScaleTotalTops:
+        type: integer
+        nullable: true
+      chkScaleTotalButts:
+        type: integer
+        nullable: true
+      chkScaleTotalLength:
+        type: number
+        format: double
+        nullable: true
+      originalScaleTotalVolume:
+        type: number
+        format: double
+        nullable: true
+      originalScaleTotalPieces:
+        type: integer
+        nullable: true
+      chkScaleTotalVolume:
+        type: number
+        format: double
+        nullable: true
+      chkScaleTotalPieces:
+        type: integer
+        nullable: true
+      speciesSummary:
+        type: array
+        nullable: true
+        items:
+          $ref: ../root.yaml#/components/schemas/SpeciesSummaryView

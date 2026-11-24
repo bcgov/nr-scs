@@ -1,0 +1,94 @@
+parameters:
+  - name: checkScaleId
+    in: path
+    required: true
+    description: Identifier of the summary check scale the SPG row belongs to.
+    schema:
+      type: integer
+      format: int64
+post:
+  tags:
+    - SummaryCheckScale
+  summary: Add an SPG row to a summary check scale
+  description: |
+    Adds one species/product/grade roll-up row to an existing summary check scale (legacy
+    `SummaryCheckScaleAction.addSpg`). The product/grade blanking rule is applied server-side based
+    on the stored return type (cksc_type) — non-SFP rows blank the product; SFP rows blank the grade
+    unless the product is the graded product (XM). Returns the freshly reloaded record so the SPG
+    table and roll-up totals refresh in one round-trip.
+  operationId: addSummaryCheckScaleSpgRow
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: '../root.yaml#/components/schemas/SummaryCheckScaleSpgRow'
+  responses:
+    '200':
+      description: SPG row added; updated summary check scale returned
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/CheckScaleDetail'
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+    '404':
+      description: Summary check scale not found
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+    '500':
+      description: Server error
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+delete:
+  tags:
+    - SummaryCheckScale
+  summary: Delete an SPG row from a summary check scale
+  description: |
+    Deletes one species/product/grade roll-up row (legacy
+    `SummaryCheckScaleAction.deleteSPGSummaryCheckScale`). The row is identified by its composite
+    key — species/product/grade — carried in the REQUEST BODY, because the product and grade are
+    stored as a single space for the non-applicable legacy cases and query-parameter binding trims
+    whitespace-only values to null (see `SummaryCheckScaleSpgRowKey`). The last remaining SPG row
+    cannot be deleted (400). Returns the freshly reloaded record so the SPG table and roll-up totals
+    refresh in one round-trip.
+  operationId: deleteSummaryCheckScaleSpgRow
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: '../root.yaml#/components/schemas/SummaryCheckScaleSpgRowKey'
+  responses:
+    '200':
+      description: SPG row deleted; updated summary check scale returned
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/CheckScaleDetail'
+    '400':
+      description: Bad request (e.g. attempt to delete the last remaining SPG row)
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+    '404':
+      description: Summary check scale not found
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+    '500':
+      description: Server error
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'

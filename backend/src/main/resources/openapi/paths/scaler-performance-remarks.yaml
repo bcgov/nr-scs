@@ -1,0 +1,139 @@
+parameters:
+  - name: scalerLicenceNo
+    in: path
+    description: Scaler licence number
+    required: true
+    schema:
+      type: string
+      maxLength: 4
+      example: "1234"
+
+get:
+  tags:
+    - ScalerPerformanceRemark
+  summary: Get performance remarks for a scaler
+  description: |
+    Retrieve the full list of performance-remark records for a scaler. This backs the legacy
+    Performance Remarks tab on the scaler view page (`scalerPerformanceRemarkSummary.jsp`).
+    Based on `scs_scaler_performanc_rmrk_pkg.search_recs`, which returns rows ordered by
+    `logged_timestamp` descending (newest incident first). The `*Description` fields are resolved
+    server-side from the `SCALER_PERFORMANCE_ACTN_CODE` / `SCALER_PERFORMANCE_OUTCM_CODE` LOVs.
+  operationId: getScalerPerformanceRemarks
+  responses:
+    '200':
+      description: Performance remark list found
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: '../root.yaml#/components/schemas/ScalerPerformanceRemarkDetail'
+          example:
+            - scalerPerformanceRemarkId: 1001
+              scalerLicenceNo: "1234"
+              loggedTimestamp: "2025-01-10"
+              performanceRemarkDesc: "Late submission of scale data"
+              scalerPerformanceActnCode: "W"
+              scalerPerformanceActnDescription: "Warning"
+              scalerPerformanceOutcmCode: "R"
+              scalerPerformanceOutcmDescription: "Resolved"
+              suspendStartDate: null
+              suspendEndDate: null
+              checkScaleId: 55001
+              entryTimestamp: "2025-01-10T10:30:00Z"
+              entryUserid: "JSMITH"
+              updateTimestamp: "2025-01-10T10:30:00Z"
+              updateUserid: "JSMITH"
+              revisionCount: 1
+    '404':
+      description: Scaler not found
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+          example:
+            code: "NOT_FOUND"
+            message: "No scaler found with licence number 1234"
+    '500':
+      description: Server error
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+          example:
+            code: "ORA-12345"
+            message: "Database connection error"
+
+post:
+  tags:
+    - ScalerPerformanceRemark
+  summary: Create a performance remark for a scaler
+  description: |
+    Create a new performance-remark record for an existing scaler. This matches the legacy
+    scaler Performance Remarks tab create flow (`scalerPerformanceRemarkCreate.jsp` /
+    `ScalerPerformanceRemarkCreateAction`). Based on `scs_scaler_performanc_rmrk_pkg.insert_rec`.
+
+    Business rules enforced server-side (mirroring `ScalerPerformanceRemarkBo.validate`):
+    * `loggedTimestamp` (Date of Incident) is required and cannot be in the future.
+    * Exactly one of `scalerPerformanceActnCode` or `scalerPerformanceOutcmCode` must be supplied.
+    * `suspendStartDate` must be on or before `suspendEndDate` when both are supplied.
+    * `checkScaleId`, when supplied, must reference an existing check scale.
+  operationId: createScalerPerformanceRemark
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: '../root.yaml#/components/schemas/ScalerPerformanceRemarkCreateRequest'
+        example:
+          loggedTimestamp: "2025-01-10"
+          scalerPerformanceActnCode: "W"
+          performanceRemarkDesc: "Late submission of scale data"
+          checkScaleId: 55001
+  responses:
+    '201':
+      description: Performance remark created successfully
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/ScalerPerformanceRemarkDetail'
+          example:
+            scalerPerformanceRemarkId: 1001
+            scalerLicenceNo: "1234"
+            loggedTimestamp: "2025-01-10"
+            performanceRemarkDesc: "Late submission of scale data"
+            scalerPerformanceActnCode: "W"
+            scalerPerformanceActnDescription: "Warning"
+            checkScaleId: 55001
+            entryTimestamp: "2026-07-06T10:30:00Z"
+            entryUserid: "JSMITH"
+            updateTimestamp: "2026-07-06T10:30:00Z"
+            updateUserid: "JSMITH"
+            revisionCount: 1
+    '400':
+      description: Bad request — validation failure
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+          example:
+            code: "VALIDATION_ERROR"
+            message: "Either an action or an outcome must be selected, but not both."
+    '404':
+      description: Scaler not found
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+          example:
+            code: "NOT_FOUND"
+            message: "No scaler found with licence number 1234"
+    '500':
+      description: Server error
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+          example:
+            code: "ORA-12345"
+            message: "Database connection error"

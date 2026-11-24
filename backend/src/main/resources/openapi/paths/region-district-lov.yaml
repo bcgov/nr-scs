@@ -1,0 +1,57 @@
+get:
+  tags:
+    - Lov
+  summary: Get region and district LOV rows
+  description: |
+    Retrieve regions and districts (organizational units) in the SCS system.
+    Based on `scs_reg_dist_lov_vw_pkg.search_recs`.
+
+    Notes:
+    * `description` supports SQL LIKE semantics. Provide `%` yourself if you need wildcard behavior.
+    * Results are ordered by `description`.
+  operationId: getRegionDistrictLov
+  parameters:
+    - name: code
+      in: query
+      description: Region/district code (exact match)
+      required: false
+      schema:
+        type: string
+        maxLength: 10
+        example: "DCC"
+
+    - name: description
+      in: query
+      description: Region/district description (SQL LIKE semantics)
+      required: false
+      schema:
+        type: string
+        maxLength: 100
+        example: "%Coast%"
+
+
+  responses:
+    '200':
+      description: Successful search operation
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: '../root.yaml#/components/schemas/RegionDistrictLov'
+          example:
+            - code: "DCC"
+              description: "Coast Area - Campbell River"
+            - code: "DSI"
+              description: "South Island District"
+
+    '500':
+      description: Server error
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+          example:
+            code: "ORA-12345"
+            message: "Database connection error"
+

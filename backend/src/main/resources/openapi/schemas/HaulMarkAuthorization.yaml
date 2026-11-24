@@ -1,0 +1,22 @@
+type: object
+description: Record returned from `scs_haul_mark_auth_srch_vw`.
+properties:
+  haulingMarkAuthorizationId:
+    type: integer
+    format: int64
+    nullable: true
+  timberMark:
+    type: string
+    nullable: true
+  effectiveDate:
+    type: string
+    format: date
+    nullable: true
+  expiryDate:
+    type: string
+    format: date
+    nullable: true
+  orgUnitName:
+    type: string
+    nullable: true
+

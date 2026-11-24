@@ -1,0 +1,84 @@
+get:
+  tags:
+    - ScaleSiteInspection
+  summary: Search for a scale site by inspection id
+  description: |
+    Search scale site inspection associations by inspection id using the same legacy package as the
+    original Scale Sites query page.
+    Based on `SCS_SCALE_SITE_INSPCTNS_VW_PKG.search_recs`.
+
+    On a unique match, the backend also validates that the inspection record is viewable through
+    `scs_site_inspection_pkg.get_inspection_report` before returning success.
+  operationId: searchScaleSiteInspection
+  parameters:
+    - name: inspectionId
+      in: query
+      description: Site inspection identifier
+      required: true
+      schema:
+        type: integer
+        format: int64
+        minimum: 1
+        example: 12345
+
+  responses:
+    '200':
+      description: Successful inspection lookup and validation
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/ScaleSiteInspectionSearchResult'
+          example:
+            inspectionId: 12345
+            scaleSiteIdNmbr: "SITE001"
+
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+          example:
+            code: "BAD_REQUEST"
+            message: "Inspection id is required."
+
+    '404':
+      description: No scale site inspection match found
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+          example:
+            code: "NOT_FOUND"
+            message: "No scale site inspection found with inspection id 12345"
+
+    '409':
+      description: More than one scale site inspection match found
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+          example:
+            code: "CONFLICT"
+            message: "Multiple scale site inspections found with inspection id 12345"
+
+    '422':
+      description: Inspection exists in the search view but is not viewable in CIMS
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+          example:
+            code: "UNPROCESSABLE_ENTITY"
+            message: "Inspection 12345 is not viewable in CIMS."
+
+    '500':
+      description: Server error
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+          example:
+            code: "ORA-12345"
+            message: "Database connection error"
+

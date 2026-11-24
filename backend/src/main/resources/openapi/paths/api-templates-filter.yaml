@@ -1,0 +1,20 @@
+get:
+  operationId: getTemplatesByFilter
+  summary: Get template LOVs by filter
+  tags:
+    - Lov
+  parameters:
+    - name: filterField
+      in: path
+      required: true
+      schema:
+        type: string
+  responses:
+    '200':
+      description: OK
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: ../root.yaml#/components/schemas/StaticLov

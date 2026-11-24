@@ -1,0 +1,17 @@
+type: object
+description: |
+  Gate-2-safe scale-site summary row for a site type / scaling method.
+  Based on the legacy `SiteScalingMethodDb.search(...)` flow backed by
+  `scs_site_scaling_method_pkg.search_recs`.
+properties:
+  priorityCode:
+    type: string
+    nullable: true
+    description: Scale site priority code.
+    example: "1"
+  scaleMethodTypeCode:
+    type: string
+    nullable: true
+    description: Scale method type code.
+    example: "W"
+

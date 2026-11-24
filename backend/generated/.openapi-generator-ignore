@@ -1,0 +1,28 @@
+# OpenAPI Generator Ignore File
+#
+# This file tells the OpenAPI Generator which files to skip when regenerating.
+#
+# INSTRUCTIONS:
+# After you move generated API or Model files to your src/main/java directory,
+# add their paths here (relative to this 'generated' directory) to prevent
+# them from being regenerated.
+#
+# Example entries:
+# src/main/java/ca/bc/gov/nrs/scs/backend/api/HaulMarkAuthorizationsApi.java
+# src/main/java/ca/bc/gov/nrs/scs/backend/model/HaulMarkAuthorization.java
+# src/main/java/ca/bc/gov/nrs/scs/backend/model/Client.java
+#
+# You can also use wildcards:
+# src/main/java/ca/bc/gov/nrs/scs/backend/model/Client*.java
+#
+# Add your already-moved files below this line:
+# ================================================================
+
+# Existing API files (already in src/main/java)
+
+src/main/java/ca/bc/gov/nrs/scs/backend/api/HealthApi.java
+
+
+# Existing Model files (already in src/main/java)
+
+src/main/java/ca/bc/gov/nrs/scs/backend/model/Health.java

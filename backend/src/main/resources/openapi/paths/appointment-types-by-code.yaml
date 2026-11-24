@@ -1,0 +1,82 @@
+parameters:
+  - name: appointmentTypeCode
+    in: path
+    required: true
+    description: Appointment type code
+    schema:
+      type: string
+      maxLength: 10
+
+put:
+  tags:
+    - AppointmentType
+  summary: Update appointment type
+  description: |
+    Update an existing scaler appointment type.
+    Based on `scs_scaler_appointment_typ_pkg.update_rec`.
+  operationId: updateAppointmentType
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: '../root.yaml#/components/schemas/AppointmentTypeUpdateRequest'
+        example:
+          description: "Acting"
+          actingInd: "Y"
+          effectiveDate: "2026-01-01"
+  responses:
+    '200':
+      description: Appointment type updated successfully
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/AppointmentType'
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+    '404':
+      description: Appointment type not found
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+    '500':
+      description: Server error
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+
+delete:
+  tags:
+    - AppointmentType
+  summary: Delete appointment type
+  description: |
+    Delete an existing scaler appointment type.
+    Based on `scs_scaler_appointment_typ_pkg.delete_rec`.
+  operationId: deleteAppointmentType
+  responses:
+    '204':
+      description: Appointment type deleted successfully
+    '400':
+      description: Appointment type has dependent records and cannot be deleted
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+    '404':
+      description: Appointment type not found
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+    '500':
+      description: Server error
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'

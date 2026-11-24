@@ -1,0 +1,27 @@
+type: object
+description: |
+  A scaler authorized at a scale site, as shown on the legacy Authorized Scalers tab of the
+  scale site record. Read-only; sourced from `scs_authorized_scalers_vw_pkg.search_recs`.
+properties:
+  scalerAuthorizationId:
+    type: integer
+    format: int64
+  scalerLicenceNo:
+    type: string
+  clientName:
+    type: string
+  status:
+    type: string
+    description: Computed status (Active / Expired / Cancelled).
+  scalerAppointmentTypes:
+    type: string
+    description: Comma-separated appointment type descriptions for the scaler.
+  authorizationEffectiveDate:
+    type: string
+    format: date
+  authorizationExpiryDate:
+    type: string
+    format: date
+  districtWideInd:
+    type: string
+    description: Y when the authorization is district-wide.

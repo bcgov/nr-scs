@@ -1,0 +1,50 @@
+parameters:
+  - name: scaleSiteIdNmbr
+    in: path
+    description: Scale site number
+    required: true
+    schema:
+      type: string
+      maxLength: 8
+      example: "SITE001"
+
+get:
+  tags:
+    - ScaleSite
+  summary: Get the tombstone (primary display fields) for a scale site
+  description: |
+    Retrieve the header-band tombstone fields for a scale site record.
+    Based on the legacy tombstone flow rooted in `ScaleSiteDelegate.loadScaleSiteTombstone(...)`
+    and `SCS_SCALE_SITE_TOMBSTON_VW_PKG.search_recs`.
+  operationId: getScaleSiteTombstone
+  responses:
+    '200':
+      description: Scale site tombstone found
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/ScaleSiteTombstone'
+          example:
+            scaleSiteIdNmbr: "SITE001"
+            siteName: "MAIN YARD"
+            regionName: "South Coast Natural Resource Region"
+            districtName: "South Island District"
+    '404':
+      description: Scale site not found
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+          example:
+            code: "NOT_FOUND"
+            message: "No scale site tombstone found with scale site number SITE001"
+    '500':
+      description: Server error
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+          example:
+            code: "ORA-12345"
+            message: "Database connection error"
+

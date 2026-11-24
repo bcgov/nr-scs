@@ -1,0 +1,222 @@
+parameters:
+  - name: inspectionId
+    in: path
+    description: Site inspection identifier
+    required: true
+    schema:
+      type: integer
+      format: int64
+      minimum: 1
+      example: 12345
+
+get:
+  tags:
+    - ScaleSiteInspection
+  summary: Get scale site inspection detail
+  description: |
+    Retrieve the full read-only Scale Site inspection view payload for a single inspection.
+
+    This endpoint is an aggregated inspection-detail resource used to render the Scale Site
+    inspection view page. It is distinct from the inspection search endpoint:
+    * `GET /scale-sites/inspection/search` performs the legacy query-page lookup and validation.
+    * `GET /scale-sites/inspection/{inspectionId}` returns the renderable inspection detail payload.
+
+    The detail payload is based on the same legacy read flow as the original Struts/JSP inspection
+    view page, with the base inspection record coming from
+    `scs_site_inspection_pkg.get_inspection_report` and supporting detail populated from the
+    related legacy scale-site, owner, inspected-scaling-method, inspection-response, and
+    inspection-question data sources.
+  operationId: getScaleSiteInspectionDetail
+  responses:
+    '200':
+      description: Successful inspection detail retrieval
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/ScaleSiteInspectionDetail'
+          example:
+            inspectionId: 12345
+            inspectionTypeCode: "COM"
+            inspectionTypeDescription: "Compliance"
+            inspectionDate: "2026-03-10"
+            inspector: "A1B2C3D4-E5F6-7890-1234-56789ABCDEF0"
+            scaleSiteIdNmbr: "SITE001"
+            siteName: "MAIN YARD"
+            siteLocation: "Nanaimo"
+            siteOwnerName: "ACME FOREST PRODUCTS LTD."
+            siteTypeDisplay: "Weight Scale, Piece Scale"
+            previousInspectionId: 12001
+            recipient: "Jordan Smith"
+            siteOperatorPresentInd: "Y"
+            siteOperatorPresentDescription: "Yes"
+            comments: "General site condition acceptable."
+            questionResponses:
+              - questionText: "Was the scale head sealed?"
+                inspectionAnswerCode: "Y"
+                inspectionAnswerDescription: "Yes"
+                commentsText: "Seal intact."
+                followUpRequiredInd: "N"
+                followUpRequiredDescription: "No"
+                followUpActionText: null
+                followUpDueDate: null
+                followUpCompletedInd: null
+                followUpCompletedDescription: null
+
+    '404':
+      description: No readable scale site inspection detail found
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+          example:
+            code: "NOT_FOUND"
+            message: "No readable scale site inspection found with inspection id 12345"
+
+    '500':
+      description: Server error
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+          example:
+            code: "ORA-12345"
+            message: "Database connection error"
+
+put:
+  tags:
+    - ScaleSiteInspection
+  summary: Update a scale site inspection
+  description: |
+    Update an existing Scale Site inspection using the legacy edit-mode writable field set.
+
+    This operation is intended for the modern inspection edit page and is narrower than create:
+    only the legacy edit-mode inspection fields plus question responses are writable.
+
+    The expected backend orchestration is:
+    1. Update the base inspection record.
+    2. Delete existing inspection question responses for the inspection.
+    3. Create the submitted inspection question responses.
+  operationId: updateScaleSiteInspection
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: '../root.yaml#/components/schemas/ScaleSiteInspectionUpdateRequest'
+        example:
+          inspectionDate: "2026-03-11"
+          inspector: "A1B2C3D4-E5F6-7890-1234-56789ABCDEF0"
+          siteOperatorPresentInd: "Y"
+          comments: "Updated after site revisit."
+          questionResponses:
+            - inspectionQuestionId: 501
+              inspectionAnswerCode: "N"
+              commentsText: "Seal missing on revisit."
+              followUpRequiredInd: "Y"
+              followUpActionText: "Issue corrective action request."
+              followUpDueDate: "2026-03-20"
+              followUpCompletedInd: "N"
+  responses:
+    '200':
+      description: Scale site inspection updated successfully
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/ScaleSiteInspectionDetail'
+          example:
+            inspectionId: 12345
+            inspectionTypeCode: "COM"
+            inspectionTypeDescription: "Compliance"
+            inspectionDate: "2026-03-11"
+            inspector: "A1B2C3D4-E5F6-7890-1234-56789ABCDEF0"
+            scaleSiteIdNmbr: "SITE001"
+            siteName: "MAIN YARD"
+            siteLocation: "Nanaimo"
+            siteOwnerName: "ACME FOREST PRODUCTS LTD."
+            siteTypeDisplay: "Weight Scale, Piece Scale"
+            previousInspectionId: 12001
+            recipient: "Jordan Smith"
+            siteOperatorPresentInd: "Y"
+            siteOperatorPresentDescription: "Yes"
+            comments: "Updated after site revisit."
+            questionResponses:
+              - questionText: "Was the scale head sealed?"
+                inspectionAnswerCode: "N"
+                inspectionAnswerDescription: "No"
+                commentsText: "Seal missing on revisit."
+                followUpRequiredInd: "Y"
+                followUpRequiredDescription: "Yes"
+                followUpActionText: "Issue corrective action request."
+                followUpDueDate: "2026-03-20"
+                followUpCompletedInd: "N"
+                followUpCompletedDescription: "No"
+    '400':
+      description: Bad request — validation failure
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+          example:
+            code: "VALIDATION_ERROR"
+            message: "inspectionDate is required."
+    '404':
+      description: Scale site inspection not found
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+          example:
+            code: "NOT_FOUND"
+            message: "No readable scale site inspection found with inspection id 12345"
+    '500':
+      description: Server error
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+          example:
+            code: "ORA-12345"
+            message: "Database connection error"
+
+delete:
+  tags:
+    - ScaleSiteInspection
+  summary: Delete a scale site inspection
+  description: |
+    Delete an existing scale site inspection record. Matches the legacy
+    `scaleSiteInspectionView.do?delete` flow (`ScaleSiteInspectionsAction.delete` →
+    `SiteInspectionDelegate.deleteSiteInspection` → `SCS_SITE_INSPECTION_PKG.delete_inspection_report`).
+
+    No business-level guards beyond the endpoint authorization. Returns 204 No Content on success.
+  operationId: deleteScaleSiteInspection
+  responses:
+    '204':
+      description: Scale site inspection deleted successfully
+    '400':
+      description: Bad request — invalid inspection identifier
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+          example:
+            code: "BAD_REQUEST"
+            message: "Inspection id is required."
+    '404':
+      description: Scale site inspection not found
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+          example:
+            code: "NOT_FOUND"
+            message: "No scale site inspection found with inspection id 12345"
+    '500':
+      description: Server error
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+          example:
+            code: "ORA-12345"
+            message: "Database connection error"
+

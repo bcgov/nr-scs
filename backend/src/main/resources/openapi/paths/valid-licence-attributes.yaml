@@ -1,0 +1,83 @@
+get:
+  tags:
+    - ValidLicenceAttribute
+  summary: Search valid licence attributes
+  description: |
+    Search valid licence attribute records using `SCS_SCALER_VALD_LCNC_TTRBT_PKG.search_recs`.
+    This backs the legacy "Maintain Valid Licence Attributes" admin page.
+    Optionally filter by `scaleGradingSystemCode`.
+  operationId: searchValidLicenceAttributes
+  parameters:
+    - in: query
+      name: scaleGradingSystemCode
+      schema:
+        type: string
+        maxLength: 4
+      description: Filter by scale grading system code.
+    - in: query
+      name: scalerAppointmentType
+      schema:
+        type: string
+        maxLength: 4
+      description: Filter by scaler appointment type code.
+  responses:
+    '200':
+      description: Successful search
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: '../root.yaml#/components/schemas/ValidLicenceAttributeDetail'
+    '500':
+      description: Server error
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+
+post:
+  tags:
+    - ValidLicenceAttribute
+  summary: Create a valid licence attribute
+  description: |
+    Create a new valid licence attribute record using `SCS_SCALER_VALD_LCNC_TTRBT_PKG.insert_rec`.
+
+    Business rules:
+    * The composite key (`scaleGradingSystemCode` + `scalerAppointmentType`) must be unique.
+    * `effectiveDate` is required.
+    * `expiryDate`, when provided, must be on or after `effectiveDate`.
+  operationId: createValidLicenceAttribute
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: '../root.yaml#/components/schemas/ValidLicenceAttributeCreateRequest'
+        example:
+          scaleGradingSystemCode: "BC"
+          scalerAppointmentType: "O"
+          effectiveDate: "2023-01-01"
+          expiryDate: "2030-12-31"
+  responses:
+    '201':
+      description: Valid licence attribute created successfully
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/ValidLicenceAttributeDetail'
+    '400':
+      description: Bad request — validation failure or duplicate key
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+          example:
+            code: "VALIDATION_ERROR"
+            message: "A valid licence attribute with grading system BC and appointment type O already exists."
+    '500':
+      description: Server error
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'

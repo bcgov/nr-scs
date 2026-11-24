@@ -1,0 +1,182 @@
+@use '@carbon/react/scss/spacing' as *;
+
+// Shared layout for "view a record with tabs" pages (Scaler view, Scale Site view, etc.).
+// Pages opt in by using the `.scs__tab-view__*` class names on their JSX. Page-specific
+// rules continue to live in each page's own index.scss.
+
+.scs__tab-view {
+  &__header-band {
+    margin-bottom: $spacing-05;
+    background-color: var(--cds-layer);
+    padding: $spacing-04;
+    max-width: 100rem;
+
+    table.cds--data-table {
+      width: auto;
+    }
+
+    td {
+      vertical-align: middle;
+      padding-left: $spacing-03;
+      padding-right: $spacing-03;
+    }
+
+    .scs__tab-view__label {
+      padding-right: $spacing-02;
+      width: 1%;
+    }
+  }
+
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: $spacing-03;
+
+    .cds--data-table-container,
+    .cds--table-container {
+      flex: 0 0 auto;
+      min-width: 0;
+    }
+  }
+
+  &__header-actions {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    gap: $spacing-04;
+    padding-left: $spacing-04;
+  }
+
+  &__label {
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
+  &__tabs-col {
+    margin-bottom: $spacing-07;
+    max-width: 100rem;
+
+    // Contained tabs render 40px high instead of Carbon's 48px default (SCS-462)
+    .cds--tabs.cds--tabs--contained:not(.cds--tabs--tall) {
+      min-block-size: 2.5rem;
+
+      .cds--tabs__nav-item {
+        block-size: 2.5rem;
+      }
+
+      .cds--tabs__nav-item-label,
+      .cds--tabs__nav-item--selected,
+      .cds--tabs__nav-item--selected:hover {
+        line-height: calc(2.5rem - (#{$spacing-03} * 2));
+      }
+    }
+  }
+
+  &__panel {
+    padding: $spacing-05;
+    background-color: var(--cds-background);
+
+    // TableResource header cells render centered in the tab context; pin them to the
+    // left so headers line up with their (left-aligned) row data.
+    .table-resource table th,
+    .table-resource table th .table-resource__header-button {
+      text-align: left;
+      justify-content: flex-start;
+    }
+
+    .cds--data-table-container,
+    .cds--table-container {
+      max-width: 100%;
+      overflow-x: auto;
+      margin-bottom: $spacing-05;
+    }
+
+    table.cds--data-table {
+      width: 100%;
+    }
+
+    td,
+    th {
+      vertical-align: middle;
+      word-break: break-word;
+    }
+
+    &--placeholder {
+      color: var(--cds-text-secondary);
+      font-style: italic;
+    }
+  }
+
+  &__filter {
+    margin-bottom: $spacing-05;
+  }
+
+  // Section heading inside a record tab. Matches the other tabs' headings (Check Scales, Scale Site
+  // Summary / Contacts, i.e. .view-scale-site__section-title) — an <h4> at Carbon's default heading
+  // weight, so nothing renders larger or bolder than its neighbours.
+  &__section-title {
+    margin-top: 0;
+    margin-bottom: $spacing-04;
+  }
+
+  &__table-link {
+    color: var(--cds-link-primary);
+    text-decoration: underline;
+
+    &:hover {
+      color: var(--cds-link-primary-hover);
+    }
+
+    // Renders an in-tab action (e.g. opening a detail panel) as a hyperlink rather than a button.
+    &--button {
+      padding: 0;
+      border: none;
+      background: none;
+      font: inherit;
+      cursor: pointer;
+    }
+  }
+
+  // Value area for a read-only detail field that holds a link (e.g. the Associated Check Scale #),
+  // sized to line up with the read-only Carbon text inputs beside it.
+  &__readonly-value {
+    display: flex;
+    align-items: center;
+    min-height: 2.5rem;
+    padding: $spacing-03 0;
+  }
+
+  &__table {
+    font-weight: 600;
+    margin-bottom: $spacing-05;
+
+    &--wide {
+      width: 70% !important;
+    }
+
+    &--compact {
+      width: auto !important;
+      display: inline-table;
+    }
+  }
+}
+
+// Clickable, sortable column header used by the read-only Risk Rating tables. Renders the header
+// label as a bare button (inheriting the table header's typography) with an ASC/DESC arrow.
+.scs__sortable-header__button {
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: baseline;
+  gap: $spacing-02;
+}
+
+.scs__sortable-header__indicator {
+  font-weight: 700;
+}

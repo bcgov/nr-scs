@@ -1,0 +1,123 @@
+# SCS backend configuration.
+#
+# Replaces the Ansible-templated application.properties and Tomcat context.xml from the Polaris
+# deployment (bcgov-c/nr-scs backend/playbooks). Every deploy-time value is an environment variable,
+# set by backend/openshift.deploy.yml on OpenShift and by backend/.env (see .env.example) locally.
+#
+# Local overrides: a gitignored src/main/resources/application-local.yml, activated with
+# SPRING_PROFILES_ACTIVE=local.
+
+server:
+  port: ${SERVER_PORT:8080}
+  shutdown: graceful
+  error:
+    include-message: always
+  # Honour X-Forwarded-* from the Caddy reverse proxy (frontend) when reconstructing request URLs.
+  forward-headers-strategy: framework
+
+spring:
+  application:
+    name: scs-backend
+  datasource:
+    # Oracle over TCPS (port 1543), as for the other NRIDS apps on OpenShift. The trust store is
+    # written to /cert/jssecacerts by the init container in backend/openshift.deploy.yml.
+    # DATABASE_URL overrides the whole URL, e.g. the plain-TCP seeded Oracle container used by the
+    # E2E suite: jdbc:oracle:thin:@//localhost:1525/DBDOCK_01
+    url: ${DATABASE_URL:jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS=(PROTOCOL=TCPS)(HOST=${DATABASE_HOST:localhost})(PORT=${DATABASE_PORT:1543}))(CONNECT_DATA=(SERVICE_NAME=${DATABASE_SERVICE_NAME:})(SERVER=DEDICATED)))}
+    username: ${DATABASE_USER:}
+    password: ${DATABASE_PASSWORD:}
+    driver-class-name: oracle.jdbc.OracleDriver
+    hikari:
+      # Sized from the Tomcat JNDI pool it replaces (maxActive 20, minIdle 2, maxWait 10s).
+      pool-name: scs-pool
+      maximum-pool-size: ${DATABASE_POOL_MAX:20}
+      minimum-idle: ${DATABASE_POOL_MIN_IDLE:2}
+      connection-timeout: 10000
+      idle-timeout: 600000
+      max-lifetime: 1800000
+      data-source-properties:
+        javax.net.ssl.trustStoreType: JKS
+        javax.net.ssl.trustStore: ${TRUSTSTORE_PATH:/cert/jssecacerts}
+        javax.net.ssl.trustStorePassword: ${KEYSTORE_SECRET:}
+
+# --- Authentication -------------------------------------------------------------------------------
+# FAM/Cognito JWT validation, carried over unchanged from the WAR. Keycloak replaces this in a
+# follow-up. Mock auth (security.jwt.enabled=false) is refused at startup unless
+# scs.app.environment is LOCAL or DEV — see SecurityConfig.
+security:
+  jwt:
+    enabled: ${SECURITY_JWT_ENABLED:true}
+  mock:
+    user-name: ${SECURITY_MOCK_USER_NAME:MOCK_CLERICAL}
+    user-guid: ${SECURITY_MOCK_USER_GUID:}
+jwt:
+  issuer:
+    jwks-uri: ${JWT_ISSUER_JWKS_URI:}
+  # Expected audience (Cognito app client id). Tokens minted for another client are rejected.
+  audience: ${JWT_AUDIENCE:}
+
+# Comma-separated. Leave blank when the frontend is served same-origin (Caddy proxies /api).
+cors:
+  allowed-origins: ${CORS_ALLOWED_ORIGINS:}
+# Blank uses SecurityConfig's built-in same-origin default.
+csp:
+  policy: ${CSP_POLICY:}
+
+# --- JasperReports Server -------------------------------------------------------------------------
+jasper:
+  server:
+    login-url: ${JASPER_SERVER_LOGIN_URL:}
+    fetch-url: ${JASPER_SERVER_FETCH_URL:}
+    username: ${JASPER_SERVER_USERNAME:}
+    password: ${JASPER_SERVER_PASSWORD:}
+
+# --- Email delivery (CHES) ------------------------------------------------------------------------
+mail:
+  enabled: ${MAIL_ENABLED:false}
+  host: ${CHES_EMAIL_URL:}
+  login: ${CHES_TOKEN_URL:}
+  username: ${CHES_CLIENT_ID:}
+  password: ${CHES_CLIENT_SECRET:}
+  from: ${CHES_FROM_EMAIL:no-reply@scs.local}
+
+scs:
+  # --- Rate limiting (M-10): per-user (IP fallback) token buckets for search/report endpoints ---
+  rate-limit:
+    enabled: ${RATE_LIMIT_ENABLED:true}
+    reports:
+      capacity: ${RATE_LIMIT_REPORTS_CAPACITY:10}
+      refill-seconds: ${RATE_LIMIT_REPORTS_REFILL_SECONDS:60}
+    search:
+      capacity: ${RATE_LIMIT_SEARCH_CAPACITY:60}
+      refill-seconds: ${RATE_LIMIT_SEARCH_REFILL_SECONDS:60}
+  app:
+    # Operations-controlled maintenance switch (WebADE-style). When false, non-administrators are
+    # routed to the "SCS temporarily disabled" interstitial and blocked from the API. Deploy-time
+    # only: changing it means a redeploy/restart.
+    enabled: ${APP_ENABLED:true}
+    version: ${APP_VERSION:0.0.0}
+    environment: ${APP_ENVIRONMENT:}
+    server-name: ${APP_SERVER_NAME:nr-scs}
+  welcome:
+    system-setting-key: ${SYSTEM_SETTING_KEY:WMSG}
+    current-news:
+      default: ${CURRENT_NEWS_DEFAULT:}
+
+# --- Actuator: Kubernetes probes and the Prometheus scrape only -----------------------------------
+management:
+  endpoints:
+    web:
+      exposure:
+        # Keep in step with the anonymous /actuator matchers in SecurityConfig.
+        include: health,prometheus
+  endpoint:
+    health:
+      probes:
+        enabled: true
+
+logging:
+  level:
+    root: ${LOGGING_LEVEL:INFO}
+    ca.bc.gov.nrs.scs: ${APP_LOG_LEVEL:INFO}
+    org.springframework: INFO
+    net.sf.jasperreports: WARN

@@ -1,0 +1,57 @@
+/* Shared styles for the summary check scale header form + SPG row fields (Create + Update). */
+
+.summary-check-scale-form__matrix {
+  width: 100%;
+}
+
+.summary-check-scale-form__matrix .cds--text-input-wrapper {
+  margin: 0;
+}
+
+/* Match the Date of Scale picker inputs to the white Scale Return # text inputs in the matrix. */
+.summary-check-scale-form__matrix .cds--date-picker__input {
+  background-color: var(--cds-field-02, #ffffff);
+}
+
+.summary-check-scale-form__matrix td,
+.summary-check-scale-form__matrix th {
+  vertical-align: middle;
+}
+
+
+.summary-check-scale-form__field-error {
+  margin-top: 0.5rem;
+  font-size: 0.875rem;
+  color: var(--cds-text-error);
+}
+
+.summary-check-scale-form__required {
+  margin-left: 0.25rem;
+  color: var(--cds-text-error);
+}
+
+.summary-check-scale-form__load-or-weigh {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 1rem;
+  background-color: var(--cds-layer-accent-01, #e8e8e8);
+  border: 1px solid var(--cds-border-subtle-01, #c6c6c6);
+  border-radius: 4px;
+}
+
+.summary-check-scale-form__load-or-weigh > * {
+  flex: 1;
+}
+
+.summary-check-scale-form__or {
+  flex: 0 0 auto;
+  margin-top: 2rem; /* drop "Or" to the input row, below the field labels */
+}
+
+/* Inline SPG action (Add button) — bottom-align it with the adjacent field's input row. */
+.summary-check-scale-form__inline-action {
+  display: flex;
+  align-items: flex-end;
+  height: 100%;
+}

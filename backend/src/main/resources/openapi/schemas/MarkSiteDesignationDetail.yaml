@@ -1,0 +1,86 @@
+description: Detail view payload for a mark site designation.
+allOf:
+  - $ref: ./AuditDetail.yaml
+  - type: object
+    properties:
+      haulingMarkAuthorizationId:
+        type: integer
+        format: int64
+        nullable: true
+      timberMark:
+        type: string
+        nullable: true
+      markHolderClient:
+        type: string
+        nullable: true
+      markHolderLoc:
+        type: string
+        nullable: true
+      markHolderName:
+        type: string
+        nullable: true
+      markStatus:
+        type: string
+        nullable: true
+      geographicLocation:
+        type: string
+        nullable: true
+      population:
+        type: integer
+        format: int64
+        nullable: true
+      effectiveDate:
+        type: string
+        format: date
+        nullable: true
+      expiryDate:
+        type: string
+        format: date
+        nullable: true
+      estimatedVolume:
+        type: integer
+        format: int64
+        nullable: true
+      estimatedTruckLoads:
+        type: integer
+        format: int64
+        nullable: true
+      timberDescription:
+        type: string
+        nullable: true
+      transportationDateDesc:
+        type: string
+        nullable: true
+      otherRequirements:
+        type: string
+        nullable: true
+      orgUnitNo:
+        type: integer
+        format: int64
+        nullable: true
+      districtWideInd:
+        type: string
+        nullable: true
+      letterExists:
+        type: boolean
+        nullable: true
+        description: Whether a letter has been issued for this authorization.
+      scaleSites:
+        type: array
+        items:
+          $ref: '../root.yaml#/components/schemas/MarkSiteDesignationScaleSite'
+      speciesContent:
+        type: array
+        items:
+          $ref: '../root.yaml#/components/schemas/MarkSiteDesignationSpeciesContent'
+      conditions:
+        type: array
+        items:
+          $ref: '../root.yaml#/components/schemas/ScaleAuthCondition'
+      exceptions:
+        type: array
+        description: |
+          Exempt mark method codes (the "Exceptions" multi-select) linked to this mark site
+          designation. Each value is an `EXEMPT_MARK_METHOD_CODE` LOV code.
+        items:
+          type: string

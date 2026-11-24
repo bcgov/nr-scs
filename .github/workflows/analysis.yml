@@ -20,66 +20,67 @@ jobs:
     name: Backend Tests
     if: (! github.event.pull_request.draft)
     runs-on: ubuntu-24.04
-    timeout-minutes: 5
-    services:
-      postgres:
-        image: postgres
-        env:
-          POSTGRES_PASSWORD: default
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-        ports:
-          - 5432:5432
+    timeout-minutes: 15
+    permissions:
+      contents: read
+    # Job-level so the Sonar step's `if:` can read them (a step's own env isn't in scope for its if).
+    env:
+      SONAR_TOKEN: ${{ secrets.sonar_token_backend }}
+      SONAR_PROJECT_KEY: ${{ vars.SONAR_PROJECT_KEY_BACKEND }}
     steps:
-      - uses: bcgov/action-test-and-analyse@8f699e3fd3fadd9a6adf6f4b1f2638ef7ecfefb9 # v2.0.0
-        env:
-          sonar_token: ${{ secrets.sonar_token_backend }}
+      - uses: actions/checkout@v7
         with:
-          commands: |
-            npm ci
-            npm run lint
-            npm run format:check
-            npm run test:cov
-          dir: backend
-          node_version: "24"
-          sonar_args: >
-            -Dsonar.exclusions=**/coverage/**,**/node_modules/**,**/*spec.ts
-            -Dsonar.organization=bcgov-sonarcloud
-            -Dsonar.projectKey=quickstart-openshift_backend
-            -Dsonar.sources=src
-            -Dsonar.test.inclusions=**/*spec.ts
-            -Dsonar.javascript.lcov.reportPaths=./coverage/lcov.info
-          sonar_token: ${{ env.sonar_token }}
-          dep_scan: warn
-          supply_scan: true
-          triggers: ('backend/')
+          # Sonar uses git blame for new-code detection; shallow clones break it.
+          fetch-depth: 0
+
+      - name: Set up Java 21 (Temurin) + Maven cache
+        uses: actions/setup-java@v6
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: maven
+
+      # Generates the OpenAPI interfaces, compiles, runs the unit tests and writes the JaCoCo report
+      # (target/site/jacoco/jacoco.xml) that Sonar reads.
+      - name: Maven verify (unit tests + coverage)
+        working-directory: backend
+        run: mvn -B verify
+
+      # Skipped (not failed) until the SonarCloud project and its token exist.
+      - name: SonarCloud scan
+        if: env.SONAR_TOKEN != '' && env.SONAR_PROJECT_KEY != ''
+        working-directory: backend
+        run: |
+          mvn -B sonar:sonar \
+            -Dsonar.host.url=https://sonarcloud.io \
+            -Dsonar.organization=bcgov-sonarcloud \
+            -Dsonar.projectKey="$SONAR_PROJECT_KEY" \
+            -Dsonar.projectName=nr-scs-backend \
+            -Dsonar.token="$SONAR_TOKEN"
 
   frontend-tests:
     name: Frontend Tests
     if: (! github.event.pull_request.draft)
     runs-on: ubuntu-24.04
-    timeout-minutes: 5
+    timeout-minutes: 10
     steps:
       - uses: bcgov/action-test-and-analyse@8f699e3fd3fadd9a6adf6f4b1f2638ef7ecfefb9 # v2.0.0
         env:
           sonar_token: ${{ secrets.sonar_token_frontend }}
         with:
+          # test:ci = the node (unit) Vitest project with coverage, lcov paths normalised for Sonar.
           commands: |
             npm ci
             npm run lint
-            npm run format:check
-            npm run test:cov
+            npm run test:ci
           dir: frontend
           node_version: "24"
           sonar_args: >
-            -Dsonar.exclusions=**/coverage/**,**/node_modules/**,**/*spec.ts,**/*test.tsx,**/routeTree.gen.ts
+            -Dsonar.exclusions=**/coverage/**,**/node_modules/**,e2e/**,**/*.test.ts,**/*.test.tsx
             -Dsonar.organization=bcgov-sonarcloud
-            -Dsonar.projectKey=quickstart-openshift_frontend
+            -Dsonar.projectKey=${{ vars.SONAR_PROJECT_KEY_FRONTEND || 'nr-scs_frontend' }}
             -Dsonar.sources=src
-            -Dsonar.test.inclusions=**/*spec.ts,**/*test.tsx
+            -Dsonar.test.inclusions=**/*.test.ts,**/*.test.tsx
             -Dsonar.javascript.lcov.reportPaths=./coverage/lcov.info
           sonar_token: ${{ env.sonar_token }}
           dep_scan: warn

@@ -1,0 +1,22 @@
+type: object
+description: |
+  Rich appointment LOV row used by the scaler create flow.
+  Based on `scs_sgcd_sapt_lov_vw_pkg.search_recs`.
+properties:
+  code:
+    type: string
+    nullable: true
+    description: Display code/key for the appointment LOV entry.
+  description:
+    type: string
+    nullable: true
+    description: User-facing appointment description.
+  scaleGradingSystemCode:
+    type: string
+    nullable: true
+    description: Derived scale grading system code for the selected appointment.
+  scalerAppointmentType:
+    type: string
+    nullable: true
+    description: Derived scaler appointment type for the selected appointment.
+

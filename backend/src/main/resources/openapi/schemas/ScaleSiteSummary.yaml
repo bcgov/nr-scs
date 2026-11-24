@@ -1,0 +1,96 @@
+description: |
+  Gate-2-safe scale site summary payload for the Summary tab of the view page.
+  This schema intentionally includes only strongly traced fields from the legacy
+  summary core and site-type flows:
+
+  * `ScaleSiteDb.read(...)` backed by `scs_scale_site_pkg.select_rec`
+  * `SiteScalingMethodDb.search(...)` backed by `scs_site_scaling_method_pkg.search_recs`
+
+  Display-only composed fields and LOV-backed descriptions are intentionally excluded
+  until Gate 3 source verification is complete.
+allOf:
+  - $ref: ./AuditDetail.yaml
+  - type: object
+    properties:
+      scaleSiteIdNmbr:
+        type: string
+        nullable: true
+        description: Scale site number.
+        example: "SITE001"
+      siteName:
+        type: string
+        nullable: true
+        description: Scale site name from the legacy summary core source.
+        example: "MAIN YARD"
+      ownerClientNumber:
+        type: string
+        nullable: true
+        description: Site owner client number.
+        example: "12345678"
+      ownerClientLocnCode:
+        type: string
+        nullable: true
+        description: Site owner location code.
+        example: "00"
+      orgUnitNo:
+        type: integer
+        format: int64
+        nullable: true
+        description: Region / district organization unit number.
+        example: 100
+      regDistDisplay:
+        type: string
+        nullable: true
+        description: Region / district display text resolved from the legacy-aligned RegionDistrictLov source.
+        example: "RKB - Selkirk Natural Resource District"
+      timberBrand:
+        type: string
+        nullable: true
+        description: Timber brand.
+        example: "TB-123"
+      siteLocation:
+        type: string
+        nullable: true
+        description: Description of site location.
+        example: "Nanaimo, BC"
+      latitudeDegrees:
+        type: integer
+        nullable: true
+        description: Latitude degrees.
+        example: 49
+      latitudeMinutes:
+        type: integer
+        nullable: true
+        description: Latitude minutes.
+        example: 10
+      latitudeSeconds:
+        type: integer
+        nullable: true
+        description: Latitude seconds.
+        example: 22
+      longitudeDegrees:
+        type: integer
+        nullable: true
+        description: Longitude degrees.
+        example: 123
+      longitudeMinutes:
+        type: integer
+        nullable: true
+        description: Longitude minutes.
+        example: 56
+      longitudeSeconds:
+        type: integer
+        nullable: true
+        description: Longitude seconds.
+        example: 31
+      siteTypes:
+        type: array
+        nullable: true
+        description: Site type / scaling method rows for the scale site.
+        items:
+          $ref: '../root.yaml#/components/schemas/ScaleSiteSummarySiteType'
+        example:
+          - priorityCode: "1"
+            scaleMethodTypeCode: "W"
+          - priorityCode: "2"
+            scaleMethodTypeCode: "P"

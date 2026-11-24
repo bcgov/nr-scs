@@ -1,0 +1,92 @@
+get:
+  tags:
+    - Workbench
+  summary: Search expiring scaler authorizations
+  description: |
+    Search expiring scaler authorizations using criteria based on
+    `scs_scaler_auth_wb_vw_pkg.search_recs`.
+  operationId: searchScalerAuthorizations
+  parameters:
+    - name: scalerAuthorizationId
+      in: query
+      description: Scaler authorization identifier
+      required: false
+      schema:
+        type: integer
+        format: int64
+        minimum: 0
+    - name: effectiveDate
+      in: query
+      description: Effective date (exact match)
+      required: false
+      schema:
+        type: string
+        format: date
+    - name: expiryDate
+      in: query
+      description: Expiry date (exact match)
+      required: false
+      schema:
+        type: string
+        format: date
+    - name: scalerLicenceNumber
+      in: query
+      description: Scaler licence number
+      required: false
+      schema:
+        type: string
+    - name: regionId
+      in: query
+      description: Region identifier
+      required: false
+      schema:
+        type: integer
+        format: int64
+    - name: districtId
+      in: query
+      description: District identifier
+      required: false
+      schema:
+        type: integer
+        format: int64
+    - name: scalerName
+      in: query
+      description: Scaler name
+      required: false
+      schema:
+        type: string
+    - name: primarySort
+      in: query
+      description: Primary sort field (1-7)
+      required: false
+      schema:
+        type: integer
+        default: 1
+    - name: secondarySort
+      in: query
+      description: Secondary sort field (0-7)
+      required: false
+      schema:
+        type: integer
+        default: 0
+  responses:
+    '200':
+      description: Successful search operation
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: '../root.yaml#/components/schemas/ScalerAuthorizationWorkbenchResult'
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+    '500':
+      description: Server error
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'

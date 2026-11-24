@@ -1,24 +1,14 @@
-# Standard exclusions
-*.md
-.git
-.github
+# Build output and regenerated sources (the image build regenerates generated/src from the spec)
+target
+generated/src
+generated/*
+!generated/.openapi-generator-ignore
+
+# Local-only config and IDE files
+.env
+src/main/resources/application.properties
+src/main/resources/application-local.yml
 .idea
-.vscode
+*.iml
+*.md
 Dockerfile
-CODE_OF_CONDUCT*
-CONTRIBUTING*
-LICENSE*
-SECURITY*
-
-# Node exclusions
-dist
-node_modules
-
-# App-specific exclusions
-coverage
-cypress
-e2e
-migrations
-output
-test
-tests

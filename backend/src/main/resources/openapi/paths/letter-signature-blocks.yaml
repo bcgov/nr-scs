@@ -1,0 +1,36 @@
+get:
+  tags:
+    - SignatureBlock
+  summary: List signature blocks for a letter's signatory picker
+  description: |
+    Read-only lookup of the signature blocks a letter author may choose from, using the same
+    `scs_maint_signatories_vw_pkg.search_recs` call as `GET /signature-blocks`. Gated on
+    `LETTER_SIGNATORY_QUERY` (held by every role that can compose a letter) rather than on the
+    Maintain Signatories permission, which letter authors such as the Check Scaler do not hold.
+  operationId: searchLetterSignatureBlocks
+  parameters:
+    - in: query
+      name: orgUnitNo
+      schema:
+        type: integer
+        format: int64
+    - in: query
+      name: rollupRegionNo
+      schema:
+        type: integer
+        format: int64
+  responses:
+    '200':
+      description: Signature blocks matching the org unit / region
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: '../root.yaml#/components/schemas/ScaleSignatoryBlock'
+    '500':
+      description: Server error
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'

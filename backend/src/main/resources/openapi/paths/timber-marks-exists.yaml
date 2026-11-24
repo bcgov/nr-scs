@@ -1,0 +1,56 @@
+get:
+  tags:
+    - TimberMark
+  summary: Check whether a timber mark exists
+  description: |
+    Whether `HAULING_AUTHORITY` holds the given timber mark — the timber-mark existence rule legacy applied
+    on the Mark Site Designation and Designated Marks Exception report forms (`ReportValidator.doesMarkExist`
+    → `scs_hauling_authority_pkg.search_recs`). Lets those screens flag an unknown mark against the field
+    before submitting; the report endpoints enforce the same rule server-side.
+
+    Notes:
+    * The mark is folded to upper case before the lookup (marks are stored upper-case).
+    * The match is exact (SQL `LIKE` with no wildcard added), as in legacy.
+    * A real mark needs no hauling-mark authorization (designation) to exist.
+  operationId: timberMarkExists
+  parameters:
+    - name: timberMark
+      in: query
+      description: Timber mark to look up (exact match)
+      required: true
+      schema:
+        type: string
+        minLength: 1
+        maxLength: 20
+        example: "AB6633"
+
+  responses:
+    '200':
+      description: Lookup completed
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/TimberMarkExistsResponse'
+          example:
+            timberMark: "AB6633"
+            exists: true
+
+    '400':
+      description: Bad request (missing or over-long timber mark)
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+          example:
+            code: "VALIDATION_ERROR"
+            message: "timberMark is required"
+
+    '500':
+      description: Server error
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+          example:
+            code: "INTERNAL_SERVER_ERROR"
+            message: "An unexpected error occurred. Please try again later."

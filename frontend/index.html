@@ -1,15 +1,18 @@
 <!doctype html>
 <html lang="en">
   <head>
-    <meta charset="utf-8" />
-    <meta name="Description" content="Quickstart OpenShift" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
-    <link rel="icon" href="/favicon.ico" />
-    <title>QuickStart OpenShift</title>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="%BASE_URL%icon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- Load Amplify config before React app (templated at deploy time).
+         Must be base-absolute (%BASE_URL%), not relative: a relative src resolves against the
+         current route, so refreshing a deep link (e.g. /pub/scs/scalers/view/123) would request
+         .../scalers/view/amplify-config.js and 404, crashing the app before Amplify initializes. -->
+    <script src="%BASE_URL%amplify-config.js"></script>
+    <title>SCS</title>
   </head>
   <body>
     <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
+    <script type="module" src="./src/main.tsx"></script>
   </body>
 </html>

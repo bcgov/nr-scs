@@ -1,0 +1,18 @@
+allOf:
+  - $ref: ./AuditDetail.yaml
+  - type: object
+    properties:
+      scaleAuthTemplateId:
+        type: integer
+        format: int64
+      orgUnitNo:
+        type: integer
+        format: int64
+      scaleConditionClassCode:
+        type: string
+      scaleAuthTemplateName:
+        type: string
+      conditions:
+        type: array
+        items:
+          $ref: '../root.yaml#/components/schemas/ScaleAuthCondition'

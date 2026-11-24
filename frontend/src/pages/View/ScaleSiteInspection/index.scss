@@ -1,0 +1,25 @@
+.scale-site-inspection-view {
+  row-gap: 1.5rem;
+
+  &__content {
+    display: flex;
+    flex-direction: column;
+  }
+
+  &__actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    margin-top: 1.5rem;
+  }
+
+  &__panel {
+    background: #ffffff;
+    border: 1px solid #e0e0e0;
+    border-radius: 0.25rem;
+    padding: 1.5rem;
+    box-shadow: 0 1px 2px rgb(0 0 0 / 8%);
+  }
+
+}
+

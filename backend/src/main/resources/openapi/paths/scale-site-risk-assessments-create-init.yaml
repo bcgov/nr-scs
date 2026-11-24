@@ -1,0 +1,60 @@
+parameters:
+  - name: scaleSiteIdNmbr
+    in: path
+    description: Scale site identifier
+    required: true
+    schema:
+      type: string
+      maxLength: 4
+      example: "123"
+
+get:
+  tags:
+    - ScaleSiteRiskAssessment
+  summary: Get the create-init payload for a new scale site risk assessment
+  description: |
+    Retrieve the payload used to render the "Add Risk Assessment" form on the scale site record's
+    Risk Rating tab. Mirrors the legacy `RiskAssessmentAction.addScaleSiteAssessment`, which binds a
+    new scale site assessment to the currently active `SCSI` template. The active template is the one
+    whose effective/expiry window contains today (`scs_risk_questionnr_tmplt_pkg.search_active_recs`);
+    exactly one must be active.
+
+    The response reuses `ScaleSiteRiskAssessmentDetail`: it carries the scale site header (id, name,
+    region, district), the bound `templateId` / `versionNo`, the blank `sections`
+    (questions/answers with no selection), and the `riskRatings` reference table. No
+    `RISK_QUESTIONNAIRE` row is created by this call — persistence happens only on the create POST.
+  operationId: getScaleSiteRiskAssessmentCreateInit
+  responses:
+    '200':
+      description: Create-init payload retrieved
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/ScaleSiteRiskAssessmentDetail'
+    '404':
+      description: Scale site not found
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+          example:
+            code: "NOT_FOUND"
+            message: "No scale site tombstone found for scale site id 123"
+    '409':
+      description: Template configuration error (no single active SCSI template)
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+          example:
+            code: "CONFLICT"
+            message: "Multiple active risk assessment templates found for type SCSI."
+    '500':
+      description: Server error
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+          example:
+            code: "ORA-12345"
+            message: "Database connection error"

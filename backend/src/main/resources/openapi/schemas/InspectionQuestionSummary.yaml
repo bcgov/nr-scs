@@ -1,0 +1,8 @@
+allOf:
+  - $ref: ./InspectionQuestion.yaml
+  - type: object
+    properties:
+      inspectionTypeCodes:
+        type: array
+        items:
+          type: string

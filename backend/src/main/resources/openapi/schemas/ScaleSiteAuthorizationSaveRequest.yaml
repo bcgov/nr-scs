@@ -1,0 +1,34 @@
+type: object
+required:
+  - scaleSiteIdNmbr
+  - authorizationEffectiveDate
+  - authorizationExpiryDate
+  - expectedScaleVolume
+properties:
+  scaleSiteIdNmbr:
+    type: string
+    maxLength: 4
+  authorizationEffectiveDate:
+    type: string
+    format: date
+  authorizationExpiryDate:
+    type: string
+    format: date
+  expectedScaleVolume:
+    type: integer
+    format: int64
+  letterArcsFileNumber:
+    type: string
+    maxLength: 20
+  expiryNotificationInd:
+    type: string
+  cancellationDate:
+    type: string
+    format: date
+  cancellationReasonTxt:
+    type: string
+    maxLength: 200
+  conditions:
+    type: array
+    items:
+      $ref: '../root.yaml#/components/schemas/ScaleAuthConditionRef'

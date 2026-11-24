@@ -1,0 +1,12 @@
+type: object
+description: |
+  Payload for the Scaler `Check Scales` tab: the check scale statistics table plus the
+  check scale summary rows, loaded in one round-trip like the legacy screen (P012).
+properties:
+  stats:
+    $ref: '../root.yaml#/components/schemas/CheckScaleStatsView'
+  checkScales:
+    type: array
+    description: Check scale summary rows for the tab table.
+    items:
+      $ref: '../root.yaml#/components/schemas/CheckScaleSummaryView'

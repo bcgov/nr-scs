@@ -1,0 +1,35 @@
+parameters:
+  - name: scaleSiteIdNmbr
+    in: path
+    required: true
+    schema:
+      type: string
+      maxLength: 4
+      example: "1234"
+
+get:
+  tags:
+    - ScaleSiteContact
+  summary: Get scale site owner information
+  description: |
+    Returns the owner details for a scale site from scs_scale_site_owner_vw_pkg.search_recs.
+  operationId: getScaleSiteOwner
+  responses:
+    '200':
+      description: Owner details
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/ScaleSiteOwner'
+    '404':
+      description: Scale site not found
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+    '500':
+      description: Server error
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'

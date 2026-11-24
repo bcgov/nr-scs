@@ -1,0 +1,169 @@
+---
+exam-upgrades:
+  get:
+    tags:
+      - ExamUpgrade
+    summary: List all exam/upgrade types
+    description: |
+      Returns rows from the SCALER_TRAINING_TYPE table via
+      `scs_scaler_training_type_pkg.search_recs`. Pass `classCode` to filter
+      by training class; omit or leave blank to return all records.
+    operationId: listExamUpgrades
+    parameters:
+      - name: classCode
+        in: query
+        description: Filter by scaler training class code.
+        required: false
+        schema:
+          type: string
+    responses:
+      '200':
+        description: Successful operation
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '../root.yaml#/components/schemas/ExamUpgrade'
+      '500':
+        description: Server error
+        content:
+          application/json:
+            schema:
+              $ref: '../root.yaml#/components/schemas/Error'
+  post:
+    tags:
+      - ExamUpgrade
+    summary: Create a new exam/upgrade type
+    description: |
+      Inserts a row into SCALER_TRAINING_TYPE via
+      `scs_scaler_training_type_pkg.insert_rec`.
+    operationId: createExamUpgrade
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/ExamUpgradeCreateRequest'
+    responses:
+      '201':
+        description: Created
+        content:
+          application/json:
+            schema:
+              $ref: '../root.yaml#/components/schemas/ExamUpgrade'
+      '400':
+        description: Bad request
+        content:
+          application/json:
+            schema:
+              $ref: '../root.yaml#/components/schemas/Error'
+      '500':
+        description: Server error
+        content:
+          application/json:
+            schema:
+              $ref: '../root.yaml#/components/schemas/Error'
+exam-upgrades/{classCode}/{typeId}:
+  parameters:
+    - name: classCode
+      in: path
+      description: Scaler training class code (part of primary key).
+      required: true
+      schema:
+        type: string
+    - name: typeId
+      in: path
+      description: Scaler training type identifier (part of primary key).
+      required: true
+      schema:
+        type: string
+  get:
+    tags:
+      - ExamUpgrade
+    summary: Get a single exam/upgrade type
+    description: |
+      Returns a single SCALER_TRAINING_TYPE row via
+      `scs_scaler_training_type_pkg.select_rec`.
+    operationId: getExamUpgrade
+    responses:
+      '200':
+        description: Exam/upgrade type found
+        content:
+          application/json:
+            schema:
+              $ref: '../root.yaml#/components/schemas/ExamUpgrade'
+      '404':
+        description: Not found
+        content:
+          application/json:
+            schema:
+              $ref: '../root.yaml#/components/schemas/Error'
+      '500':
+        description: Server error
+        content:
+          application/json:
+            schema:
+              $ref: '../root.yaml#/components/schemas/Error'
+  put:
+    tags:
+      - ExamUpgrade
+    summary: Update an existing exam/upgrade type
+    description: |
+      Updates a SCALER_TRAINING_TYPE row via
+      `scs_scaler_training_type_pkg.update_rec`.
+    operationId: updateExamUpgrade
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/ExamUpgradeUpdateRequest'
+    responses:
+      '200':
+        description: Updated
+        content:
+          application/json:
+            schema:
+              $ref: '../root.yaml#/components/schemas/ExamUpgrade'
+      '400':
+        description: Bad request
+        content:
+          application/json:
+            schema:
+              $ref: '../root.yaml#/components/schemas/Error'
+      '404':
+        description: Not found
+        content:
+          application/json:
+            schema:
+              $ref: '../root.yaml#/components/schemas/Error'
+      '500':
+        description: Server error
+        content:
+          application/json:
+            schema:
+              $ref: '../root.yaml#/components/schemas/Error'
+  delete:
+    tags:
+      - ExamUpgrade
+    summary: Delete an exam/upgrade type
+    description: |
+      Deletes a SCALER_TRAINING_TYPE row via
+      `scs_scaler_training_type_pkg.delete_rec`.
+    operationId: deleteExamUpgrade
+    responses:
+      '204':
+        description: Deleted
+      '404':
+        description: Not found
+        content:
+          application/json:
+            schema:
+              $ref: '../root.yaml#/components/schemas/Error'
+      '500':
+        description: Server error
+        content:
+          application/json:
+            schema:
+              $ref: '../root.yaml#/components/schemas/Error'

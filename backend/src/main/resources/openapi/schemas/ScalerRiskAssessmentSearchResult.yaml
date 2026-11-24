@@ -1,0 +1,62 @@
+type: object
+description: |
+  Record returned from `scs_risk_scaler_vw_pkg.search_recs`.
+properties:
+  riskQuestionnaireId:
+    type: integer
+    format: int64
+    nullable: true
+    description: Risk questionnaire / assessment identifier.
+  riskRating:
+    type: number
+    nullable: true
+    description: Calculated risk rating value.
+  maxRiskRating:
+    type: number
+    nullable: true
+    description: Maximum possible risk rating.
+  numResp:
+    type: number
+    nullable: true
+    description: Number of responses.
+  questCount:
+    type: number
+    nullable: true
+    description: Number of questions.
+  riskTypeCode:
+    type: string
+    nullable: true
+    description: Risk type code.
+  codeDescription:
+    type: string
+    nullable: true
+    description: Display description of risk level.
+  rangeLowValue:
+    type: integer
+    nullable: true
+    description: Low value for the assessment range.
+  rangeHighValue:
+    type: integer
+    nullable: true
+    description: High value for the assessment range.
+  versionNo:
+    type: integer
+    format: int64
+    nullable: true
+    description: Risk questionnaire version number.
+  scalerLicenceNo:
+    type: string
+    nullable: true
+    description: Scaler licence number.
+  scalerClientLoc:
+    type: string
+    nullable: true
+    description: Scaler client / location display.
+  orgUnitName:
+    type: string
+    nullable: true
+    description: Region / district display name.
+  clientName:
+    type: string
+    nullable: true
+    description: Client name.

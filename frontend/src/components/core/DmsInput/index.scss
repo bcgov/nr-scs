@@ -1,0 +1,26 @@
+.dms-input-row {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.dms-input-part {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.dms-input-part .cds--text-input-wrapper {
+  margin: 0;
+}
+
+.dms-input-suffix {
+  min-width: 10px;
+  color: var(--cds-text-secondary);
+}
+
+.dms-input-error {
+  margin-top: 0.5rem;
+  font-size: 0.875rem;
+  color: var(--cds-text-error);
+}

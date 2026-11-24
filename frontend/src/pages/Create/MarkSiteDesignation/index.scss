@@ -1,0 +1,51 @@
+
+.mark-site-designation-create__field-error {
+  margin-top: 0.5rem;
+  font-size: 0.875rem;
+  color: var(--cds-text-error);
+}
+
+.mark-site-designation-create__mark-holder-row {
+  margin-top: -10.5px;
+}
+
+.mark-site-designation-create__mark-holder-row .slash {
+  transform: translateY(0);
+}
+
+.mark-site-designation-create__species-input-row {
+  display: flex;
+  align-items: stretch;
+  gap: 0.5rem;
+  width: 100%;
+}
+
+.mark-site-designation-create__species-input-field {
+  min-width: 0;
+}
+
+.mark-site-designation-create__species-input-field--species {
+  flex: 1 1 52%;
+}
+
+.mark-site-designation-create__species-input-field--content {
+  flex: 0 0 24%;
+}
+
+.mark-site-designation-create__species-input-field--add {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: stretch;
+}
+
+.mark-site-designation-create__species-input-field--add .scs__input-search-button {
+  margin-top: 1.5rem;
+}
+
+.mark-site-designation-create__species-input-field :global(.cds--form-item),
+.mark-site-designation-create__species-input-field :global(.cds--select),
+.mark-site-designation-create__species-input-field :global(.cds--text-input-wrapper) {
+  width: 100%;
+}
+
+

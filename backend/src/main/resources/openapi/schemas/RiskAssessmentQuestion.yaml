@@ -1,0 +1,28 @@
+type: object
+description: |
+  A single risk question with its selectable answers and the currently saved selection,
+  from `scs_risk_tmplt_qa_vw` joined with the saved responses in `scs_risk_question_responses_vw`.
+properties:
+  questionId:
+    type: integer
+    format: int64
+    nullable: true
+    description: risk_question_id.
+  questionText:
+    type: string
+    nullable: true
+    description: Display label for the question.
+  questionOrder:
+    type: integer
+    nullable: true
+    description: question_order - display sort order within the section.
+  selectedAnswerId:
+    type: integer
+    format: int64
+    nullable: true
+    description: risk_valid_answer_id of the saved response for this question, or null if unanswered.
+  answers:
+    type: array
+    description: Selectable answer options for this question.
+    items:
+      $ref: './RiskAssessmentAnswer.yaml'

@@ -1,0 +1,19 @@
+type: object
+description: Represents an error response from the server.
+properties:
+  code:
+    type: string
+    description: The error code (e.g., SQLCODE)
+  message:
+    type: string
+    description: A detailed error message (e.g., SQLERRM)
+  fieldErrors:
+    type: array
+    nullable: true
+    description: |
+      Per-field validation errors for inline display, present on 400 validation responses
+      (bean-validation field errors and server-side referential checks). Absent for non-validation
+      errors.
+    items:
+      $ref: '../root.yaml#/components/schemas/FieldValidationError'
+

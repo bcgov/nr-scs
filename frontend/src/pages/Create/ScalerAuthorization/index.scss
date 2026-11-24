@@ -1,0 +1,42 @@
+.scaler-authorization-create__required { margin-left: 0.25rem; color: var(--cds-text-error); }
+
+.scaler-authorization-create__fieldset { border: none; padding: 0; margin: 0; }
+
+.scaler-authorization-create__input-row {
+    display: flex;
+    align-items: flex-end;
+    gap: 0.75rem;
+}
+
+.scaler-authorization-create__input-row :global(.cds--text-input-wrapper) {
+    flex: 1 1 auto;
+}
+
+.scaler-authorization-create__input-row .scs__input-search-button,
+.scaler-authorization-create__input-row .action-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.scaler-authorization-create__input-row .scs__input-search-button .cds--btn__icon,
+.scaler-authorization-create__input-row .action-btn .cds--btn__icon {
+    margin-top: 0 !important;
+}
+
+.scaler-authorization-create__input-row .scs__input-search-button .cds--btn__text,
+.scaler-authorization-create__input-row .action-btn .cds--btn__text {
+    display: inline-flex;
+    align-items: center;
+}
+
+.scaler-authorization-create__fieldset[disabled] input,
+.scaler-authorization-create__fieldset[disabled] select,
+.scaler-authorization-create__fieldset[disabled] textarea,
+.scaler-authorization-create__fieldset[disabled] .cds--text-input__input,
+.scaler-authorization-create__fieldset[disabled] .cds--select-input__input,
+.scaler-authorization-create__fieldset[disabled] .cds--date-picker__input,
+.scaler-authorization-create__fieldset[disabled] .bx--text-input__input { color: #8d8d8d !important; -webkit-text-fill-color: #8d8d8d !important; }
+
+.scaler-authorization-create-form .cds--form-requirement,
+.scs-date-input .cds--form-requirement { margin-top: 0.5rem; font-size: 0.875rem; color: var(--cds-text-error); }

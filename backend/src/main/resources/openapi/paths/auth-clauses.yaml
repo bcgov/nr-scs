@@ -1,0 +1,57 @@
+get:
+  tags:
+    - AuthorizationClause
+  summary: Search authorization clauses
+  description: |
+    Search scale method authorization clauses.
+  operationId: searchAuthorizationClauses
+  parameters:
+    - in: query
+      name: scaleMethodTypeCode
+      schema:
+        type: string
+  responses:
+    '200':
+      description: Successful search operation
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: '../root.yaml#/components/schemas/ScaleMethodAuthClause'
+    '500':
+      description: Server error
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+post:
+  tags:
+    - AuthorizationClause
+  summary: Create an authorization clause
+  operationId: createAuthorizationClause
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: '../root.yaml#/components/schemas/ScaleMethodAuthClauseCreateRequest'
+  responses:
+    '201':
+      description: Authorization clause created
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/ScaleMethodAuthClause'
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+    '500':
+      description: Server error
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'

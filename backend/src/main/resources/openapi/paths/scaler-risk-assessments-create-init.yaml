@@ -1,0 +1,60 @@
+parameters:
+  - name: scalerLicenceNo
+    in: path
+    description: Scaler licence number
+    required: true
+    schema:
+      type: string
+      maxLength: 4
+      example: "1234"
+
+get:
+  tags:
+    - ScalerRiskAssessment
+  summary: Get the create-init payload for a new scaler risk assessment
+  description: |
+    Retrieve the payload used to render the "Add Risk Assessment" form on the scaler record's
+    Risk Rating tab. Mirrors the legacy `RiskAssessmentAction.addScalerAssessment`, which binds a
+    new scaler assessment to the currently active `SCLE` template (the Consequences (C) /
+    Likelihood (L) format). The active template is the one whose effective/expiry window contains
+    today (`scs_risk_questionnr_tmplt_pkg.search_active_recs`); exactly one must be active.
+
+    The response reuses `ScalerRiskAssessmentDetail`: it carries the scaler header (licence, name,
+    region, district), the bound `templateId` / `versionNo`, the blank `sections`
+    (questions/answers with no selection), and the `riskRatings` reference table. No
+    `RISK_QUESTIONNAIRE` row is created by this call — persistence happens only on the create POST.
+  operationId: getScalerRiskAssessmentCreateInit
+  responses:
+    '200':
+      description: Create-init payload retrieved
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/ScalerRiskAssessmentDetail'
+    '404':
+      description: Scaler not found
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+          example:
+            code: "NOT_FOUND"
+            message: "No scaler tombstone found for licence number 1234"
+    '409':
+      description: Template configuration error (no single active SCLE template)
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+          example:
+            code: "CONFLICT"
+            message: "Multiple active risk assessment templates found for type SCLE."
+    '500':
+      description: Server error
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+          example:
+            code: "ORA-12345"
+            message: "Database connection error"

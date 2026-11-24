@@ -1,0 +1,20 @@
+.view-check-scale {
+  &__subtitle {
+    margin-bottom: 1rem;
+  }
+
+  &__check-scale-id {
+    margin-bottom: 0.5rem;
+  }
+
+  &__label {
+    font-weight: bold;
+  }
+
+  &__summary-table {
+    &.cds--data-table td,
+    &.cds--data-table th {
+      vertical-align: middle;
+    }
+  }
+}

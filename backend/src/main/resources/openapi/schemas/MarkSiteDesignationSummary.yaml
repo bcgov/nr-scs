@@ -1,0 +1,12 @@
+type: object
+description: |
+  A timber mark designated to a scale site, as shown on the legacy MSD tab of the scale site
+  record. Read-only; sourced from `scs_msd_vw_pkg.search_recs`.
+properties:
+  timberMark:
+    type: string
+  scaleSiteIdNmbr:
+    type: string
+  ownerCliNumber:
+    type: string
+    description: Owner client number for the timber mark.

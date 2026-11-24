@@ -1,0 +1,121 @@
+@use '@carbon/type';
+
+/**
+ * Metrics are deliberately Carbon's default (`md`) field metrics, because this control sits in the
+ * same form grids as `Select` / `TextInput` / `DateInput` and must be indistinguishable from them.
+ * It is hand-rolled markup (a flex shell around pills plus a bare `<input>`), so it inherits none of
+ * that automatically — every value below has a Carbon counterpart:
+ *   - shell height  2.5rem  = `$size-md` (was 2rem, which is `$size-sm` — the field rendered a full
+ *                             size smaller than every other control on the page)
+ *   - field type    `body-compact-01`   (was `font: inherit`, which resolved to the page's 1rem, so
+ *                             typed text was larger than the placeholder beside it)
+ *   - label type    `label-01`          (was 0.875rem, a size too large)
+ *   - helper type   `helper-text-01`
+ *   - focus         2px inset outline, as Carbon draws on `.cds--text-input:focus`
+ * If Carbon's field size changes, these need to move with it.
+ */
+
+.multi-value-input__label {
+  @include type.type-style('label-01');
+
+  display: block;
+  margin-bottom: 0.5rem;
+  color: var(--cds-text-secondary);
+}
+
+.multi-value-input__shell {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+  align-items: center;
+  /* border-box so the vertical padding (which gives wrapped pill rows room to breathe) stays
+     inside the 2.5rem field height rather than adding to it. */
+  box-sizing: border-box;
+  min-height: 2.5rem;
+  padding: 0.25rem 1rem;
+  margin-top: 0;
+  border: none;
+  border-bottom: 1px solid var(--cds-border-strong-01);
+  border-top-left-radius: 0.25rem;
+  border-top-right-radius: 0.25rem;
+  background: var(--cds-field, #f4f4f4);
+  color: var(--cds-text-primary);
+}
+
+.multi-value-input__shell:focus-within {
+  /* Carbon draws a 2px inset outline on a focused field; a border-bottom colour change alone read
+     as a different control. */
+  outline: 2px solid var(--cds-focus);
+  outline-offset: -2px;
+}
+
+.multi-value-input__shell[aria-disabled='true'] {
+  background: var(--cds-field, #f4f4f4);
+  border-bottom-color: var(--cds-border-subtle);
+  color: var(--cds-text-disabled);
+}
+
+.multi-value-input__field {
+  @include type.type-style('body-compact-01');
+
+  flex: 1 1 8rem;
+  /* min-width 0, not a fixed floor: the control shares `Column sm={4}` with the rest of the form, and
+     a hard floor made the field overflow its column at narrow widths. */
+  min-width: 0;
+  border: none;
+  background: transparent;
+  padding: 0;
+  color: inherit;
+  box-sizing: border-box;
+}
+
+.multi-value-input__field::placeholder {
+  /* Type is inherited from the field above, so the placeholder and typed text cannot drift apart. */
+  color: var(--cds-text-placeholder);
+}
+
+.multi-value-input__field:focus {
+  outline: none;
+}
+
+.multi-value-input__pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.125rem 0.5rem;
+  border: 1px solid var(--cds-border-subtle);
+  border-radius: 999px;
+  font-size: 0.875rem;
+  background: var(--cds-layer-01);
+}
+
+.multi-value-input__shell[data-invalid='true'] {
+  border-bottom-color: var(--cds-support-error);
+}
+
+.multi-value-input__pill--invalid {
+  border-color: var(--cds-support-error);
+  color: var(--cds-text-error);
+  background: var(--cds-layer-01);
+}
+
+.multi-value-input__error {
+  @include type.type-style('helper-text-01');
+
+  margin-top: 0.25rem;
+  color: var(--cds-text-error);
+}
+
+.multi-value-input__remove {
+  border: none;
+  background: none;
+  padding: 0;
+  color: var(--cds-text-secondary);
+  cursor: pointer;
+  font: inherit;
+}
+
+.multi-value-input__remove:disabled {
+  cursor: not-allowed;
+  color: var(--cds-text-disabled);
+}

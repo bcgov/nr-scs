@@ -1,0 +1,66 @@
+description: |
+  Full scaler record as returned by GET, POST (create), and PUT (update) operations.
+  Combines data from `scs_scaler_pkg`, `SCS_SCALER_ASSIGND_LIC_TYP_PKG`,
+  `SCS_SCALER_LICENCE_ATTRIBT_PKG`, and `scs_scaler_training_pkg`.
+allOf:
+  - $ref: ./AuditDetail.yaml
+  - type: object
+    properties:
+      scalerLicenceNo:
+        type: string
+        maxLength: 4
+        nullable: true
+        description: System-generated scaler licence number (PK). Null on create request, populated in response.
+        example: "1234"
+      clientNumber:
+        type: string
+        maxLength: 8
+        nullable: true
+        description: Client number from the BC Forests client registry
+        example: "12345678"
+      orgUnitNo:
+        type: integer
+        format: int64
+        nullable: true
+        description: Organization unit number (region/district)
+        example: 1234
+      issuedDate:
+        type: string
+        format: date
+        nullable: true
+        description: Date the scaler licence was issued
+        example: "2025-01-15"
+      expiryDate:
+        type: string
+        format: date
+        nullable: true
+        description: Licence expiry date
+        example: "2027-01-15"
+      oathTakenInd:
+        type: string
+        enum: [Y, N]
+        nullable: true
+        description: Indicates whether the scaler has taken the oath
+        example: "Y"
+      licenceCancelledDate:
+        type: string
+        format: date
+        nullable: true
+        description: Date the licence was cancelled
+        example: null
+      licenceTypes:
+        type: array
+        nullable: true
+        description: Assigned licence type codes (`SCS` and/or `WA`)
+        items:
+          type: string
+          enum: [SCS, WA]
+        example: ["SCS"]
+      appointment:
+        nullable: true
+        description: Appointment record associated with this scaler (null if exam was used or neither exists)
+        $ref: '../root.yaml#/components/schemas/ScalerAppointmentDetail'
+      exam:
+        nullable: true
+        description: Exam/upgrade record associated with this scaler (null if appointment was used or neither exists)
+        $ref: '../root.yaml#/components/schemas/ScalerExamDetail'

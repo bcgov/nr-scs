@@ -1,0 +1,10 @@
+type: object
+description: Record returned from `scs_sclr_appt_lov_vw`.
+properties:
+  code:
+    type: string
+    nullable: true
+  description:
+    type: string
+    nullable: true
+

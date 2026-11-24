@@ -1,0 +1,23 @@
+type: object
+description: |
+  Response for the validate-before-create check-scale endpoint. The same
+  body is returned for both HTTP 200 (validation passed, `errors` empty)
+  and HTTP 400 (validation failed, `errors` non-empty). When validation
+  passes, `checkScale` carries the enriched preview payload used by step 2
+  (its `speciesSummary` field holds the per-species roll-up).
+required:
+  - ok
+properties:
+  ok:
+    type: boolean
+    description: Whether validation passed (i.e., `errors` is empty).
+  errors:
+    type: array
+    items:
+      $ref: './FieldError.yaml'
+    description: |
+      Validation errors. Each entry is tied to a specific form input.
+      Empty / absent when `ok` is `true`.
+  checkScale:
+    $ref: './CheckScaleDetail.yaml'
+    description: Enriched preview payload (present when `ok` is `true`).

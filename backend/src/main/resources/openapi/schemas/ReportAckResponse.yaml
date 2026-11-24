@@ -1,0 +1,6 @@
+type: object
+properties:
+  requestId:
+    type: string
+  message:
+    type: string

@@ -1,0 +1,136 @@
+get:
+  tags:
+    - AppointmentType
+  summary: Get scaler appointment types
+  description: |
+    Retrieve scaler appointment types in the SCS system.
+    Based on `scs_scaler_appointment_typ_pkg.search_recs`.
+
+    Notes:
+    * Filter fields support SQL LIKE semantics where applicable. Provide `%` yourself if you need wildcard behavior.
+  operationId: getAppointmentTypes
+  parameters:
+    - name: code
+      in: query
+      description: Appointment type code (SQL LIKE semantics)
+      required: false
+      schema:
+        type: string
+        maxLength: 10
+        example: "A%"
+
+    - name: description
+      in: query
+      description: Appointment type description (SQL LIKE semantics)
+      required: false
+      schema:
+        type: string
+        maxLength: 100
+        example: "%Official%"
+
+    - name: actingInd
+      in: query
+      description: Acting indicator
+      required: false
+      schema:
+        type: string
+        enum: [Y, N]
+        example: "Y"
+
+    - name: effectiveDate
+      in: query
+      description: Effective date filter
+      required: false
+      schema:
+        type: string
+        format: date
+        example: "2026-01-01"
+
+    - name: expiryDate
+      in: query
+      description: Expiry date filter
+      required: false
+      schema:
+        type: string
+        format: date
+        example: "2099-12-31"
+
+  responses:
+    '200':
+      description: Successful search operation
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: '../root.yaml#/components/schemas/AppointmentType'
+          example:
+            - code: "A"
+              description: "Acting"
+              actingInd: "Y"
+              effectiveDate: "2026-01-01"
+              expiryDate: "2099-12-31"
+            - code: "O"
+              description: "Official"
+              actingInd: "N"
+              effectiveDate: "2026-01-01"
+              expiryDate: "2099-12-31"
+
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+          example:
+            code: "VALIDATION_ERROR"
+            message: "Acting indicator must be Y or N"
+
+    '500':
+      description: Server error
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+          example:
+            code: "ORA-12345"
+            message: "Database connection error"
+
+post:
+  tags:
+    - AppointmentType
+  summary: Create appointment type
+  description: |
+    Create a new scaler appointment type.
+    Based on `scs_scaler_appointment_typ_pkg.insert_rec`.
+  operationId: createAppointmentType
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: '../root.yaml#/components/schemas/AppointmentTypeCreateRequest'
+        example:
+          code: "A"
+          description: "Acting"
+          actingInd: "Y"
+          effectiveDate: "2026-01-01"
+  responses:
+    '201':
+      description: Appointment type created successfully
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/AppointmentType'
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+    '500':
+      description: Server error
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'

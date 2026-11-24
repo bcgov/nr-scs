@@ -1,0 +1,14 @@
+type: object
+description: A single saved answer selection for one question.
+required:
+  - questionId
+properties:
+  questionId:
+    type: integer
+    format: int64
+    description: risk_question_id being answered.
+  answerId:
+    type: integer
+    format: int64
+    nullable: true
+    description: risk_valid_answer_id selected, or null/omitted to clear the response.

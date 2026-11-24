@@ -1,0 +1,19 @@
+allOf:
+  - $ref: ./AuditDetail.yaml
+  - type: object
+    properties:
+      inspectionQuestionId:
+        type: integer
+        format: int64
+      questionText:
+        type: string
+      commentRequiredInd:
+        type: string
+      sortOrderNo:
+        type: integer
+      effectiveDate:
+        type: string
+        format: date
+      expiryDate:
+        type: string
+        format: date

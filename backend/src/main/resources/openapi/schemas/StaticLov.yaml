@@ -1,0 +1,16 @@
+type: object
+description: Record returned from `scs_static_lov_pkg.static_lov_recs`.
+properties:
+  tableKey:
+    type: string
+    nullable: true
+    description: The table key identifier (e.g., SCALE_SPECIES_CODE)
+  code:
+    type: string
+    nullable: true
+    description: The code value
+  description:
+    type: string
+    nullable: true
+    description: The description of the code
+

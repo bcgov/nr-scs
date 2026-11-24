@@ -1,0 +1,22 @@
+@use '@carbon/react/scss/spacing' as spacing;
+
+.scale-site-risk-assessment-page {
+  .scale-site-risk-assessment-form {
+    margin-top: spacing.$spacing-05;
+    margin-bottom: spacing.$spacing-09;
+  }
+
+  // Risk-level chip styles are global — see src/styles/_risk-level-pill.scss.
+
+  // Filter accordion styling is global — see src/styles/_query-accordion.scss (.scs-query-accordion).
+
+  .scale-site-risk-assessment-notification {
+    margin-bottom: spacing.$spacing-05;
+  }
+
+  .scale-site-risk-assessment-results {
+    .cds--pagination {
+      margin-bottom: spacing.$spacing-07;
+    }
+  }
+}

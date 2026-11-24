@@ -1,0 +1,25 @@
+description: Model for Exam/Upgrade (Training Type) — maps to the SCALER_TRAINING_TYPE table via scs_scaler_training_type_pkg.
+allOf:
+  - $ref: ./AuditDetail.yaml
+  - type: object
+    properties:
+      scalerTrainingClassCode:
+        type: string
+        description: Training class code (part of primary key)
+      scalerTrainingTypeId:
+        type: string
+        description: Training type identifier (part of primary key)
+      licenceAccreditInd:
+        type: string
+        description: Licence accreditation indicator
+      description:
+        type: string
+        description: Description of the training type
+      effectiveDate:
+        type: string
+        format: date
+        description: Date the training type becomes effective
+      expiryDate:
+        type: string
+        format: date
+        description: Date the training type expires

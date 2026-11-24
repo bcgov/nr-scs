@@ -1,0 +1,87 @@
+get:
+  tags:
+    - SignatureBlock
+  summary: Search signature blocks
+  description: |
+    Search signature blocks using `scs_maint_signatories_vw_pkg.search_recs`.
+  operationId: searchSignatureBlocks
+  parameters:
+    - in: query
+      name: scaleSignatoryBlockId
+      schema:
+        type: integer
+        format: int64
+    - in: query
+      name: orgUnitNo
+      schema:
+        type: integer
+        format: int64
+    - in: query
+      name: rollupRegionNo
+      schema:
+        type: integer
+        format: int64
+    - in: query
+      name: lastName
+      schema:
+        type: string
+        maxLength: 40
+    - in: query
+      name: firstName
+      schema:
+        type: string
+        maxLength: 40
+    - in: query
+      name: middleName
+      schema:
+        type: string
+        maxLength: 40
+    - in: query
+      name: signatureTitle
+      schema:
+        type: string
+  responses:
+    '200':
+      description: Successful search operation
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: '../root.yaml#/components/schemas/ScaleSignatoryBlock'
+    '500':
+      description: Server error
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+post:
+  tags:
+    - SignatureBlock
+  summary: Create a signature block
+  operationId: createSignatureBlock
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: '../root.yaml#/components/schemas/ScaleSignatoryBlockCreateRequest'
+  responses:
+    '201':
+      description: Signature block created
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/ScaleSignatoryBlock'
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+    '500':
+      description: Server error
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'

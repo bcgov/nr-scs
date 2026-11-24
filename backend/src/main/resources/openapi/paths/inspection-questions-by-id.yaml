@@ -1,0 +1,101 @@
+get:
+  tags:
+    - InspectionQuestion
+  summary: Get an inspection question
+  operationId: getInspectionQuestion
+  parameters:
+    - name: inspectionQuestionId
+      in: path
+      required: true
+      schema:
+        type: integer
+        format: int64
+  responses:
+    '200':
+      description: Inspection question found
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/InspectionQuestionDetail'
+    '404':
+      description: Inspection question not found
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+put:
+  tags:
+    - InspectionQuestion
+  summary: Update an inspection question
+  operationId: updateInspectionQuestion
+  parameters:
+    - name: inspectionQuestionId
+      in: path
+      required: true
+      schema:
+        type: integer
+        format: int64
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: '../root.yaml#/components/schemas/InspectionQuestionUpdateRequest'
+  responses:
+    '200':
+      description: Inspection question updated
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/InspectionQuestionDetail'
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+    '404':
+      description: Inspection question not found
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+    '500':
+      description: Server error
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+delete:
+  tags:
+    - InspectionQuestion
+  summary: Delete an inspection question
+  operationId: deleteInspectionQuestion
+  parameters:
+    - name: inspectionQuestionId
+      in: path
+      required: true
+      schema:
+        type: integer
+        format: int64
+  responses:
+    '204':
+      description: Inspection question deleted
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+    '404':
+      description: Inspection question not found
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+    '500':
+      description: Server error
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'

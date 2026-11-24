@@ -1,0 +1,37 @@
+@use '@carbon/react/scss/spacing' as spacing;
+
+.scale-site-search-page {
+  .scale-site-search-form {
+    margin-top: spacing.$spacing-05;
+    margin-bottom: spacing.$spacing-09;
+  }
+
+  // Filter accordion styling is global — see src/styles/_query-accordion.scss (.scs-query-accordion).
+
+  .scale-site-search__notification,
+  .scale-site-search__inline-notification {
+    margin-bottom: spacing.$spacing-05;
+  }
+
+  .scale-site-search__method-types {
+    display: flex;
+    flex-direction: column;
+    gap: spacing.$spacing-03;
+  }
+
+  .scale-site-search__method-types-label {
+    margin-bottom: spacing.$spacing-03;
+  }
+
+  .scale-site-search__method-types-options {
+    display: grid;
+    gap: spacing.$spacing-03;
+  }
+
+  .scale-site-search-results {
+    .cds--pagination {
+      margin-bottom: spacing.$spacing-07;
+    }
+  }
+}
+

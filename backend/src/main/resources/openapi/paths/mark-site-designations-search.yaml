@@ -1,0 +1,44 @@
+get:
+  tags:
+    - MarkSiteDesignation
+  summary: Search mark site designations by timber mark
+  description: |
+    General timber-mark search backing the Queries > Mark Site Designations page. Returns every
+    mark site designation matching the timber mark, regardless of expiry (unlike the workbench
+    search). Based on `scs_haul_mark_auth_srch_vw_pkg.search_recs`.
+  operationId: searchMarkSiteDesignationsByTimberMark
+  parameters:
+    - name: timberMark
+      in: query
+      description: Timber mark (exact match)
+      required: true
+      schema:
+        type: string
+        maxLength: 20
+  responses:
+    '200':
+      description: Successful search operation
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: '../root.yaml#/components/schemas/MarkSiteDesignationSearchResult'
+          example:
+            - haulingMarkAuthorizationId: 5001
+              timberMark: "AB1234"
+              effectiveDate: "2025-01-15"
+              expiryDate: "2027-01-15"
+              orgUnitName: "Cariboo Region"
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+    '500':
+      description: Server error
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'

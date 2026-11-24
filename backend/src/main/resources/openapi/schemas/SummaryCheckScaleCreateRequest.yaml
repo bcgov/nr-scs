@@ -1,0 +1,100 @@
+type: object
+description: |
+  Request body for `POST /api/summary-check-scales/create` — the single-step
+  summary check scale create (legacy `SummaryCheckScaleAction.create`,
+  `createSummaryCheckScale.jsp`). Unlike the detail (HBCS) flow there is no tally
+  document lookup; the user supplies the header fields and at least one SPG row
+  directly. Server maps `returnType` to `cksc_type`
+  (LOG_TALLY→LTSCS, SAMPLE_LOG_TALLY→SLTSCS, SPECIAL_FOREST_PRODUCT→SFPSCS) and
+  sets `partial_ind` to `Y` for LT/SLT (user-supplied for SFP). `originalScaleNetValue`
+  / `checkScaleNetValue` on the header stay null and are derived from the SPG rows.
+required:
+  - returnType
+  - checkScaleTypeCode
+  - originalScalerLicenceNo
+  - checkScalerLicenceNo
+  - timberMark
+  - scaleSiteIdNmbr
+  - followedGoodPracticeInd
+  - originalWithinStandardInd
+  - checkReplacesOriginalInd
+  - originalScaleDate
+  - originalScaleReturnNo
+  - chkScaleDate
+  - chkScaleReturnNo
+  - spgRows
+properties:
+  returnType:
+    $ref: '../root.yaml#/components/schemas/ReturnType'
+  checkScaleTypeCode:
+    type: string
+    maxLength: 4
+    description: Code from the CHECK_SCALE_TYPE_CODE LOV.
+  originalScalerLicenceNo:
+    type: string
+    maxLength: 4
+    description: Licence number of the original scaler (must exist; must differ from check scaler).
+  checkScalerLicenceNo:
+    type: string
+    maxLength: 4
+    description: Licence number of the check scaler.
+  loadArrivalNumber:
+    type: string
+    maxLength: 10
+    nullable: true
+    description: Load arrival number. Either this or weighSlipNumber, not both.
+  weighSlipNumber:
+    type: integer
+    format: int64
+    nullable: true
+    description: Weigh split/slip number. Either this or loadArrivalNumber, not both.
+  timberMark:
+    type: string
+    maxLength: 6
+    description: Timber mark (must exist).
+  scaleSiteIdNmbr:
+    type: string
+    maxLength: 4
+    description: Scale site id number (must exist).
+  followedGoodPracticeInd:
+    type: string
+    enum: [Y, N]
+    description: Whether the original scaler followed good practices.
+  originalWithinStandardInd:
+    type: string
+    enum: [Y, N]
+    description: Whether the original scale was within standard.
+  checkReplacesOriginalInd:
+    type: string
+    enum: [Y, N]
+    description: Whether the check scale replaces the original.
+  partialInd:
+    type: string
+    enum: [Y, N]
+    nullable: true
+    description: Partial load indicator. Required for SFP; ignored for LT/SLT (server forces Y).
+  originalScaleDate:
+    type: string
+    format: date
+    description: Original date of scale (not in the future; on/before chkScaleDate).
+  originalScaleReturnNo:
+    type: integer
+    description: Original scale return number.
+  chkScaleDate:
+    type: string
+    format: date
+    description: Check date of scale (not in the future).
+  chkScaleReturnNo:
+    type: integer
+    description: Check scale return number.
+  chkScalerCommentTxt:
+    type: string
+    maxLength: 4000
+    nullable: true
+    description: Free-text comment by the check scaler.
+  spgRows:
+    type: array
+    minItems: 1
+    description: One or more species/product/grade roll-up rows.
+    items:
+      $ref: '../root.yaml#/components/schemas/SummaryCheckScaleSpgRow'

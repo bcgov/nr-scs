@@ -1,0 +1,12 @@
+type: object
+description: Result of a timber-mark existence lookup against `HAULING_AUTHORITY`.
+required:
+  - timberMark
+  - exists
+properties:
+  timberMark:
+    type: string
+    description: The mark that was looked up, as supplied.
+  exists:
+    type: boolean
+    description: Whether `HAULING_AUTHORITY` holds the mark.

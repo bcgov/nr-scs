@@ -1,0 +1,19 @@
+type: object
+description: |
+  Valid species / product / grade combination row from SPECIES_PRODUCT_GRADE_XREF.
+  Used to filter the Product and Grade dropdowns on the check-scale create/update
+  forms so only valid combinations are selectable.
+  Based on `scs_species_prdct_grd_xrf_pkg.search_active_recs`.
+properties:
+  scaleSpeciesCode:
+    type: string
+    nullable: true
+    description: Scale species code (part of the composite key).
+  scaleProductCode:
+    type: string
+    nullable: true
+    description: Scale product code valid for the species.
+  scaleGradeCode:
+    type: string
+    nullable: true
+    description: Scale grade code valid for the species/product combination.

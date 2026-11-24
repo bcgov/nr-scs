@@ -1,0 +1,17 @@
+type: object
+description: Request body for updating an Exam/Upgrade (Training Type).
+properties:
+  licenceAccreditInd:
+    type: string
+    description: Licence accreditation indicator
+  description:
+    type: string
+    description: Description of the training type
+  effectiveDate:
+    type: string
+    format: date
+    description: Date the training type becomes effective
+  expiryDate:
+    type: string
+    format: date
+    description: Date the training type expires

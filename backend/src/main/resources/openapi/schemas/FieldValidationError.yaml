@@ -1,0 +1,21 @@
+type: object
+description: |
+  A validation error tied to a specific request field, for inline display next to the input.
+  Unlike `FieldError` (whose `field` is a fixed enum for the detail check-scale validate flow), this
+  carries a free-form request field name so it can serve any endpoint (server-side referential checks
+  and flattened bean-validation errors).
+
+  Tech debt: this and the enum-based `FieldError` are two shapes for the same concept; the plan is to
+  converge onto this generic one and retire the enum — see deferred-work.md (CHK-5, 2026-06-24).
+required:
+  - field
+  - message
+properties:
+  field:
+    type: string
+    description: The request field the error applies to (e.g. originalScalerLicenceNo).
+    example: originalScalerLicenceNo
+  message:
+    type: string
+    description: Human-readable, inline-displayable message.
+    example: "A Scaler # could not be found for 1AB."

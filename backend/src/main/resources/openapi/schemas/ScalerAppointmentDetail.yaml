@@ -1,0 +1,88 @@
+type: object
+description: |
+  Full appointment (licence attribute) record as returned in a scaler GET/POST/PUT response.
+  Maps to `SCS_SCALER_LICENCE_ATTRIBT_PKG`.
+properties:
+  scalerLicenceAttributeId:
+    type: integer
+    format: int64
+    nullable: true
+    description: System-generated appointment PK
+    example: 5001
+  scalerLicenceNo:
+    type: string
+    nullable: true
+    description: Parent scaler licence number
+    example: "1234"
+  scalerAppointmentType:
+    type: string
+    maxLength: 4
+    nullable: true
+    description: Appointment type code (e.g. `FORS`, `CHSC`)
+    example: "FORS"
+  scaleGradingSystemCode:
+    type: string
+    maxLength: 4
+    nullable: true
+    description: Scale grading system code derived from the appointment type
+    example: "BC"
+  orgUnitNo:
+    type: integer
+    format: int64
+    nullable: true
+    description: District org unit number. Populated when `provinceWideInd` is `N`.
+    example: 1234
+  provinceWideInd:
+    type: string
+    enum: [Y, N]
+    nullable: true
+    description: Province-wide indicator
+    example: "Y"
+  issuedDate:
+    type: string
+    format: date
+    nullable: true
+    description: Appointment effective date
+    example: "2025-01-15"
+  expiryDate:
+    type: string
+    format: date
+    nullable: true
+    description: Appointment expiry date
+    example: "2027-01-15"
+  cancellationDate:
+    type: string
+    format: date
+    nullable: true
+    description: Date the appointment was cancelled
+    example: null
+  cancellationReasonTxt:
+    type: string
+    maxLength: 200
+    nullable: true
+    description: Reason for cancellation
+    example: null
+  entryTimestamp:
+    type: string
+    format: date-time
+    nullable: true
+    description: Audit field — record creation timestamp
+  entryUserid:
+    type: string
+    nullable: true
+    description: Audit field — userid that created the record
+  updateTimestamp:
+    type: string
+    format: date-time
+    nullable: true
+    description: Audit field — last update timestamp
+  updateUserid:
+    type: string
+    nullable: true
+    description: Audit field — userid that last updated the record
+  revisionCount:
+    type: integer
+    format: int64
+    nullable: true
+    description: Optimistic locking revision counter
+

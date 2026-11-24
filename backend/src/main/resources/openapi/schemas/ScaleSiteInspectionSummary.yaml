@@ -1,0 +1,33 @@
+type: object
+description: |
+  Lightweight inspection-list row used to render the legacy Scale Site `Inspections` tab.
+  This schema represents a tab row rather than the full inspection detail payload.
+properties:
+  inspectionId:
+    type: integer
+    format: int64
+    nullable: true
+    description: Inspection identifier shown as the primary navigation link.
+  inspectionTypeDescription:
+    type: string
+    nullable: true
+    description: Display description of the inspection type.
+  siteTypeDisplay:
+    type: string
+    nullable: true
+    description: Display value for the site / inspected scaling type column.
+  inspectionDate:
+    type: string
+    format: date
+    nullable: true
+    description: Inspection date.
+  inspector:
+    type: string
+    nullable: true
+    description: Inspector identifier displayed in the legacy `Inspector #` column.
+  followUpInspectionIndicator:
+    type: string
+    nullable: true
+    description: Legacy follow-up inspection indicator displayed in the `Follow up Inspection?` column.
+
+

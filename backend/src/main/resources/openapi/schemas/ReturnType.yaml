@@ -1,0 +1,9 @@
+type: string
+enum: [LOG_TALLY, SAMPLE_LOG_TALLY, SPECIAL_FOREST_PRODUCT]
+description: |
+  Summary check-scale return type. Shared by the summary create and update requests so both
+  generate the same enum type. Determines the persisted legacy cksc_type
+  (LOG_TALLY→LTSCS, SAMPLE_LOG_TALLY→SLTSCS, SPECIAL_FOREST_PRODUCT→SFPSCS), whether partial_ind is
+  forced to Y (LT/SLT) or user-supplied (SFP), and the SPG product/grade blanking rule. The legacy
+  cksc_type codes are deliberately kept off the wire — the server maps them via the domain
+  `ReturnType` enum.

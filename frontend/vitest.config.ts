@@ -1,32 +1,68 @@
-import { defineConfig } from 'vitest/config'
+import path from 'node:path';
 
-// https://vitejs.dev/config/
-export default defineConfig({
-  resolve: {
-    tsconfigPaths: true,
+import react from '@vitejs/plugin-react';
+import { loadEnv } from 'vite';
+import { configDefaults, defineConfig } from 'vitest/config';
+
+export default defineConfig(({ mode }) => ({
+  define: {
+    global: {},
   },
-  test: {
-    exclude: ['**/node_modules/**', '**/e2e/**'],
-    globals: true,
-    environment: 'jsdom',
-    setupFiles: 'src/test-setup.ts',
-    // you might want to disable it, if you don't have tests that rely on CSS
-    // since parsing CSS is slow
-    css: false,
-    coverage: {
-      reporter: ['lcov', 'text-summary', 'text', 'json', 'html'],
-      exclude: [
-        '**/node_modules/**',
-        '**/dist/**',
-        '**/coverage/**',
-        '**/*.config.*',
-        'src/routeTree.gen.ts', // Auto-generated file
-        'src/**/*.test.ts',
-        'src/**/*.spec.ts',
-        'src/**/*.test.tsx',
-        'src/**/*.spec.tsx',
-        'src/__tests__/**',
-      ],
+  plugins: [react()],
+  resolve: {
+    alias: {
+      '@': path.resolve(import.meta.dirname, './src'),
     },
   },
-})
+  test: {
+    env: loadEnv(mode, process.cwd(), ''),
+    globals: true,
+    environment: 'happy-dom',
+    globalSetup: ['./src/config/tests/apiManifest.globalSetup.ts'],
+    setupFiles: [
+      './src/config/tests/setup-env.ts',
+      './src/config/tests/custom-matchers.ts',
+    ],
+    include: ['src/**/*.unit.test.{ts,tsx}'],
+    // The full suite runs many page renders in parallel; a page that loads promptly on its own can
+    // take several seconds under that contention. Every entry point (test, test:ci, IDE) inherits this.
+    testTimeout: 45000,
+    hookTimeout: 45000,
+    exclude: [...configDefaults.exclude, 'dist/**', 'build/**'],
+    coverage: {
+      provider: 'v8',
+      reporter: ['lcov', 'cobertura', 'html', 'json', 'text'],
+      reportsDirectory: './coverage',
+      all: true,
+      exclude: [
+        '**/node_modules/**',
+        '**/tests/**',
+        '**/*.test.{ts,tsx}',
+        '**/vite-env.d.ts',
+        '**/types/**',
+        '**/constants/**',
+        '**/config/fam/*',
+        '**/config/react-query/*',
+        '**/config/tests/*',
+        'src/env.ts',
+        '**/*.types.ts',
+        '**/*.scss',
+        '**/*.css',
+        '**/*.d.ts',
+        '**/types.ts',
+        '**/main.tsx',
+        '**/App.tsx',
+      ],
+      include: ['src/**/*.ts', 'src/**/*.tsx'],
+      // Vitest 4 reads thresholds from here, not from `coverage` itself. Set just under the
+      // measured figures (lines ~89, statements ~88, branches ~80, functions ~80): close enough
+      // that a real regression fails CI, with a point or two for run-to-run noise.
+      thresholds: {
+        lines: 87,
+        statements: 87,
+        branches: 78,
+        functions: 78,
+      },
+    },
+  },
+}));

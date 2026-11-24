@@ -1,0 +1,32 @@
+type: object
+properties:
+  client:
+    type: string
+    nullable: true
+  companyName:
+    type: string
+    nullable: true
+  lastName:
+    type: string
+    nullable: true
+  firstName:
+    type: string
+    nullable: true
+  city:
+    type: string
+    nullable: true
+  businessPhone:
+    type: string
+    nullable: true
+  cellPhone:
+    type: string
+    nullable: true
+  emailAddress:
+    type: string
+    nullable: true
+  clientNumber:
+    type: string
+    nullable: true
+  clientLocnCode:
+    type: string
+    nullable: true

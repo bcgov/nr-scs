@@ -1,0 +1,29 @@
+type: object
+description: |
+  Scale site tombstone record for the view page header band.
+  Based on the legacy tombstone flow rooted in `ScaleSiteDelegate.loadScaleSiteTombstone(...)`
+  and `SCS_SCALE_SITE_TOMBSTON_VW_PKG.search_recs`.
+properties:
+  scaleSiteIdNmbr:
+    type: string
+    nullable: true
+    description: Scale site number.
+    example: "SITE001"
+  siteName:
+    type: string
+    nullable: true
+    description: Scale site name.
+    example: "MAIN YARD"
+  regionName:
+    type: string
+    nullable: true
+    description: Region name as supplied by the legacy tombstone source.
+    example: "South Coast Natural Resource Region"
+  districtName:
+    type: string
+    nullable: true
+    description: District name as supplied by the legacy tombstone source.
+    example: "South Island District"
+required:
+  - scaleSiteIdNmbr
+

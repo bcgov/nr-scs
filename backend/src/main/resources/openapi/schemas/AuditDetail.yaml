@@ -1,0 +1,28 @@
+type: object
+description: >-
+  Standard audit metadata ("who did it") shared across all persisted record schemas: the user and
+  timestamp for creation and last update, plus the optimistic-lock revision counter.
+properties:
+  entryTimestamp:
+    type: string
+    format: date-time
+    nullable: true
+    description: When the record was created
+  entryUserid:
+    type: string
+    nullable: true
+    description: User who created the record
+  updateTimestamp:
+    type: string
+    format: date-time
+    nullable: true
+    description: When the record was last updated
+  updateUserid:
+    type: string
+    nullable: true
+    description: User who last updated the record
+  revisionCount:
+    type: integer
+    format: int64
+    nullable: true
+    description: Optimistic locking counter

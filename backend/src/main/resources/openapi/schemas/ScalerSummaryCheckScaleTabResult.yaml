@@ -1,0 +1,11 @@
+type: object
+description: |
+  Payload for the Scaler `Summary Check Scales` tab (legacy screen P132): the summary
+  check scale rows for a scaler. Unlike the detail `Check Scales` tab there is no
+  statistics block and no filter — the legacy summary list has neither.
+properties:
+  summaryCheckScales:
+    type: array
+    description: Summary check scale rows for the tab table.
+    items:
+      $ref: '../root.yaml#/components/schemas/SummaryCheckScaleView'

@@ -1,0 +1,19 @@
+@use '@carbon/react/scss/spacing' as spacing;
+
+// Shared styling for the collapsible filter Accordion on the Queries search pages
+// (Client, Scalers, Scale Sites, Scaler / Scale Site Risk Assessments). Applied to the
+// Carbon <Accordion> via className="scs-query-accordion". Kept global so every query
+// filter accordion renders identically. Carbon Accordion doesn't accept inline `style`
+// in our typings, so the heading/content spacing lives here instead. The Carbon internals
+// are nested so these overrides only affect accordions carrying this class.
+.scs-query-accordion {
+  margin-top: spacing.$spacing-08;
+
+  .cds--accordion__heading {
+    margin-bottom: 32px;
+  }
+
+  .cds--accordion__content {
+    padding-inline-end: 3rem;
+  }
+}

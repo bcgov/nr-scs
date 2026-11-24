@@ -1,0 +1,14 @@
+type: object
+description: |
+  Fields saved/updated on a risk assessment. Responses are keyed by question id
+  so the payload works for any template version (scaler or scale site).
+properties:
+  comments:
+    type: string
+    nullable: true
+    description: Free-text comments.
+  responses:
+    type: array
+    description: Saved answer selections, one entry per answered question.
+    items:
+      $ref: './RiskAssessmentResponseInput.yaml'

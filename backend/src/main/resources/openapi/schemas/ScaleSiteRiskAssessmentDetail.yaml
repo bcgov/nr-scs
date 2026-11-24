@@ -1,0 +1,78 @@
+description: |
+  Full detail of a scale site risk assessment for the edit/view page. The questionnaire
+  structure (sections, questions, answers) and risk-level thresholds are driven entirely
+  by the template version the assessment is bound to (`risk_questionnaire_template_id`),
+  so different assessments render different sections, questions, and Risk Levels.
+allOf:
+  - $ref: ./AuditDetail.yaml
+  - type: object
+    properties:
+      riskQuestionnaireId:
+        type: integer
+        format: int64
+        nullable: true
+        description: Risk questionnaire / assessment identifier.
+      templateId:
+        type: integer
+        format: int64
+        nullable: true
+        description: risk_questionnaire_template_id the assessment is bound to.
+      versionNo:
+        type: integer
+        format: int64
+        nullable: true
+        description: Template version number.
+      riskRating:
+        type: number
+        nullable: true
+        description: Persisted calculated total (product of section totals) from the view.
+      maxRiskRating:
+        type: number
+        nullable: true
+        description: Maximum possible total for this template.
+      riskTypeCode:
+        type: string
+        nullable: true
+        description: Current risk level code.
+      codeDescription:
+        type: string
+        nullable: true
+        description: Display description of the current risk level.
+      rangeLowValue:
+        type: integer
+        nullable: true
+        description: Low bound of the current risk level range.
+      rangeHighValue:
+        type: integer
+        nullable: true
+        description: High bound of the current risk level range.
+      scaleSiteIdNmbr:
+        type: string
+        nullable: true
+        description: Scale site identifier.
+      siteName:
+        type: string
+        nullable: true
+        description: Scale site name.
+      regionName:
+        type: string
+        nullable: true
+        description: Natural resource region name.
+      districtName:
+        type: string
+        nullable: true
+        description: Natural resource district name.
+      comments:
+        type: string
+        nullable: true
+        description: Free-text comments saved on the assessment.
+      sections:
+        type: array
+        description: Template sections (in section_order), each with its questions and answers.
+        items:
+          $ref: './RiskAssessmentSection.yaml'
+      riskRatings:
+        type: array
+        description: Risk level thresholds for this template, for the Risk Levels reference table.
+        items:
+          $ref: './RiskAssessmentRiskRating.yaml'

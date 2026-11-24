@@ -1,0 +1,25 @@
+@use '@carbon/react/scss/spacing' as spacing;
+
+.client-search-page {
+  .client-search-form {
+    margin-top: spacing.$spacing-05;
+    margin-bottom: spacing.$spacing-09;
+  }
+
+  .client-search-form__section-title {
+    margin-top: spacing.$spacing-08;
+    margin-bottom: spacing.$spacing-08;
+  }
+
+  // Filter accordion styling is global — see src/styles/_query-accordion.scss (.scs-query-accordion).
+
+  .client-search__notification {
+    margin-bottom: spacing.$spacing-05;
+  }
+
+  .client-search-results {
+    .cds--pagination {
+      margin-bottom: spacing.$spacing-07;
+    }
+  }
+}

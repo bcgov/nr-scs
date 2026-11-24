@@ -1,0 +1,75 @@
+type: object
+description: |
+  Aggregated inspection payload used to render the modern Scale Site inspection edit page.
+  This extends the read-only detail view with edit-oriented question response metadata,
+  including inspection question identifiers and valid answer options.
+properties:
+  inspectionId:
+    type: integer
+    format: int64
+    nullable: true
+    description: Inspection identifier.
+  inspectionTypeCode:
+    type: string
+    nullable: true
+    description: Scale site inspection type code.
+  inspectionTypeDescription:
+    type: string
+    nullable: true
+    description: Display description of the inspection type.
+  inspectionDate:
+    type: string
+    format: date
+    nullable: true
+    description: Inspection date.
+  inspector:
+    type: string
+    nullable: true
+    description: Inspector identifier displayed on the legacy edit page.
+  scaleSiteIdNmbr:
+    type: string
+    nullable: true
+    description: Scale site number associated with the inspection.
+  siteName:
+    type: string
+    nullable: true
+    description: Scale site name.
+  siteLocation:
+    type: string
+    nullable: true
+    description: Scale site location.
+  siteOwnerName:
+    type: string
+    nullable: true
+    description: Scale site owner display name.
+  siteTypeDisplay:
+    type: string
+    nullable: true
+    description: Comma-separated display value of the inspected scaling methods shown as the site type.
+  previousInspectionId:
+    type: integer
+    format: int64
+    nullable: true
+    description: Follow-up-to inspection identifier shown read-only in edit mode.
+  recipient:
+    type: string
+    nullable: true
+    description: Site operator / recipient display value shown read-only in edit mode.
+  siteOperatorPresentInd:
+    type: string
+    enum: [Y, N]
+    nullable: true
+    description: Legacy yes/no indicator for whether the site operator was present during the inspection.
+  siteOperatorPresentDescription:
+    type: string
+    nullable: true
+    description: Display description of `siteOperatorPresentInd`.
+  comments:
+    type: string
+    nullable: true
+    description: General comments for the inspection.
+  questionResponses:
+    type: array
+    description: Question response rows displayed and edited on the inspection edit page.
+    items:
+      $ref: './ScaleSiteInspectionEditQuestionResponse.yaml'

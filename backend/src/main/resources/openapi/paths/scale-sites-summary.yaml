@@ -1,0 +1,68 @@
+parameters:
+  - name: scaleSiteIdNmbr
+    in: path
+    description: Scale site number
+    required: true
+    schema:
+      type: string
+      maxLength: 8
+      example: "SITE001"
+
+get:
+  tags:
+    - ScaleSite
+  summary: Get the summary tab data for a scale site
+  description: |
+    Retrieve the Summary-tab payload for a scale site record.
+    This contract intentionally contains only strongly traced fields from the legacy summary flow:
+    `ScaleSiteDelegate.loadScaleSite(...)` / `scs_scale_site_pkg.select_rec` and
+    `SiteScalingMethodDb.search(...)` / `scs_site_scaling_method_pkg.search_recs`.
+
+    Display-only composed fields such as owner display name, reg/dist display text, and LOV-backed
+    descriptions are intentionally deferred pending Gate 3 source verification.
+  operationId: getScaleSiteSummary
+  responses:
+    '200':
+      description: Scale site summary found
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/ScaleSiteSummary'
+          example:
+            scaleSiteIdNmbr: "SITE001"
+            siteName: "MAIN YARD"
+            ownerClientNumber: "12345678"
+            ownerClientLocnCode: "00"
+            orgUnitNo: 100
+            timberBrand: "TB-123"
+            siteLocation: "Nanaimo, BC"
+            latitudeDegrees: 49
+            latitudeMinutes: 10
+            latitudeSeconds: 22
+            longitudeDegrees: 123
+            longitudeMinutes: 56
+            longitudeSeconds: 31
+            siteTypes:
+              - priorityCode: "1"
+                scaleMethodTypeCode: "W"
+              - priorityCode: "2"
+                scaleMethodTypeCode: "P"
+    '404':
+      description: Scale site not found
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+          example:
+            code: "NOT_FOUND"
+            message: "No scale site found with scale site number SITE001"
+    '500':
+      description: Server error
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+          example:
+            code: "ORA-12345"
+            message: "Database connection error"
+

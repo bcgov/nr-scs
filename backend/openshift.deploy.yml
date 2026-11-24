@@ -1,5 +1,17 @@
+---
+# Backend deploy Template — consumed by `oc process` in reusable-deploy.yml.
+#
+# Naming follows the quickstart-openshift convention (${NAME}-${ZONE}-backend, label
+# app=${NAME}-${ZONE}) so the shared PR-close cleanup and the scheduled PR purge, which select on
+# that label, keep working. The Oracle wiring (TCPS trust-store init container, keystore PVC) follows
+# the other NRIDS Java apps (e.g. bcgov/nr-cbr).
+#
+#   ZONE       PR number for previews, 'test' for TEST, 'prod' for PROD.
+#   IMAGE_TAG  GHCR tag (PR number or head SHA for previews; merge.yml deploys the PR's tag).
 apiVersion: template.openshift.io/v1
 kind: Template
+metadata:
+  name: nr-scs-backend-deploy
 parameters:
   - name: NAME
     description: Module name
@@ -8,7 +20,7 @@ parameters:
     description: Component name
     value: backend
   - name: ZONE
-    description: Deployment zone, e.g. pr-### or prod
+    description: Deployment zone, e.g. PR number, test or prod
     required: true
   - name: IMAGE_TAG
     description: Image tag to use
@@ -19,24 +31,82 @@ parameters:
   - name: ORG_NAME
     description: Organization name
     value: bcgov
-  - name: DOMAIN
-    value: apps.silver.devops.gov.bc.ca
   - name: MIN_REPLICAS
     description: The minimum amount of replicas for the horizontal pod autoscaler.
-    value: "2"
+    value: "1"
   - name: MAX_REPLICAS
     description: The maximum amount of replicas for the horizontal pod autoscaler.
-    value: "5"
+    value: "2"
   - name: CPU_REQUEST
-    value: "100m"
+    value: "200m"
   - name: MEMORY_REQUEST
-    value: "128Mi"
+    value: "500Mi"
+  # The JVM sizes its heap as a percentage of this limit (-XX:MaxRAMPercentage=60 in the Dockerfile).
   - name: MEMORY_LIMIT
-    description: Memory limit for the container (bounds the pod's working set).
-    value: "4Gi"
-  - name: LOG_LEVEL
-    description: Application log level (debug|info|warn|error)
-    value: "info"
+    value: "1Gi"
+  # Container timezone; the JVM default zone and so the log timestamps. Named zones resolve from the
+  # tzdb bundled in the JDK, so the Alpine image needs no tzdata package.
+  - name: TZ
+    value: America/Vancouver
+  - name: APP_LOG_LEVEL
+    description: Log level for ca.bc.gov.nrs.scs (DEBUG|INFO|WARN|ERROR)
+    value: INFO
+  # Welcome-page label and the mock-auth guard's input. Never LOCAL or DEV on OpenShift: those are
+  # the only values under which SecurityConfig permits mock authentication.
+  - name: APP_ENVIRONMENT
+    description: DELIVERY (PR previews), TEST or PROD
+    required: true
+  - name: APP_VERSION
+    description: Version shown on the welcome page
+    value: "0.0.0"
+
+  # --- Oracle (TCPS, port 1543) ---
+  - name: DATABASE_HOST
+    required: true
+  - name: DATABASE_SERVICE_NAME
+    required: true
+  - name: DATABASE_USER
+    required: true
+  - name: DATABASE_PASSWORD
+    required: true
+  - name: KEYSTORE_SECRET
+    description: Passphrase for the Oracle TCPS trust store built by the init container
+    required: true
+
+  # --- Authentication (FAM/Cognito JWT validation; replaced by Keycloak in a follow-up) ---
+  # Required: with no JWKS URI the backend would fall back to mock auth, which SecurityConfig refuses
+  # outside LOCAL/DEV, so the pod would not start. Failing here gives the clearer error.
+  - name: JWT_ISSUER_JWKS_URI
+    description: https://cognito-idp.<region>.amazonaws.com/<user-pool-id>/.well-known/jwks.json
+    required: true
+  - name: JWT_AUDIENCE
+    description: Expected token audience (the Cognito app client id)
+    required: true
+
+  # --- JasperReports Server ---
+  - name: JASPER_SERVER_LOGIN_URL
+    value: ""
+  - name: JASPER_SERVER_FETCH_URL
+    value: ""
+  - name: JASPER_SERVER_USERNAME
+    value: ""
+  - name: JASPER_SERVER_PASSWORD
+    value: ""
+
+  # --- Email (CHES). Off unless MAIL_ENABLED=true, which then requires the URLs and credentials. ---
+  - name: MAIL_ENABLED
+    value: "false"
+  - name: CHES_EMAIL_URL
+    value: ""
+  - name: CHES_TOKEN_URL
+    value: ""
+  - name: CHES_CLIENT_ID
+    value: ""
+  - name: CHES_CLIENT_SECRET
+    value: ""
+  - name: CHES_FROM_EMAIL
+    value: ""
+
 objects:
   - apiVersion: apps/v1
     kind: Deployment
@@ -45,6 +115,7 @@ objects:
         app: ${NAME}-${ZONE}
       name: ${NAME}-${ZONE}-${COMPONENT}
     spec:
+      replicas: ${{MIN_REPLICAS}}
       selector:
         matchLabels:
           deployment: ${NAME}-${ZONE}-${COMPONENT}
@@ -58,125 +129,170 @@ objects:
           labels:
             app: ${NAME}-${ZONE}
             deployment: ${NAME}-${ZONE}-${COMPONENT}
+          annotations:
+            prometheus.io/path: /actuator/prometheus
+            prometheus.io/port: "8080"
+            prometheus.io/scrape: "true"
         spec:
-          terminationGracePeriodSeconds: 30
-          affinity:
-            podAntiAffinity:
-              preferredDuringSchedulingIgnoredDuringExecution:
-                - weight: 100
-                  podAffinityTerm:
-                    labelSelector:
-                      matchLabels:
-                        deployment: ${NAME}-${ZONE}-${COMPONENT}
-                    topologyKey: kubernetes.io/hostname
+          automountServiceAccountToken: false
+          securityContext:
+            runAsNonRoot: true
           initContainers:
-            - name: wait-for-db
-              image: ${REGISTRY}/${ORG_NAME}/${NAME}/migrations:${IMAGE_TAG}
-              command:
-                - /bin/sh
-                - -c
-                - |
-                  echo "Waiting for database to be reachable..."
-                  max_retries=30
-                  attempt=1
-                  until nc -z -v -w3 ${NAME}-${ZONE}-database 5432; do
-                    if [ "$attempt" -ge "$max_retries" ]; then
-                      echo "ERROR: Database ${NAME}-${ZONE}-database:5432 is not reachable after ${max_retries} attempts." >&2
-                      exit 1
-                    fi
-                    echo "Database not ready (attempt ${attempt}/${max_retries}), sleeping..."
-                    attempt=$((attempt + 1))
-                    sleep 2
-                  done
-                  echo "Database is UP!"
-              securityContext:
-                allowPrivilegeEscalation: false
-                runAsNonRoot: true
-                readOnlyRootFilesystem: true
-                capabilities:
-                  drop: ["ALL"]
-                seccompProfile:
-                  type: RuntimeDefault
-              volumeMounts:
-                - name: tmp
-                  mountPath: /tmp
-            - name: migrations
-              image: ${REGISTRY}/${ORG_NAME}/${NAME}/migrations:${IMAGE_TAG}
+            # Fetches the Oracle listener's certificate and writes a JKS trust store to /cert
+            # (jssecacerts), protected by KEYSTORE_SECRET. Shared image used by the NRIDS Java apps.
+            - name: ${NAME}-${COMPONENT}-init
+              image: ghcr.io/bcgov/nr-forest-client/common:prod
               imagePullPolicy: Always
               env:
-                - name: POSTGRES_DATABASE
+                - name: ORACLEDB_HOST
+                  value: ${DATABASE_HOST}
+                - name: ORACLEDB_SECRET
                   valueFrom:
                     secretKeyRef:
-                      name: ${NAME}-${ZONE}-database
-                      key: database-name
-                - name: FLYWAY_URL
-                  value: jdbc:postgresql://${NAME}-${ZONE}-database:5432/$(POSTGRES_DATABASE)
-                - name: FLYWAY_USER
-                  valueFrom:
-                    secretKeyRef:
-                      name: ${NAME}-${ZONE}-database
-                      key: database-user
-                - name: FLYWAY_PASSWORD
-                  valueFrom:
-                    secretKeyRef:
-                      name: ${NAME}-${ZONE}-database
-                      key: database-password
-                - name: FLYWAY_DEFAULT_SCHEMA
-                  value: "users"
-                - name: FLYWAY_BASELINE_ON_MIGRATE
-                  value: "true"
+                      name: ${NAME}-${ZONE}-${COMPONENT}
+                      key: KEYSTORE_SECRET
+                - name: ORACLEDB_PORT
+                  value: "1543"
+              volumeMounts:
+                - name: api-cert
+                  mountPath: /cert
+                - name: init-tmp
+                  mountPath: /tmp
               resources:
                 requests:
-                  cpu: 10m
-                  memory: 50Mi
+                  cpu: "100m"
+                  memory: "200Mi"
+                  ephemeral-storage: "50Mi"
+                limits:
+                  cpu: "500m"
+                  memory: "500Mi"
+                  ephemeral-storage: "100Mi"
               securityContext:
                 allowPrivilegeEscalation: false
                 runAsNonRoot: true
                 readOnlyRootFilesystem: true
                 capabilities:
                   drop: ["ALL"]
-                seccompProfile:
-                  type: RuntimeDefault
-              volumeMounts:
-                - name: tmp
-                  mountPath: /tmp
           containers:
             - name: ${NAME}
               image: ${REGISTRY}/${ORG_NAME}/${NAME}/${COMPONENT}:${IMAGE_TAG}
               imagePullPolicy: Always
               ports:
                 - name: http
-                  containerPort: 3000
+                  containerPort: 8080
+                  protocol: TCP
               env:
-                - name: LOG_LEVEL
-                  value: ${LOG_LEVEL}
-                - name: POSTGRES_HOST
-                  value: ${NAME}-${ZONE}-database
-                - name: POSTGRES_PORT
-                  value: "5432"
-                - name: POSTGRES_DATABASE
+                - name: TZ
+                  value: ${TZ}
+                - name: SERVER_PORT
+                  value: "8080"
+                - name: APP_ENVIRONMENT
+                  value: ${APP_ENVIRONMENT}
+                - name: APP_VERSION
+                  value: ${APP_VERSION}
+                - name: APP_SERVER_NAME
+                  value: ${NAME}-${ZONE}
+                - name: APP_LOG_LEVEL
+                  value: ${APP_LOG_LEVEL}
+                - name: SECURITY_JWT_ENABLED
+                  value: "true"
+                - name: JWT_ISSUER_JWKS_URI
+                  value: ${JWT_ISSUER_JWKS_URI}
+                - name: JWT_AUDIENCE
+                  value: ${JWT_AUDIENCE}
+                - name: DATABASE_HOST
+                  value: ${DATABASE_HOST}
+                - name: DATABASE_SERVICE_NAME
+                  value: ${DATABASE_SERVICE_NAME}
+                - name: DATABASE_USER
                   valueFrom:
                     secretKeyRef:
-                      name: ${NAME}-${ZONE}-database
-                      key: database-name
-                - name: POSTGRES_USER
+                      name: ${NAME}-${ZONE}-${COMPONENT}
+                      key: DATABASE_USER
+                - name: DATABASE_PASSWORD
                   valueFrom:
                     secretKeyRef:
-                      name: ${NAME}-${ZONE}-database
-                      key: database-user
-                - name: POSTGRES_PASSWORD
+                      name: ${NAME}-${ZONE}-${COMPONENT}
+                      key: DATABASE_PASSWORD
+                - name: KEYSTORE_SECRET
                   valueFrom:
                     secretKeyRef:
-                      name: ${NAME}-${ZONE}-database
-                      key: database-password
-                - name: POSTGRES_SCHEMA
-                  value: "users"
+                      name: ${NAME}-${ZONE}-${COMPONENT}
+                      key: KEYSTORE_SECRET
+                - name: JASPER_SERVER_LOGIN_URL
+                  value: ${JASPER_SERVER_LOGIN_URL}
+                - name: JASPER_SERVER_FETCH_URL
+                  value: ${JASPER_SERVER_FETCH_URL}
+                - name: JASPER_SERVER_USERNAME
+                  valueFrom:
+                    secretKeyRef:
+                      name: ${NAME}-${ZONE}-${COMPONENT}
+                      key: JASPER_SERVER_USERNAME
+                - name: JASPER_SERVER_PASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      name: ${NAME}-${ZONE}-${COMPONENT}
+                      key: JASPER_SERVER_PASSWORD
+                - name: MAIL_ENABLED
+                  value: ${MAIL_ENABLED}
+                - name: CHES_EMAIL_URL
+                  value: ${CHES_EMAIL_URL}
+                - name: CHES_TOKEN_URL
+                  value: ${CHES_TOKEN_URL}
+                - name: CHES_FROM_EMAIL
+                  value: ${CHES_FROM_EMAIL}
+                - name: CHES_CLIENT_ID
+                  valueFrom:
+                    secretKeyRef:
+                      name: ${NAME}-${ZONE}-${COMPONENT}
+                      key: CHES_CLIENT_ID
+                - name: CHES_CLIENT_SECRET
+                  valueFrom:
+                    secretKeyRef:
+                      name: ${NAME}-${ZONE}-${COMPONENT}
+                      key: CHES_CLIENT_SECRET
               resources:
                 requests:
                   cpu: ${CPU_REQUEST}
                   memory: ${MEMORY_REQUEST}
+                  ephemeral-storage: "500Mi"
                 limits:
                   memory: ${MEMORY_LIMIT}
+                  ephemeral-storage: "1Gi"
+              # Liveness and readiness use Boot's probe groups, not /actuator/health: the overall
+              # status includes the database, and a DB outage should not restart every pod.
+              startupProbe:
+                httpGet:
+                  path: /actuator/health/liveness
+                  port: http
+                periodSeconds: 5
+                failureThreshold: 60
+              readinessProbe:
+                httpGet:
+                  path: /actuator/health/readiness
+                  port: http
+                periodSeconds: 10
+                timeoutSeconds: 5
+                failureThreshold: 3
+              livenessProbe:
+                httpGet:
+                  path: /actuator/health/liveness
+                  port: http
+                periodSeconds: 30
+                timeoutSeconds: 5
+                failureThreshold: 5
+              volumeMounts:
+                - name: api-cert
+                  mountPath: /cert
+                - name: logs
+                  mountPath: /logs
+                # Heap dumps on OOM (-XX:HeapDumpPath=/temp in the Dockerfile).
+                - name: heap-dumps
+                  mountPath: /temp
+                # Load-bearing under readOnlyRootFilesystem: the JVM's temp dir, multipart spool and
+                # fontconfig cache (HOME=/tmp in the Dockerfile).
+                - name: tmp
+                  mountPath: /tmp
               securityContext:
                 allowPrivilegeEscalation: false
                 runAsNonRoot: true
@@ -185,37 +301,19 @@ objects:
                   drop: ["ALL"]
                 seccompProfile:
                   type: RuntimeDefault
-              volumeMounts:
-                - name: tmp
-                  mountPath: /tmp
-              startupProbe:
-                httpGet:
-                  path: /api/health
-                  port: http
-                periodSeconds: 5
-                failureThreshold: 30
-              readinessProbe:
-                httpGet:
-                  path: /api/health
-                  port: http
-                periodSeconds: 5
-                failureThreshold: 3
-              livenessProbe:
-                httpGet:
-                  path: /api
-                  port: http
-                periodSeconds: 10
-                failureThreshold: 3
-              lifecycle:
-                preStop:
-                  exec:
-                    # distroless/nodejs has no /bin/sleep; exec hooks skip image ENTRYPOINT
-                    command: ["/nodejs/bin/node", "-e", "setTimeout(() => {}, 10000)"]
           volumes:
+            - name: api-cert
+              persistentVolumeClaim:
+                claimName: ${NAME}-${ZONE}-${COMPONENT}-api-cert
+            - name: logs
+              emptyDir: {}
+            - name: heap-dumps
+              emptyDir: {}
             - name: tmp
-              emptyDir:
-                medium: Memory
-                sizeLimit: 256Mi
+              emptyDir: {}
+            - name: init-tmp
+              emptyDir: {}
+
   - apiVersion: v1
     kind: Service
     metadata:
@@ -226,9 +324,11 @@ objects:
       ports:
         - name: http
           port: 80
-          targetPort: 3000
+          targetPort: 8080
+          protocol: TCP
       selector:
         deployment: ${NAME}-${ZONE}-${COMPONENT}
+
   - apiVersion: autoscaling/v2
     kind: HorizontalPodAutoscaler
     metadata:
@@ -248,30 +348,75 @@ objects:
             name: cpu
             target:
               type: Utilization
-              averageUtilization: 80
-      behavior:
-        scaleUp:
-          stabilizationWindowSeconds: 30
-          policies:
-            - type: Percent
-              value: 100
-              periodSeconds: 60
-          selectPolicy: Max
-        scaleDown:
-          stabilizationWindowSeconds: 300
-          policies:
-            - type: Percent
-              value: 50
-              periodSeconds: 60
-          selectPolicy: Max
-  - apiVersion: policy/v1
-    kind: PodDisruptionBudget
+              averageUtilization: 200
+
+  # Oracle trust store written by the init container; one per zone so PR previews get their own.
+  - apiVersion: v1
+    kind: PersistentVolumeClaim
+    metadata:
+      labels:
+        app: ${NAME}-${ZONE}
+      name: ${NAME}-${ZONE}-${COMPONENT}-api-cert
+    spec:
+      accessModes:
+        - ReadWriteMany
+      resources:
+        requests:
+          storage: 50Mi
+      storageClassName: netapp-file-standard
+
+  - apiVersion: v1
+    kind: Secret
     metadata:
       labels:
         app: ${NAME}-${ZONE}
       name: ${NAME}-${ZONE}-${COMPONENT}
+    type: Opaque
+    stringData:
+      DATABASE_USER: ${DATABASE_USER}
+      DATABASE_PASSWORD: ${DATABASE_PASSWORD}
+      KEYSTORE_SECRET: ${KEYSTORE_SECRET}
+      JASPER_SERVER_USERNAME: ${JASPER_SERVER_USERNAME}
+      JASPER_SERVER_PASSWORD: ${JASPER_SERVER_PASSWORD}
+      CHES_CLIENT_ID: ${CHES_CLIENT_ID}
+      CHES_CLIENT_SECRET: ${CHES_CLIENT_SECRET}
+
+  # Ingress: same-zone frontend (Caddy proxies /api) and cluster monitoring (Prometheus scrape).
+  - apiVersion: networking.k8s.io/v1
+    kind: NetworkPolicy
+    metadata:
+      labels:
+        app: ${NAME}-${ZONE}
+      name: ${NAME}-${ZONE}-${COMPONENT}-ingress
     spec:
-      maxUnavailable: 1
-      selector:
+      podSelector:
         matchLabels:
           deployment: ${NAME}-${ZONE}-${COMPONENT}
+      ingress:
+        - from:
+            - podSelector:
+                matchLabels:
+                  app: ${NAME}-${ZONE}
+                  deployment: ${NAME}-${ZONE}-frontend
+            - namespaceSelector:
+                matchLabels:
+                  network.openshift.io/policy-group: monitoring
+      policyTypes:
+        - Ingress
+
+  # Egress: explicit permit-all (Oracle, JasperReports Server, CHES, FAM/Cognito JWKS). Documents
+  # intent; it does not restrict anything the namespace default allows.
+  - apiVersion: networking.k8s.io/v1
+    kind: NetworkPolicy
+    metadata:
+      labels:
+        app: ${NAME}-${ZONE}
+      name: ${NAME}-${ZONE}-${COMPONENT}-egress
+    spec:
+      podSelector:
+        matchLabels:
+          deployment: ${NAME}-${ZONE}-${COMPONENT}
+      egress:
+        - {}
+      policyTypes:
+        - Egress

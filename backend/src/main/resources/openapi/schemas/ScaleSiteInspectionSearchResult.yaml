@@ -1,0 +1,14 @@
+type: object
+description: |
+  Validated inspection lookup result returned from `SCS_SCALE_SITE_INSPCTNS_VW_PKG.search_recs`.
+properties:
+  inspectionId:
+    type: integer
+    format: int64
+    nullable: true
+    description: Inspection identifier.
+  scaleSiteIdNmbr:
+    type: string
+    nullable: true
+    description: Scale site number associated with the inspection.
+

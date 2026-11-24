@@ -1,0 +1,83 @@
+put:
+  tags:
+    - CheckScale
+  summary: Update a check scale record
+  description: |
+    Updates the editable fields of an existing HBCS check scale
+    (legacy P077 update). Only the six user-editable fields are
+    accepted; the DDN/version refs are immutable and preserved
+    server-side from the stored row. Returns the updated record.
+  operationId: updateCheckScale
+  parameters:
+    - name: checkScaleId
+      in: path
+      required: true
+      description: Identifier of the check scale to update.
+      schema:
+        type: integer
+        format: int64
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: '../root.yaml#/components/schemas/CheckScaleUpdateRequest'
+  responses:
+    '200':
+      description: Check scale updated
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/CheckScaleDetail'
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+    '404':
+      description: Check scale not found
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+    '500':
+      description: Server error
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+
+delete:
+  tags:
+    - CheckScale
+  summary: Delete a detail check scale record
+  description: |
+    Deletes a detail (HBCS) check scale and its SPG-summary child rows
+    (legacy `CheckScaleAction.delete`). The children cascade in the stored
+    procedure (`scs_check_scale_pkg.delete_rec` deletes `check_scale_spg_summary`
+    rows then the `check_scale` header). Returns 204 on success.
+  operationId: deleteCheckScale
+  parameters:
+    - name: checkScaleId
+      in: path
+      required: true
+      description: Identifier of the check scale to delete.
+      schema:
+        type: integer
+        format: int64
+  responses:
+    '204':
+      description: Check scale deleted
+    '404':
+      description: Check scale not found
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+    '500':
+      description: Server error
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'

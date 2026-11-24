@@ -1,0 +1,38 @@
+@use '@carbon/type';
+@use '../../../styles/variables' as vars;
+
+.page-title-col {
+  &.page-title-col--no-gutter {
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  .page-title-breadcrumb {
+    .#{vars.$bcgov-prefix}--link {
+      cursor: pointer;
+    }
+
+    .page-title-sep {
+      display: inline-block;
+      margin: 0 0.5rem;
+    }
+
+    margin-bottom: 0.5rem;
+  }
+
+  .page-title-container {
+    display: flex;
+    flex-direction: column;
+    row-gap: 0.5rem;
+
+    .title-container {
+      display: flex;
+      flex-direction: row;
+      column-gap: 0.5rem;
+
+      h1 {
+        @include type.type-style('heading-05');
+      }
+    }
+  }
+}

@@ -1,0 +1,78 @@
+.authorization-conditions__condition-input-row {
+  margin-top: 24px !important;
+}
+
+.authorization-conditions__template-row {
+  margin-top: 16px;
+}
+
+.authorization-conditions__input-row {
+  display: flex;
+  align-items: flex-end;
+  gap: 0.75rem;
+}
+
+.authorization-conditions__input-row :global(.cds--text-input-wrapper) {
+  flex: 1 1 auto;
+}
+
+.authorization-conditions__template-controls {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.authorization-conditions__template-controls .cds--select {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.authorization-conditions__template-controls .cds--select .cds--label,
+.authorization-conditions__template-controls .cds--select .cds--form-item__label {
+  margin-bottom: 0.5rem;
+}
+
+.authorization-conditions__template-controls .scs__input-search-button {
+  flex: 0 0 auto;
+  align-self: center;
+  margin-top: 1.5rem;
+}
+
+.authorization-conditions__template-controls .scs__input-search-button,
+.authorization-conditions__input-row .scs__input-search-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.authorization-conditions__template-controls .scs__input-search-button .cds--btn__icon,
+.authorization-conditions__input-row .scs__input-search-button .cds--btn__icon {
+  margin-top: 0 !important;
+}
+
+.authorization-conditions__template-controls .scs__input-search-button .cds--btn__text,
+.authorization-conditions__input-row .scs__input-search-button .cds--btn__text {
+  display: inline-flex;
+  align-items: center;
+}
+
+.scs__condition-search-table .table-resource table th:nth-child(3),
+.scs__condition-search-table .table-resource table td:nth-child(3) {
+  text-align: left;
+  white-space: normal;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+  max-width: none;
+}
+
+.scs__condition-search-table .table-resource table th:nth-child(1),
+.scs__condition-search-table .table-resource table td:nth-child(1) {
+  width: 110px !important;
+  min-width: 90px !important;
+}
+
+.scs__condition-search-table .table-resource table th:nth-child(2),
+.scs__condition-search-table .table-resource table td:nth-child(2) {
+  width: 360px !important;
+  min-width: 220px !important;
+}

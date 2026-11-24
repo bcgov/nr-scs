@@ -1,3 +1,10 @@
+# Reusable Tests
+#
+# Adapted from quickstart-openshift. The template's integration tests (common/tests, written against
+# its NestJS API) and its Playwright suite went with the template code. SCS's own E2E suite
+# (frontend/e2e) drives a seeded Oracle with mock auth and cannot run against a deployed zone (see
+# frontend/e2e/README.md), so this runs a smoke test against the deployment instead: the SPA through
+# the route, and an anonymous API call through Caddy's /api proxy to the backend.
 name: Reusable Tests
 
 on:
@@ -9,91 +16,38 @@ on:
         default: ${{ github.event.number }}
         type: string
 
-env:
-  DOMAIN: apps.silver.devops.gov.bc.ca
-  PREFIX: ${{ github.event.repository.name }}-${{ inputs.target }}
-
 permissions: {}
 
 jobs:
-  integration-tests:
-    name: Integration
-    runs-on: ubuntu-24.04
-    timeout-minutes: 5
-    steps:
-      - uses: actions/checkout@v7
-      - uses: actions/setup-node@v7
-        name: Setup Node
-        with:
-          node-version: 24
-      - id: cache-npm
-        uses: actions/cache@v6
-        with:
-          path: ~/.npm
-          key: ${{ runner.os }}-build-cache-node-modules-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-build-cache-node-modules-
-            ${{ runner.os }}-build-
-            ${{ runner.os }}-
-
-      - name: Wait for backend health check
-        env:
-          BASE_URL: https://${{ env.PREFIX }}.${{ env.DOMAIN }}
-        run: |
-          echo "Waiting for backend health check at ${BASE_URL}/api/health..."
-          for i in {1..30}; do
-            status=$(curl -k --connect-timeout 5 --max-time 10 -s -o /dev/null -w "%{http_code}" "${BASE_URL}/api/health" || true)
-            if [ "$status" -eq 200 ]; then
-              echo "Backend is healthy!"
-              exit 0
-            fi
-            echo "Waiting for health check (HTTP $status), retrying in 10s... ($i/30)"
-            sleep 10
-          done
-          echo "ERROR: Backend did not become healthy in time."
-          exit 1
-
-      - name: Run Integration Tests
-        env:
-          API_NAME: nest
-          BASE_URL: https://${{ env.PREFIX }}.${{ env.DOMAIN }}
-        run: |
-          cd common/tests/integration
-          npm ci
-          node src/main.js
-
-  e2e-tests:
-    name: E2E
-    defaults:
-      run:
-        working-directory: frontend
+  smoke-tests:
+    name: Smoke
     runs-on: ubuntu-24.04
     timeout-minutes: 10
+    env:
+      BASE_URL: https://${{ github.event.repository.name }}-${{ inputs.target }}.apps.gold.devops.gov.bc.ca
     steps:
-      - uses: actions/checkout@v7
-        name: Checkout
-      - uses: actions/setup-node@v7
-        name: Setup Node
-        with:
-          node-version: 24
-          cache: "npm"
-          cache-dependency-path: frontend/package-lock.json
-      - name: Install dependencies
+      # /api/system-status is permitted anonymously (SecurityConfig) so the SPA can show the
+      # "temporarily disabled" page; a 200 proves route -> Caddy -> backend.
+      - name: Wait for the API through the frontend proxy
         run: |
-          npm ci
-          npx playwright install --with-deps chromium
+          for i in {1..30}; do
+            status=$(curl --connect-timeout 5 --max-time 10 -s -o /dev/null -w "%{http_code}" "${BASE_URL}/api/system-status" || true)
+            if [ "$status" = "200" ]; then
+              echo "API reachable through the frontend."
+              exit 0
+            fi
+            echo "Waiting for ${BASE_URL}/api/system-status (HTTP $status), retrying in 10s... ($i/30)"
+            sleep 10
+          done
+          echo "ERROR: API did not become reachable in time."
+          exit 1
 
-      - name: Run Tests
-        env:
-          E2E_BASE_URL: https://${{ env.PREFIX }}.${{ env.DOMAIN }}/
-          CI: "true"
+      - name: SPA and runtime config are served
         run: |
-          npx playwright test --project="chromium" --reporter=html
-
-      - uses: actions/upload-artifact@v7
-        if: (! cancelled())
-        name: upload results
-        with:
-          name: playwright-report-chromium
-          path: "./frontend/playwright-report" # path from current folder
-          retention-days: 7
+          set -euo pipefail
+          curl -fsS "${BASE_URL}/" | grep -q '<div id="root">'
+          # Deep link: Caddy must fall back to index.html for client-side routes.
+          curl -fsS "${BASE_URL}/scalers" | grep -q '<div id="root">'
+          # Generated at container start by frontend/docker-entrypoint.sh.
+          curl -fsS "${BASE_URL}/amplify-config.js" | grep -q 'window.amplifyConfig'
+          echo "Frontend OK."

@@ -1,0 +1,148 @@
+get:
+  tags:
+    - ScaleSite
+  summary: Search for scale sites
+  description: |
+    Search for scale site records in the SCS system using the same legacy package as the original
+    Scale Sites query page.
+    Based on `scs_scale_site_search_vw_pkg.search_recs`.
+
+    Notes:
+    * Text fields support partial matching using the legacy package's existing behavior.
+    * `methodTypes` are mapped to the legacy `ws`, `ps`, `sf`, and `cb` flags.
+    * Multiple criteria are combined with AND logic.
+  operationId: searchScaleSites
+  parameters:
+    - name: scaleSiteIdNmbr
+      in: query
+      description: Scale site number
+      required: false
+      schema:
+        type: string
+        maxLength: 8
+        example: "SITE001"
+
+    - name: orgUnitNo
+      in: query
+      description: Region / district organization unit number
+      required: false
+      schema:
+        type: integer
+        format: int64
+        example: 100
+
+    - name: siteName
+      in: query
+      description: Scale site name (partial match supported with %)
+      required: false
+      schema:
+        type: string
+        maxLength: 40
+        example: "%MAIN%"
+
+    - name: ownerClientNumber
+      in: query
+      description: Site owner client number
+      required: false
+      schema:
+        type: string
+        maxLength: 8
+        example: "12345678"
+
+    - name: ownerClientLocnCode
+      in: query
+      description: Site owner location code
+      required: false
+      schema:
+        type: string
+        maxLength: 2
+        example: "00"
+
+    - name: methodTypes
+      in: query
+      description: |
+        Selected scale method types:
+        * `W` - Weight Scale
+        * `P` - Piece Scale
+        * `S` - Special Forest Product
+        * `C` - Cruise Based
+      required: false
+      style: form
+      explode: true
+      schema:
+        type: array
+        items:
+          type: string
+          enum: [W, P, S, C]
+
+    - name: primarySort
+      in: query
+      description: |
+        Primary sort field:
+        * `1` - Scale Site #
+        * `11` - Region
+        * `10` - District
+        * `3` - Site Type
+        * `8` - Scale Site Name
+        * `7` - Site Owner
+      required: false
+      schema:
+        type: integer
+        enum: [1, 11, 10, 3, 8, 7]
+        default: 1
+
+    - name: secondarySort
+      in: query
+      description: |
+        Secondary sort field:
+        * `0` - No secondary sort
+        * `1` - Scale Site #
+        * `11` - Region
+        * `10` - District
+        * `3` - Site Type
+        * `8` - Scale Site Name
+        * `7` - Site Owner
+      required: false
+      schema:
+        type: integer
+        enum: [0, 1, 11, 10, 3, 8, 7]
+        default: 0
+
+  responses:
+    '200':
+      description: Successful search operation
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: '../root.yaml#/components/schemas/ScaleSiteSearchResult'
+          example:
+            - scaleSiteIdNmbr: "SITE001"
+              siteName: "MAIN YARD"
+              region: "South Coast Natural Resource Region"
+              district: "South Island District"
+              methodTypeCodeName: "Weight Scale"
+              ownerClientNumber: "12345678"
+              ownerClientLocnCode: "00"
+
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+          example:
+            code: "BAD_REQUEST"
+            message: "Invalid primarySort value"
+
+    '500':
+      description: Server error
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+          example:
+            code: "ORA-12345"
+            message: "Database connection error"
+

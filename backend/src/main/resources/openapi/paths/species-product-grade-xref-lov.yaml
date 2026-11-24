@@ -1,0 +1,32 @@
+get:
+  tags:
+    - Lov
+  summary: Get valid species/product/grade combinations
+  description: |
+    Retrieve all active valid species → product → grade combinations used to filter the
+    Product and Grade dropdowns on the check-scale create/update forms, eliminating the
+    FK-violation error path.
+    Based on `scs_species_prdct_grd_xrf_pkg.search_active_recs` (all params null → every active combo).
+  operationId: getSpeciesProductGradeXref
+  responses:
+    '200':
+      description: Successful search operation
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: '../root.yaml#/components/schemas/SpeciesProductGradeXref'
+          example:
+            - scaleSpeciesCode: "FI"
+              scaleProductCode: "LT"
+              scaleGradeCode: "1"
+            - scaleSpeciesCode: "FI"
+              scaleProductCode: "XM"
+              scaleGradeCode: "xmFI"
+    '500':
+      description: Server error
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'

@@ -1,0 +1,19 @@
+type: object
+required:
+  - scaleAuthTemplateName
+  - scaleConditionClassCode
+  - orgUnitNo
+properties:
+  scaleAuthTemplateName:
+    type: string
+    maxLength: 100
+  scaleConditionClassCode:
+    type: string
+    maxLength: 10
+  orgUnitNo:
+    type: integer
+    format: int64
+  conditions:
+    type: array
+    items:
+      $ref: '../root.yaml#/components/schemas/ScaleAuthConditionRef'

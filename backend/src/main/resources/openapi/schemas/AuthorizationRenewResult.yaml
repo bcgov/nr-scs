@@ -1,0 +1,6 @@
+type: object
+properties:
+  newAuthorizationId:
+    type: integer
+    format: int64
+    nullable: true

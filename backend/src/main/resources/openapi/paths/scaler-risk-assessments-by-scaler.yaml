@@ -1,0 +1,85 @@
+parameters:
+  - name: scalerLicenceNo
+    in: path
+    description: Scaler licence number
+    required: true
+    schema:
+      type: string
+      maxLength: 4
+      example: "1234"
+
+post:
+  tags:
+    - ScalerRiskAssessment
+  summary: Create a risk assessment for a scaler
+  description: |
+    Create a new scaler risk assessment. Mirrors the legacy scaler risk assessment create flow
+    (`RiskAssessmentAction.addScalerAssessment` + `saveScalerAssessment`): the new
+    `RISK_QUESTIONNAIRE` row is bound to the currently active `SCLE` template (Consequences (C) /
+    Likelihood (L) format) and linked to the scaler via `scaler_licence_no`, and the supplied
+    answers are written as `RISK_QUESTION_RESPONSE` rows in the same transaction. The risk rating
+    total / level are derived by the database views from the saved responses.
+
+    Business rules enforced server-side:
+    * Exactly one `SCLE` template must be active; otherwise the request is rejected.
+    * Every question in the active template must be answered (a full save, matching legacy
+      `validateAllQuestionResponsesAnswered`).
+    * Each `answerId` must be a valid answer for its `questionId` in the bound template.
+    * `comments` are optional and length-limited (4000 characters).
+  operationId: createScalerRiskAssessment
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: '../root.yaml#/components/schemas/RiskAssessmentSaveRequest'
+        example:
+          comments: "Initial assessment on appointment."
+          responses:
+            - questionId: 101
+              answerId: 5001
+            - questionId: 102
+              answerId: 5010
+  responses:
+    '201':
+      description: Risk assessment created successfully
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/ScalerRiskAssessmentDetail'
+    '400':
+      description: Bad request — validation failure
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+          example:
+            code: "BAD_REQUEST"
+            message: "All questions must be answered in order to save the assessment."
+    '404':
+      description: Scaler not found
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+          example:
+            code: "NOT_FOUND"
+            message: "No scaler tombstone found for licence number 1234"
+    '409':
+      description: Template configuration error (no single active SCLE template)
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+          example:
+            code: "CONFLICT"
+            message: "Multiple active risk assessment templates found for type SCLE."
+    '500':
+      description: Server error
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+          example:
+            code: "ORA-12345"
+            message: "Database connection error"

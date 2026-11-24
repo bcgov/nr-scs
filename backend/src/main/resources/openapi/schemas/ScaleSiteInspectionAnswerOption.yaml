@@ -1,0 +1,15 @@
+type: object
+description: |
+  A valid answer option for a Scale Site inspection question on the edit page.
+required:
+  - code
+  - description
+properties:
+  code:
+    type: string
+    description: Legacy inspection answer code.
+    example: "Y"
+  description:
+    type: string
+    description: Display description of the answer code.
+    example: "Yes"

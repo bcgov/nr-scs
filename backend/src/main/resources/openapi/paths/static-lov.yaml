@@ -1,0 +1,60 @@
+get:
+  tags:
+    - Lov
+  summary: Get static list of values
+  description: |
+    Retrieve static list of values (LOV) for various code tables in the SCS system.
+    Based on `scs_static_lov_pkg.static_lov_recs`.
+
+    Notes:
+    * If `tableKey` is not provided, all static LOV records are returned.
+    * Only records where the current date is between `effective_date` and `expiry_date` are returned.
+    * Results are ordered by `tableKey` and `description`.
+    * Supported table keys include: CHECK_SCALE_TYPE_CODE, CIM_INSPECTION_TYPE_CODE, EXEMPT_MARK_METHOD_CODE,
+      SCALE_SPECIES_CODE, INSPECTION_ANSWER_CODE, SCALER_LICENCE_TYPE_CODE, SCALER_PERFORMANCE_ACTN_CODE,
+      SCALER_PERFORMANCE_OUTCM_CODE, SCALER_TRAINING_CLASS_CODE, SCALE_CONDITION_CLASS_CODE, SCALE_GRADE_CODE,
+      SCALE_GRADING_SYSTEM_CODE, SCALE_METHOD_TYPE_CODE, SCALE_PRODUCT_CODE, SCALE_SITE_INSPCTN_TYPE_CODE,
+      SCALE_SITE_PRIORITY_CODE, SCALER_TRAINING_TYPE, CRUISE_RESULT_TYPE_CODE, PROF_DESIGNATION_TYPE_CODE,
+      CRUISE_ROLE_CODE, CRUISE_DOCUMENT_TYPE_CODE, SCALER_APPOINTMENT_TYPE, CRUISE_TYPE_CODE, RISK_TYPE_CODE,
+      BASAL_AREA_SPECIES_CODE, CRUISE_PLAN_STAGE_CODE, CRUISE_PLAN_STAGE_CODE_FIELD, WASTE_ASSESS_AREA_STS_CODE,
+      SGCD_SAPT, TIMBER_STATUS_CODE.
+  operationId: getStaticLov
+  parameters:
+    - name: tableKey
+      in: query
+      description: Table key to filter results (e.g., CHECK_SCALE_TYPE_CODE, SCALE_SPECIES_CODE)
+      required: false
+      schema:
+        type: string
+        maxLength: 50
+        example: "SCALE_SPECIES_CODE"
+
+  responses:
+    '200':
+      description: Successful search operation
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: '../root.yaml#/components/schemas/StaticLov'
+          example:
+            - tableKey: "SCALE_SPECIES_CODE"
+              code: "FIR"
+              description: "Douglas Fir"
+            - tableKey: "SCALE_SPECIES_CODE"
+              code: "SPR"
+              description: "Spruce"
+            - tableKey: "SCALE_GRADE_CODE"
+              code: "A"
+              description: "Grade A"
+
+    '500':
+      description: Server error
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+          example:
+            code: "ORA-12345"
+            message: "Database connection error"

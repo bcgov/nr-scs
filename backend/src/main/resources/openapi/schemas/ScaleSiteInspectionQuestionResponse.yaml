@@ -1,0 +1,46 @@
+type: object
+description: |
+  A single question-response row displayed on the legacy Scale Site inspection view page.
+properties:
+  questionText:
+    type: string
+    nullable: true
+    description: Inspection question text.
+  inspectionAnswerCode:
+    type: string
+    nullable: true
+    description: Legacy inspection answer code.
+  inspectionAnswerDescription:
+    type: string
+    nullable: true
+    description: Display description of `inspectionAnswerCode`.
+  commentsText:
+    type: string
+    nullable: true
+    description: Question-level response comments.
+  followUpRequiredInd:
+    type: string
+    nullable: true
+    description: Legacy yes/no indicator for whether follow-up is required.
+  followUpRequiredDescription:
+    type: string
+    nullable: true
+    description: Display description of `followUpRequiredInd`.
+  followUpActionText:
+    type: string
+    nullable: true
+    description: Follow-up action required text.
+  followUpDueDate:
+    type: string
+    format: date
+    nullable: true
+    description: Follow-up due date.
+  followUpCompletedInd:
+    type: string
+    nullable: true
+    description: Legacy yes/no indicator for whether follow-up is complete.
+  followUpCompletedDescription:
+    type: string
+    nullable: true
+    description: Display description of `followUpCompletedInd`.
+

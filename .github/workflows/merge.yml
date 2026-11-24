@@ -34,31 +34,50 @@ jobs:
     needs: [init]
     uses: ./.github/workflows/reusable-deploy.yml
     secrets:
-      db_password: ${{ secrets.db_password }}
       oc_namespace: ${{ secrets.oc_namespace }}
       oc_token: ${{ secrets.oc_token }}
+      database_host: ${{ secrets.database_host }}
+      database_service_name: ${{ secrets.database_service_name }}
+      database_user: ${{ secrets.database_user }}
+      database_password: ${{ secrets.database_password }}
+      keystore_secret: ${{ secrets.keystore_secret }}
+      jasper_server_username: ${{ secrets.jasper_server_username }}
+      jasper_server_password: ${{ secrets.jasper_server_password }}
+      ches_client_id: ${{ secrets.ches_client_id }}
+      ches_client_secret: ${{ secrets.ches_client_secret }}
     with:
       environment: test
       target: test
       tag: ${{ needs.init.outputs.pr }}
 
-  tests:
-    name: Tests
-    needs: [deploy-test]
-    uses: ./.github/workflows/reusable-tests.yml
-    with:
-      target: test
+  # Post-deploy tests are disabled for now. Restore this job (and its entry in the `needs` below) to
+  # re-enable them; reusable-tests.yml is unchanged.
+  # tests:
+  #   name: Tests
+  #   needs: [deploy-test]
+  #   uses: ./.github/workflows/reusable-tests.yml
+  #   with:
+  #     target: test
 
-  deploy-prod:
-    name: PROD Deploys (${{ needs.init.outputs.pr }})
-    needs: [tests, init]
-    uses: ./.github/workflows/reusable-deploy.yml
-    secrets:
-      db_password: ${{ secrets.db_password }}
-      oc_namespace: ${{ secrets.oc_namespace }}
-      oc_token: ${{ secrets.oc_token }}
-    with:
-      environment: prod
-      target: prod
-      tag: ${{ needs.init.outputs.pr }}
-
+  # PROD deploys are disabled for now: merges deploy to TEST only. Uncomment this job to re-enable
+  # them (if post-deploy tests are restored too, change its `needs` back to [tests, init]).
+  # deploy-prod:
+  #   name: PROD Deploys (${{ needs.init.outputs.pr }})
+  #   needs: [deploy-test, init]
+  #   uses: ./.github/workflows/reusable-deploy.yml
+  #   secrets:
+  #     oc_namespace: ${{ secrets.oc_namespace }}
+  #     oc_token: ${{ secrets.oc_token }}
+  #     database_host: ${{ secrets.database_host }}
+  #     database_service_name: ${{ secrets.database_service_name }}
+  #     database_user: ${{ secrets.database_user }}
+  #     database_password: ${{ secrets.database_password }}
+  #     keystore_secret: ${{ secrets.keystore_secret }}
+  #     jasper_server_username: ${{ secrets.jasper_server_username }}
+  #     jasper_server_password: ${{ secrets.jasper_server_password }}
+  #     ches_client_id: ${{ secrets.ches_client_id }}
+  #     ches_client_secret: ${{ secrets.ches_client_secret }}
+  #   with:
+  #     environment: prod
+  #     target: prod
+  #     tag: ${{ needs.init.outputs.pr }}

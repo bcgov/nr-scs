@@ -1,0 +1,25 @@
+@use '@carbon/react/scss/spacing' as *;
+
+// Page-specific styles for the Scaler View page. Shared "view a record with tabs"
+// styles live in src/styles/_tab-view.scss under the .scs__tab-view__* namespace.
+
+.view-scaler {
+  &__required {
+    color: var(--cds-support-error);
+    margin-left: 2px;
+  }
+
+  &__notification {
+    margin-bottom: $spacing-05;
+  }
+
+  &__table-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: $spacing-03;
+  }
+
+  &__modal-grid {
+    row-gap: $spacing-05;
+  }
+}

@@ -1,0 +1,73 @@
+description: |
+  A single scaler performance-remark record as shown on the legacy Performance Remarks tab
+  (`scalerPerformanceRemarkSummary.jsp`). Maps to a row of `scs_scaler_performanc_rmrk_pkg`.
+  The `*Description` fields are resolved server-side from the static LOVs
+  `SCALER_PERFORMANCE_ACTN_CODE` and `SCALER_PERFORMANCE_OUTCM_CODE` (the legacy "Issue Type"
+  column is the action description immediately followed by the outcome description).
+allOf:
+  - $ref: ./AuditDetail.yaml
+  - type: object
+    properties:
+      scalerPerformanceRemarkId:
+        type: integer
+        format: int64
+        nullable: true
+        description: Primary key — legacy "Issue #" column
+        example: 1001
+      scalerLicenceNo:
+        type: string
+        nullable: true
+        description: Parent scaler licence number
+        example: "1234"
+      loggedTimestamp:
+        type: string
+        format: date
+        nullable: true
+        description: Date of incident — legacy "Date Of Incident" column
+        example: "2025-01-10"
+      loggedUserid:
+        type: string
+        nullable: true
+        description: Userid that logged the remark
+      performanceRemarkDesc:
+        type: string
+        nullable: true
+        description: Free-text remark — legacy "Description" column
+      scalerPerformanceActnCode:
+        type: string
+        nullable: true
+        description: Performance action code (LOV SCALER_PERFORMANCE_ACTN_CODE)
+      scalerPerformanceActnDescription:
+        type: string
+        nullable: true
+        description: Resolved description for the performance action code
+      scalerPerformanceOutcmCode:
+        type: string
+        nullable: true
+        description: Performance outcome code (LOV SCALER_PERFORMANCE_OUTCM_CODE)
+      scalerPerformanceOutcmDescription:
+        type: string
+        nullable: true
+        description: Resolved description for the performance outcome code
+      outcomeDesc:
+        type: string
+        nullable: true
+        description: Free-text outcome description
+      suspendStartDate:
+        type: string
+        format: date
+        nullable: true
+        description: Suspension start date — legacy "Suspension Start Date" column
+        example: "2025-02-01"
+      suspendEndDate:
+        type: string
+        format: date
+        nullable: true
+        description: Suspension end date — legacy "Suspension End Date" column
+        example: "2025-03-01"
+      checkScaleId:
+        type: integer
+        format: int64
+        nullable: true
+        description: Associated check scale id — legacy "Associated Check Scale #" column
+        example: 55001

@@ -1,0 +1,36 @@
+post:
+  tags:
+    - SummaryCheckScale
+  summary: Create a summary check scale record
+  description: |
+    Single-step create of a summary check scale (legacy P132/P134
+    `SummaryCheckScaleAction.create`). Persists the check scale header
+    (`cksc_type` one of LTSCS/SLTSCS/SFPSCS) plus its SPG roll-up rows in one
+    transaction and returns the new check scale id. The frontend navigates to the
+    summary check scale update screen for the new id after success.
+  operationId: createSummaryCheckScale
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: '../root.yaml#/components/schemas/SummaryCheckScaleCreateRequest'
+  responses:
+    '201':
+      description: Summary check scale created
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/CheckScaleCreateResponse'
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+    '500':
+      description: Server error
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'

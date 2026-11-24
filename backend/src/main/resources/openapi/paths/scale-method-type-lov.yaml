@@ -1,0 +1,60 @@
+get:
+  tags:
+    - Lov
+  summary: Get scale method type LOV rows
+  description: |
+    Retrieve scale method types in the SCS system.
+    Based on `SCS_SCALE_METHOD_TYP_CD_VW_PKG.search_recs`.
+
+    Notes:
+    * `code` and `description` support SQL LIKE semantics. Provide `%` yourself if you need wildcard behavior.
+    * The underlying legacy package applies its own effective / expiry date filtering rules.
+  operationId: getScaleMethodTypeLov
+  parameters:
+    - name: code
+      in: query
+      description: Scale method type code (SQL LIKE semantics)
+      required: false
+      schema:
+        type: string
+        maxLength: 10
+        example: "W"
+
+    - name: description
+      in: query
+      description: Scale method type description (SQL LIKE semantics)
+      required: false
+      schema:
+        type: string
+        maxLength: 100
+        example: "%Weight%"
+
+  responses:
+    '200':
+      description: Successful search operation
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: '../root.yaml#/components/schemas/ScaleMethodTypeLov'
+          example:
+            - code: "W"
+              description: "Weight Scale"
+              effectiveDate: "2000-01-01"
+              expiryDate: null
+            - code: "P"
+              description: "Piece Scale"
+              effectiveDate: "2000-01-01"
+              expiryDate: null
+
+    '500':
+      description: Server error
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+          example:
+            code: "ORA-12345"
+            message: "Database connection error"
+

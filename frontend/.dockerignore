@@ -11,14 +11,19 @@ LICENSE*
 SECURITY*
 
 # Node exclusions
+build
 dist
 node_modules
 
-# App-specific exclusions
+# Local-only runtime config and env files (the image's amplify-config.js is generated at start)
+public/amplify-config.js
+.env
+.env.*
+!.env.example
+
+# App-specific exclusions (the E2E suite is not part of the image)
 coverage
-cypress
 e2e
-migrations
 output
-test
-tests
+test-results
+playwright-report

@@ -1,0 +1,61 @@
+type: object
+description: |
+  A single question-response row returned by the Scale Site inspection edit endpoint.
+required:
+  - inspectionQuestionId
+  - questionText
+  - answerOptions
+properties:
+  inspectionQuestionId:
+    type: integer
+    format: int64
+    description: Stable inspection question identifier used during update.
+    example: 501
+  questionText:
+    type: string
+    nullable: true
+    description: Inspection question text.
+  inspectionAnswerCode:
+    type: string
+    nullable: true
+    description: Selected legacy inspection answer code.
+  inspectionAnswerDescription:
+    type: string
+    nullable: true
+    description: Display description of `inspectionAnswerCode`.
+  answerOptions:
+    type: array
+    description: Valid answer options for the question.
+    items:
+      $ref: './ScaleSiteInspectionAnswerOption.yaml'
+  commentsText:
+    type: string
+    nullable: true
+    description: Question-level response comments.
+  followUpRequiredInd:
+    type: string
+    enum: [Y, N]
+    nullable: true
+    description: Legacy yes/no indicator for whether follow-up is required.
+  followUpRequiredDescription:
+    type: string
+    nullable: true
+    description: Display description of `followUpRequiredInd`.
+  followUpActionText:
+    type: string
+    nullable: true
+    description: Follow-up action required text.
+  followUpDueDate:
+    type: string
+    format: date
+    nullable: true
+    description: Follow-up due date.
+  followUpCompletedInd:
+    type: string
+    enum: [Y, N]
+    nullable: true
+    description: Legacy yes/no indicator for whether follow-up is complete.
+  followUpCompletedDescription:
+    type: string
+    nullable: true
+    description: Display description of `followUpCompletedInd`.

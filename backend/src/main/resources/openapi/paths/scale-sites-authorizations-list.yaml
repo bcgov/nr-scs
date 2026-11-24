@@ -1,0 +1,62 @@
+parameters:
+  - name: scaleSiteIdNmbr
+    in: path
+    description: Scale site id number
+    required: true
+    schema:
+      type: string
+      example: "A12345"
+
+get:
+  tags:
+    - ScaleSiteAuthorization
+  summary: List authorizations for a scale site
+  description: |
+    Retrieve every authorization belonging to a scale site, for the legacy Site Authorizations
+    tab on the scale site view page. Each row carries its computed status and a letter-exists flag.
+    Based on `scs_scale_site_auth_vw_pkg.search_recs` (search by `scale_site_id_nmbr`).
+  operationId: listScaleSiteAuthorizations
+  responses:
+    '200':
+      description: Authorization list found
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: '../root.yaml#/components/schemas/ScaleSiteAuthorizationDetail'
+          example:
+            - scaleSiteAuthorizationId: 7001
+              scaleSiteIdNmbr: "A12345"
+              authorizationEffectiveDate: "2025-01-15"
+              authorizationExpiryDate: "2027-01-15"
+              cancellationDate: null
+              cancellationReasonTxt: null
+              status: "Active"
+              letterExists: true
+            - scaleSiteAuthorizationId: 7002
+              scaleSiteIdNmbr: "A12345"
+              authorizationEffectiveDate: "2018-01-15"
+              authorizationExpiryDate: "2020-01-15"
+              cancellationDate: null
+              cancellationReasonTxt: null
+              status: "Expired"
+              letterExists: false
+    '404':
+      description: Scale site not found
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+          example:
+            code: "NOT_FOUND"
+            message: "No scale site found with number A12345"
+    '500':
+      description: Server error
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+          example:
+            code: "ORA-12345"
+            message: "Database connection error"

@@ -1,0 +1,64 @@
+parameters:
+  - name: scalerLicenceNo
+    in: path
+    description: Scaler licence number
+    required: true
+    schema:
+      type: string
+      maxLength: 4
+      example: "1234"
+
+get:
+  tags:
+    - ScalerAuthorization
+  summary: List authorizations for a scaler
+  description: |
+    Retrieve every authorization belonging to a scaler, for the legacy Authorizations
+    tab on the scaler view page. Each row is enriched with its authorized sites, a
+    computed status, and a letter-exists flag.
+    Based on `scs_scaler_authorization_pkg.search_recs` (search by `scaler_licence_no`).
+  operationId: listScalerAuthorizations
+  responses:
+    '200':
+      description: Authorization list found
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: '../root.yaml#/components/schemas/ScalerAuthorizationListItem'
+          example:
+            - scalerAuthorizationId: 4001
+              authorizationEffectiveDate: "2025-01-15"
+              authorizationExpiryDate: "2027-01-15"
+              districtWideInd: "N"
+              orgUnitNo: 1234
+              authorizedSites: ["A12345", "B67890"]
+              status: "Active"
+              letterExists: true
+            - scalerAuthorizationId: 4002
+              authorizationEffectiveDate: "2020-01-15"
+              authorizationExpiryDate: "2022-01-15"
+              districtWideInd: "Y"
+              orgUnitNo: 1234
+              authorizedSites: []
+              status: "Expired"
+              letterExists: false
+    '404':
+      description: Scaler not found
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+          example:
+            code: "NOT_FOUND"
+            message: "No scaler found with licence number 1234"
+    '500':
+      description: Server error
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+          example:
+            code: "ORA-12345"
+            message: "Database connection error"

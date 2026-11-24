@@ -1,0 +1,42 @@
+.scs-date-input { width: 100%; }
+
+/* Ensure Carbon date picker participates in grid sizing and does not
+   constrain inline-size. Combine common selectors to reduce duplication. */
+.scs-date-input .cds--date-picker,
+.scs-date-input .cds--date-picker-container,
+.scs-date-input .cds--date-picker-input__wrapper {
+  width: 100%;
+  min-width: 0;
+  overflow: visible !important;
+}
+
+.scs-date-input .cds--date-picker__input,
+.scs-date-input .cds--date-picker-input__wrapper > span {
+  width: 100%;
+  inline-size: 100% !important;
+  max-inline-size: none !important;
+  flex: 1 1 auto;
+}
+
+.scs-date-input .cds--date-picker__input:disabled {
+  color: var(--cds-text-disabled, #8d8d8d);
+  -webkit-text-fill-color: var(--cds-text-disabled, #8d8d8d);
+  background-color: var(--cds-field, #f4f4f4);
+  cursor: not-allowed;
+}
+
+.scs-date-input .cds--date-picker-input__wrapper[data-invalid],
+.scs-date-input .cds--date-picker-input__wrapper.cds--date-picker-input__wrapper--invalid {
+  z-index: 2;
+}
+
+/* Make helper/validation visible and consistent */
+.scs-date-input .cds--form-requirement,
+.scs-date-input .cds--form__helper-text {
+  display: block !important;
+  overflow: visible !important;
+  max-block-size: none !important;
+  margin-block-start: .25rem !important;
+  color: var(--cds-text-error, #B32001) !important;
+}
+

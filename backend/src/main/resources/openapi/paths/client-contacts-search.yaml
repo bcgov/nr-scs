@@ -1,0 +1,48 @@
+get:
+  tags:
+    - ScaleSiteContact
+  summary: Search client contacts
+  description: |
+    Search for existing client contacts to associate with a scale site.
+    Only contacts with bus_contact_code = 'SI' are returned.
+    Based on scs_client_contact_pkg.search_recs.
+  operationId: searchClientContacts
+  parameters:
+    - name: clientContactId
+      in: query
+      required: false
+      schema:
+        type: integer
+        format: int64
+    - name: clientNumber
+      in: query
+      required: false
+      schema:
+        type: string
+        maxLength: 8
+    - name: clientLocnCode
+      in: query
+      required: false
+      schema:
+        type: string
+        maxLength: 2
+    - name: contactName
+      in: query
+      required: false
+      schema:
+        type: string
+  responses:
+    '200':
+      description: Search results
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: '../root.yaml#/components/schemas/ClientContactSearchResult'
+    '500':
+      description: Server error
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'

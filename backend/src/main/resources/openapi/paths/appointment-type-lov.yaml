@@ -1,0 +1,56 @@
+get:
+  tags:
+    - Lov
+  summary: Get appointment type LOV rows
+  description: |
+    Retrieve scaler appointment types in the SCS system.
+    Based on `scs_sclr_appt_lov_vw_pkg.search_recs`.
+
+    Notes:
+    * `code` and `description` support SQL LIKE semantics. Provide `%` yourself if you need wildcard behavior.
+    * Results are ordered by `description`.
+  operationId: getAppointmentTypeLov
+  parameters:
+    - name: code
+      in: query
+      description: Scaler appointment type code (SQL LIKE semantics)
+      required: false
+      schema:
+        type: string
+        maxLength: 10
+        example: "CS%"
+
+    - name: description
+      in: query
+      description: Scaler appointment type description (SQL LIKE semantics)
+      required: false
+      schema:
+        type: string
+        maxLength: 100
+        example: "%Check Scaler%"
+
+  responses:
+    '200':
+      description: Successful search operation
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: '../root.yaml#/components/schemas/AppointmentTypeLov'
+          example:
+            - code: "CS"
+              description: "Check Scaler"
+            - code: "OS"
+              description: "Official Scaler"
+
+    '500':
+      description: Server error
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+          example:
+            code: "ORA-12345"
+            message: "Database connection error"
+

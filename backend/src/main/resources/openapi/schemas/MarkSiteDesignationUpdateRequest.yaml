@@ -1,0 +1,83 @@
+type: object
+description: |
+  Request payload for updating an existing mark site designation.
+  Maps to `scs_hauling_mark_authorztn_pkg.update_rec`.
+  When the authorization already has a letter issued, only `expiryDate` may be changed.
+required:
+  - expiryDate
+properties:
+  geographicLocation:
+    type: string
+    nullable: true
+    description: Geographic location text.
+  population:
+    type: string
+    nullable: true
+    maxLength: 4
+    description: Population number from the form.
+  effectiveDate:
+    type: string
+    format: date
+    description: Authorization effective date.
+  expiryDate:
+    type: string
+    format: date
+    description: Authorization expiry date.
+  orgUnitNo:
+    type: integer
+    format: int64
+    nullable: true
+    description: Region / district organization unit number.
+  districtWideInd:
+    type: string
+    nullable: true
+    description: Whether the authorization is district wide.
+  estimatedVolume:
+    type: integer
+    format: int32
+    nullable: true
+    description: Estimated volume.
+  estimatedTruckLoads:
+    type: integer
+    format: int32
+    nullable: true
+    description: Estimated truck loads.
+  timberDescription:
+    type: string
+    nullable: true
+    description: Timber description text.
+  transportationDateDesc:
+    type: string
+    nullable: true
+    description: Transportation date description.
+  otherRequirements:
+    type: string
+    nullable: true
+    description: Other requirements text.
+  scaleSites:
+    type: array
+    nullable: true
+    description: Scale site identifiers linked to this mark site designation.
+    items:
+      type: string
+  speciesContent:
+    type: array
+    nullable: true
+    description: Species content rows linked to this mark site designation.
+    items:
+      $ref: '../root.yaml#/components/schemas/MarkSiteDesignationSpeciesContent'
+  conditions:
+    type: array
+    nullable: true
+    description: Conditions linked to this mark site designation.
+    items:
+      $ref: '../root.yaml#/components/schemas/ScaleAuthConditionRef'
+  exceptions:
+    type: array
+    nullable: true
+    description: |
+      Exempt mark method codes (the "Exceptions" multi-select) linked to this mark site
+      designation. Each value is an `EXEMPT_MARK_METHOD_CODE` LOV code. Maps to
+      `scs_designtd_xmpt_mrk_mthd_pkg.insert_rec`.
+    items:
+      type: string

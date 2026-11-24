@@ -1,0 +1,87 @@
+get:
+  tags:
+    - Workbench
+  summary: Search expiring mark site designations
+  description: |
+    Search expiring mark site designations using criteria based on
+    `scs_mark_site_des_wb_vw_pkg.search_recs`.
+  operationId: searchMarkSiteDesignations
+  parameters:
+    - name: haulingMarkAuthorizationId
+      in: query
+      description: Mark site designation identifier
+      required: false
+      schema:
+        type: integer
+        format: int64
+        minimum: 0
+    - name: effectiveDate
+      in: query
+      description: Effective date (exact match)
+      required: false
+      schema:
+        type: string
+        format: date
+    - name: expiryDate
+      in: query
+      description: Expiry date (exact match)
+      required: false
+      schema:
+        type: string
+        format: date
+    - name: timberMark
+      in: query
+      description: Timber mark
+      required: false
+      schema:
+        type: string
+        maxLength: 20
+    - name: regionId
+      in: query
+      description: Region identifier
+      required: false
+      schema:
+        type: integer
+        format: int64
+    - name: districtId
+      in: query
+      description: District identifier
+      required: false
+      schema:
+        type: integer
+        format: int64
+    - name: primarySort
+      in: query
+      description: Primary sort field (1-6)
+      required: false
+      schema:
+        type: integer
+        default: 1
+    - name: secondarySort
+      in: query
+      description: Secondary sort field (0-6)
+      required: false
+      schema:
+        type: integer
+        default: 0
+  responses:
+    '200':
+      description: Successful search operation
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: '../root.yaml#/components/schemas/MarkSiteDesignationWorkbenchResult'
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+    '500':
+      description: Server error
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'

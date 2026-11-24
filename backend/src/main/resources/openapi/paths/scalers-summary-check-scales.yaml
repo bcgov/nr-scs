@@ -1,0 +1,69 @@
+parameters:
+  - name: scalerLicenceNo
+    in: path
+    description: Scaler licence number
+    required: true
+    schema:
+      type: string
+      maxLength: 4
+      example: "1234"
+
+get:
+  tags:
+    - SummaryCheckScale
+  summary: Get the summary check scale list for the Scaler Summary Check Scales tab
+  description: |
+    Retrieve the rows used to render the `Summary Check Scales` tab on the Scaler view page
+    (legacy screen P132, `summaryCheckScaleList.jsp`).
+
+    * The list is based on `scs_summary_check_scal_vw_pkg.search_recs`, filtered by the scaler's
+      licence number across the primary/secondary original and check licence columns (the legacy
+      `SummaryCheckScaleAction.list()` binds all four licence criteria to the scaler licence),
+      returned in the legacy default sort order.
+    * Unlike the detail `Check Scales` tab there is no statistics block and no filter parameter —
+      the legacy summary list has neither.
+  operationId: getScalerSummaryCheckScales
+  responses:
+    '200':
+      description: Summary check scale tab data found
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/ScalerSummaryCheckScaleTabResult'
+          example:
+            summaryCheckScales:
+              - checkScaleId: 146943
+                scaleSiteIdNmbr: "SITE001"
+                ckscType: "SFPSCS"
+                primCheckLicenceNo: "1234"
+                secCheckLicenceNo: null
+                primOrigLicenceNo: "5678"
+                secOrigLicenceNo: null
+                origScaleDate: "2026-05-01"
+                checkScaleDate: "2026-05-03"
+                pieceDiff: 2
+                volumeVariance: 1.5
+                valueVariance: 0.8
+                replacedInd: "N"
+                checkScaleTypeCode: "FIRST"
+                recordType: "S"
+                followedGoodPracticeInd: "Y"
+                originalWithinStandardInd: "Y"
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+          example:
+            code: "BAD_REQUEST"
+            message: "Scaler licence number is required."
+    '500':
+      description: Server error
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+          example:
+            code: "ORA-12345"
+            message: "Database connection error"

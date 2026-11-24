@@ -1,0 +1,64 @@
+type: object
+description: |
+  Scaler summary record for the summary view.
+  Combines data from `scs_scaler_vw_pkg.search_recs`, `scs_slct_slcd_lov_vw_pkg.search_recs`,
+  and `SCS_SCALER_LICENSE_STTS_VW_PKG.search_recs`.
+properties:
+  scalerLicenceNo:
+    type: string
+    maxLength: 4
+    nullable: true
+    description: Scaler licence number
+    example: "1234"
+  clientNumber:
+    type: string
+    maxLength: 8
+    nullable: true
+    description: Client number from the BC Forests client registry
+    example: "12345678"
+  orgUnitName:
+    type: string
+    nullable: true
+    description: Organization unit name
+    example: "Vancouver Forest District"
+  issuedDate:
+    type: string
+    format: date
+    nullable: true
+    description: Date the scaler licence was issued
+    example: "2025-01-15"
+  expiryDate:
+    type: string
+    format: date
+    nullable: true
+    description: Licence expiry date
+    example: "2027-01-15"
+  licenceCancelledDate:
+    type: string
+    format: date
+    nullable: true
+    description: Date the scaler licence was cancelled, if any
+    example: null
+  oathTakenInd:
+    type: string
+    enum: [Y, N]
+    nullable: true
+    description: Indicates whether the scaler has taken the oath
+    example: "Y"
+  licenceStatus:
+    type: string
+    nullable: true
+    description: Scaler licence status
+    example: "ACTIVE"
+  licenceTypes:
+    type: array
+    nullable: true
+    description: Assigned licence type descriptions for the scaler
+    items:
+      $ref: '../root.yaml#/components/schemas/ScalerSummaryLicenceType'
+    example:
+      - code: "SCS"
+        description: "Scale Administration and Control System"
+      - code: "WA"
+        description: "Waste Assessment"
+

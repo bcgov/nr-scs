@@ -1,26 +1,48 @@
-import '@bcgov/bc-sans/css/BC_Sans.css'
-import { StrictMode } from 'react'
-import * as ReactDOM from 'react-dom/client'
-import { RouterProvider, createRouter } from '@tanstack/react-router'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { Amplify } from 'aws-amplify';
+import { StrictMode } from 'react';
+import { createRoot } from 'react-dom/client';
 
-// Import bootstrap styles
-import '@/scss/styles.scss'
+import '@/styles/index.scss';
+import { getAmplifyConfig } from '@/amplify-initializer';
+import App from '@/App.tsx';
+import { ErrorBoundary } from '@/components/ErrorBoundary';
+import { queryClientConfig } from '@/config/react-query/config';
+import { ActiveClientProvider } from '@/context/activeClient/ActiveClientProvider';
+import { AuthProvider } from '@/context/auth/AuthProvider';
+import NotificationProvider from '@/context/notification/NotificationProvider';
+import PageTitleProvider from '@/context/pageTitle/PageTitleProvider';
+import { PreferenceProvider } from '@/context/preference/PreferenceProvider.tsx';
+import ThemeProvider from '@/context/theme/ThemeProvider.tsx';
+import updateSW from '@/registerServiceWorker';
+import { validateEnv } from '@/utils/validateEnv';
 
-// Import the generated route tree
-import { routeTree } from './routeTree.gen'
+validateEnv();
 
-// Create a new router instance
-const router = createRouter({ routeTree })
+Amplify.configure(getAmplifyConfig());
 
-// Register the router instance for type safety
-declare module '@tanstack/react-router' {
-  interface Register {
-    router: typeof router
-  }
-}
+const queryClient = new QueryClient(queryClientConfig);
 
-ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
+updateSW();
+
+createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <RouterProvider router={router} />
+    <QueryClientProvider client={queryClient}>
+      <PreferenceProvider>
+        <ThemeProvider>
+          <NotificationProvider>
+            <PageTitleProvider>
+              <AuthProvider>
+                <ActiveClientProvider>
+                  <ErrorBoundary>
+                    <App />
+                  </ErrorBoundary>
+                </ActiveClientProvider>
+              </AuthProvider>
+            </PageTitleProvider>
+          </NotificationProvider>
+        </ThemeProvider>
+      </PreferenceProvider>
+    </QueryClientProvider>
   </StrictMode>,
-)
+);

@@ -1,0 +1,57 @@
+parameters:
+  - name: scalerLicenceNo
+    in: path
+    description: Scaler licence number
+    required: true
+    schema:
+      type: string
+      maxLength: 4
+      example: "1234"
+
+get:
+  tags:
+    - ScalerRiskRating
+  summary: Get risk-assessment summaries for a scaler
+  description: |
+    Retrieve the list of risk-assessment summary rows for a scaler. This backs the read-only
+    "Risk Rating" tab on the scaler view page (legacy `scalerAssessmentsView.jsp`).
+    Based on `scs_risk_summary_vw_pkg.search_recs` filtered by scaler licence number, returning
+    rows ordered by assessment id.
+  operationId: getScalerRiskRatings
+  responses:
+    '200':
+      description: Risk-rating summary list found
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: '../root.yaml#/components/schemas/ScalerRiskRatingSummary'
+          example:
+            - riskQuestionnaireId: 12345
+              entryTimestamp: "2025-01-10T10:30:00Z"
+              riskRating: 24
+              riskTypeCode: "H"
+              codeDescription: "High"
+              rangeLowValue: 20
+              rangeHighValue: 30
+              ratingDescription: "2 checks every 12 months"
+              versionNo: 3
+    '404':
+      description: Scaler not found
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+          example:
+            code: "NOT_FOUND"
+            message: "No scaler found with licence number 1234"
+    '500':
+      description: Server error
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+          example:
+            code: "ORA-12345"
+            message: "Database connection error"

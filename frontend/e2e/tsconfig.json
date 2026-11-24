@@ -1,0 +1,40 @@
+{
+  // Type-check only — `npm run typecheck:e2e` from nr-scs/frontend/ (tsc --noEmit -p e2e/tsconfig.json). Nothing here compiles the suite: Playwright
+  // transpiles each .ts with esbuild at run time, which STRIPS types without checking them. So without
+  // this gate a cross-file type refactor (a shared type in fixtures/ used by pages/ and steps/) is
+  // validated only by whether the scenarios happen to exercise the changed line.
+  //
+  // Deliberately mirrors the app's frontend tsconfig (../tsconfig.app.json) where it matters — strict,
+  // ESM, bundler resolution — but is NOT inherited from it, and is deliberately NOT added to
+  // ../tsconfig.json's project references: that config is `include: ["src"]` and targets the React app
+  // (jsx, the `@/*` alias, DOM-only libs). This is Node-side Playwright code, so it keeps its own gate.
+  //
+  // A warning from that frontend's config, worth repeating here: a FATAL option diagnostic (e.g. TS5101
+  // on a deprecated option, TS2688 on an unresolvable `types` entry) makes tsc exit BEFORE checking any
+  // file, so the gate looks like it passed while validating nothing. If you change options below, prove
+  // the gate still bites by planting `const x: string = 123` in a step file and confirming it fails.
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "types": ["node"],
+
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUncheckedSideEffectImports": true,
+
+    "esModuleInterop": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "verbatimModuleSyntax": true,
+    "skipLibCheck": true,
+    "noEmit": true
+  },
+  // `.features-gen/` is disposable bddgen output, regenerated on every run and gitignored — checking it
+  // would gate the suite on generated code. The hand-written layers are what this exists for.
+  "include": ["fixtures/**/*.ts", "pages/**/*.ts", "steps/**/*.ts", "preflight/**/*.ts", "playwright.config.ts"],
+  "exclude": ["node_modules", ".features-gen", "test-results", "playwright-report"]
+}

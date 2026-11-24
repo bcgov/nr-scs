@@ -1,0 +1,33 @@
+type: object
+description: A client contact search result for contact lookup
+properties:
+  clientContactId:
+    type: integer
+    format: int64
+    description: Client contact identifier
+    example: 12345
+  contactName:
+    type: string
+    nullable: true
+    description: Contact name
+    example: "John Smith"
+  clientNumber:
+    type: string
+    nullable: true
+    description: Client number
+    example: "00001234"
+  clientLocnCode:
+    type: string
+    nullable: true
+    description: Client location code
+    example: "00"
+  businessPhone:
+    type: string
+    nullable: true
+    description: Business phone
+    example: "250-555-1234"
+  emailAddress:
+    type: string
+    nullable: true
+    description: Email address
+    example: "john@example.com"

@@ -1,0 +1,64 @@
+type: object
+description: |
+  Record returned from `scs_risk_scale_site_vw_pkg.search_recs`.
+properties:
+  riskQuestionnaireId:
+    type: integer
+    format: int64
+    nullable: true
+  riskRating:
+    type: number
+    nullable: true
+  scaleSiteIdNmbr:
+    type: string
+    nullable: true
+  versionNo:
+    type: integer
+    format: int64
+    nullable: true
+  maxRiskRating:
+    type: number
+    nullable: true
+  ratingDescription:
+    type: string
+    nullable: true
+  riskTypeCode:
+    type: string
+    nullable: true
+  codeDescription:
+    type: string
+    nullable: true
+  rangeLowValue:
+    type: integer
+    nullable: true
+  rangeHighValue:
+    type: integer
+    nullable: true
+  numResp:
+    type: number
+    nullable: true
+  questCount:
+    type: number
+    nullable: true
+  completeInd:
+    type: string
+    nullable: true
+  orgUnitNo:
+    type: integer
+    format: int64
+    nullable: true
+  methodTypeCodeName:
+    type: string
+    nullable: true
+  ownerClientNumber:
+    type: string
+    nullable: true
+  ownerClientLocnCode:
+    type: string
+    nullable: true
+  siteName:
+    type: string
+    nullable: true
+  district:
+    type: string
+    nullable: true

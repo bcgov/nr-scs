@@ -1,0 +1,93 @@
+parameters:
+  - name: scalerLicenceNo
+    in: path
+    description: Scaler licence number
+    required: true
+    schema:
+      type: string
+      maxLength: 4
+      example: "1234"
+
+get:
+  tags:
+    - CheckScale
+  summary: Get the check scale summary list and statistics for the Scaler Check Scales tab
+  description: |
+    Retrieve the rows and statistics used to render the `Check Scales` tab on the Scaler view page
+    (legacy screen P012, `scalerCheckScaleList.jsp`).
+
+    * The list is based on `scs_check_scale_summary_vw_pkg.search_recs`, filtered by the scaler's
+      licence number across the primary/secondary original and check licence columns according to
+      the `filter` parameter, using the legacy tab sort order.
+    * The statistics are based on `scs_calc_check_scale_pkg.calculate_check_scale` with the same
+      filter, and are only computed when the list returns at least one row (legacy behavior —
+      stats fields are null otherwise).
+
+    Filter values match the legacy dropdown: `All`, `Primary`, `Secondary`, `Primary/Secondary`,
+    `Check`. An omitted or unrecognized value behaves as `All` (legacy silently defaults).
+
+    Note: for the `Check` filter the legacy list and statistics disagreed on which licence columns
+    to match (legacy list bug); this endpoint binds the primary and secondary check licence columns
+    for both, so the tab is internally consistent.
+  operationId: getScalerCheckScales
+  parameters:
+    - name: filter
+      in: query
+      description: |
+        Legacy tab filter controlling which licence columns are matched against the scaler's
+        licence number. One of `All`, `Primary`, `Secondary`, `Primary/Secondary`, `Check`.
+        Defaults to `All` when omitted or unrecognized.
+      required: false
+      schema:
+        type: string
+        maxLength: 20
+        example: "All"
+  responses:
+    '200':
+      description: Check scale tab data found
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/ScalerCheckScaleTabResult'
+          example:
+            stats:
+              last10Volume: 1.25
+              last10Value: 0.98
+              past12Volume: 2.10
+              past12Value: 1.75
+              allVolume: 1.80
+              allValue: 1.40
+            checkScales:
+              - checkScaleId: 146943
+                scaleSiteIdNmbr: "SITE001"
+                primCheckLicenceNo: "1234"
+                secCheckLicenceNo: null
+                primOrigLicenceNo: "5678"
+                secOrigLicenceNo: null
+                origScaleDate: "2026-05-01"
+                checkScaleDate: "2026-05-03"
+                pieceDiff: 2
+                volumeVariance: 1.5
+                valueVariance: 0.8
+                replacedInd: "N"
+                checkScaleTypeCode: "FIRST"
+                followedGoodPracticeInd: "Y"
+                originalWithinStandardInd: "Y"
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+          example:
+            code: "BAD_REQUEST"
+            message: "Scaler licence number is required."
+    '500':
+      description: Server error
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+          example:
+            code: "ORA-12345"
+            message: "Database connection error"

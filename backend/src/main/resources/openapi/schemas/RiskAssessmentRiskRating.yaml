@@ -1,0 +1,26 @@
+type: object
+description: |
+  A risk level threshold for the template, from `scs_risk_rating_vw`. Thresholds and
+  descriptions are defined per template version, so the Risk Levels reference differs
+  between assessment versions.
+properties:
+  riskTypeCode:
+    type: string
+    nullable: true
+    description: risk_type_code.
+  codeDescription:
+    type: string
+    nullable: true
+    description: Display description of the risk level (e.g. "High Risk - 9 checks for every 12 months").
+  ratingDescription:
+    type: string
+    nullable: true
+    description: rating_description.
+  rangeLowValue:
+    type: integer
+    nullable: true
+    description: Inclusive low bound of the score range for this risk level.
+  rangeHighValue:
+    type: integer
+    nullable: true
+    description: Inclusive high bound of the score range for this risk level.

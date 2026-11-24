@@ -1,0 +1,21 @@
+type: object
+description: |
+  A single selectable answer option for a risk question, from `scs_risk_tmplt_qa_vw`.
+properties:
+  answerId:
+    type: integer
+    format: int64
+    nullable: true
+    description: risk_valid_answer_id - value submitted when this answer is selected.
+  answerText:
+    type: string
+    nullable: true
+    description: Display label for the answer option.
+  weight:
+    type: integer
+    nullable: true
+    description: answer_weighting - numeric weight contributed to the section total when selected.
+  answerOrder:
+    type: integer
+    nullable: true
+    description: answer_order - display sort order within the question.

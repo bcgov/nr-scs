@@ -1,0 +1,132 @@
+get:
+  tags:
+    - HaulMarkAuthorization
+  summary: Search for haul mark authorizations
+  description: |
+    Search for haul mark authorizations using criteria based on
+    `scs_haul_mark_auth_srch_vw_pkg.search_recs`.
+
+    Notes:
+    * `timberMark` and `orgUnitName` support partial matching (SQL LIKE semantics). Provide `%` yourself if you need wildcard behavior.
+    * `effectiveDate` and `expiryDate` are exact matches.
+    * Multiple criteria are combined with AND logic.
+  operationId: searchHaulMarkAuthorizations
+  parameters:
+    - name: haulingMarkAuthorizationId
+      in: query
+      description: Hauling mark authorization identifier
+      required: false
+      schema:
+        type: integer
+        format: int64
+        minimum: 0
+        example: 12345
+
+    - name: timberMark
+      in: query
+      description: Timber mark (partial match supported)
+      required: false
+      schema:
+        type: string
+        maxLength: 20
+        example: "TMB%"
+
+    - name: effectiveDate
+      in: query
+      description: Effective date (exact match)
+      required: false
+      schema:
+        type: string
+        format: date
+        example: "2025-01-01"
+
+    - name: expiryDate
+      in: query
+      description: Expiry date (exact match)
+      required: false
+      schema:
+        type: string
+        format: date
+        example: "2025-12-31"
+
+    - name: orgUnitName
+      in: query
+      description: Organization unit name (partial match supported)
+      required: false
+      schema:
+        type: string
+        maxLength: 100
+        example: "%Vancouver%"
+
+    - name: primarySort
+      in: query
+      description: |
+        Primary sort field:
+        * `1` - Hauling Mark Authorization ID
+        * `2` - Timber Mark
+        * `3` - Effective Date
+        * `4` - Expiry Date
+        * `5` - Org Unit Name
+      required: false
+      schema:
+        type: integer
+        enum: [1, 2, 3, 4, 5]
+        default: 1
+
+    - name: secondarySort
+      in: query
+      description: |
+        Secondary sort field:
+        * `0` - No secondary sort
+        * `1` - Hauling Mark Authorization ID
+        * `2` - Timber Mark
+        * `3` - Effective Date
+        * `4` - Expiry Date
+        * `5` - Org Unit Name
+      required: false
+      schema:
+        type: integer
+        enum: [0, 1, 2, 3, 4, 5]
+        default: 0
+
+  responses:
+    '200':
+      description: Successful search operation
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: '../root.yaml#/components/schemas/HaulMarkAuthorization'
+          example:
+            - haulingMarkAuthorizationId: 12345
+              timberMark: "TMB123"
+              effectiveDate: "2025-01-01"
+              expiryDate: "2025-12-31"
+              orgUnitName: "Vancouver"
+            - haulingMarkAuthorizationId: 54321
+              timberMark: "TMB999"
+              effectiveDate: null
+              expiryDate: null
+              orgUnitName: "Victoria"
+
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+          example:
+            code: "INVALID_PARAMETER"
+            message: "Invalid primarySort value"
+
+    '500':
+      description: Server error
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+          example:
+            code: "ORA-12345"
+            message: "Database connection error"
+

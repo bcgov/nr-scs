@@ -1,0 +1,24 @@
+type: object
+description: |
+  Writable scaling-method row submitted with a Scale Site create request.
+  Maps to `scs_site_scaling_method_pkg.insert_rec`. Each request must include
+  at least one row, with exactly one row carrying `scaleSitePriorityCode` `"P"`
+  (the primary scaling method). Method codes must be distinct across the list.
+required:
+  - scaleMethodTypeCode
+  - scaleSitePriorityCode
+properties:
+  scaleMethodTypeCode:
+    type: string
+    maxLength: 1
+    description: |
+      Scale method type code (single-character LOV code, e.g., `W`, `P`, `C`, `S`).
+      Resolved from `GET /scale-method-type-lov`.
+    example: "W"
+  scaleSitePriorityCode:
+    type: string
+    enum: ["P", "S", "T"]
+    description: |
+      Scale site priority code. Exactly one row in the request must use `"P"`
+      (primary); the optional secondary and tertiary rows use `"S"` and `"T"`.
+    example: "P"

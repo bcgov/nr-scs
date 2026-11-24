@@ -1,0 +1,95 @@
+parameters:
+  - name: inspectionId
+    in: path
+    description: Site inspection identifier
+    required: true
+    schema:
+      type: integer
+      format: int64
+      minimum: 1
+      example: 12345
+
+get:
+  tags:
+    - ScaleSiteInspection
+  summary: Get scale site inspection edit payload
+  description: |
+    Retrieve the edit-page payload for a single Scale Site inspection.
+
+    This endpoint is distinct from the read-only inspection detail endpoint because the edit page
+    needs edit-oriented metadata in each question response row, including the inspection question
+    identifier and valid answer options.
+
+    The response preserves the same inspection header/detail context shown on the legacy edit page
+    while adding the writable question metadata needed by the modern edit flow.
+  operationId: getScaleSiteInspectionEdit
+  responses:
+    '200':
+      description: Successful inspection edit payload retrieval
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/ScaleSiteInspectionEditView'
+          example:
+            inspectionId: 12345
+            inspectionTypeCode: "COM"
+            inspectionTypeDescription: "Compliance"
+            inspectionDate: "2026-03-10"
+            inspector: "A1B2C3D4-E5F6-7890-1234-56789ABCDEF0"
+            scaleSiteIdNmbr: "SITE001"
+            siteName: "MAIN YARD"
+            siteLocation: "Nanaimo"
+            siteOwnerName: "ACME FOREST PRODUCTS LTD."
+            siteTypeDisplay: "Weight Scale, Piece Scale"
+            previousInspectionId: 12001
+            recipient: "Jordan Smith"
+            siteOperatorPresentInd: "Y"
+            siteOperatorPresentDescription: "Yes"
+            comments: "General site condition acceptable."
+            questionResponses:
+              - inspectionQuestionId: 501
+                questionText: "Was the scale head sealed?"
+                inspectionAnswerCode: "Y"
+                inspectionAnswerDescription: "Yes"
+                answerOptions:
+                  - code: "Y"
+                    description: "Yes"
+                  - code: "N"
+                    description: "No"
+                  - code: "NA"
+                    description: "N/A"
+                commentsText: "Seal intact."
+                followUpRequiredInd: "N"
+                followUpRequiredDescription: "No"
+                followUpActionText: null
+                followUpDueDate: null
+                followUpCompletedInd: null
+                followUpCompletedDescription: null
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+          example:
+            code: "BAD_REQUEST"
+            message: "Inspection id is required."
+    '404':
+      description: No editable scale site inspection found
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+          example:
+            code: "NOT_FOUND"
+            message: "No readable scale site inspection found with inspection id 12345"
+    '500':
+      description: Server error
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+          example:
+            code: "ORA-12345"
+            message: "Database connection error"
+

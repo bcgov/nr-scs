@@ -1,0 +1,88 @@
+post:
+  tags:
+    - MarkSiteDesignation
+  summary: Create mark site designation letter
+  description: Generate the mark site designation letter report (legacy R011).
+  operationId: createMarkSiteDesignationLetter
+  parameters:
+    - in: path
+      name: authorizationId
+      required: true
+      schema:
+        type: integer
+        format: int64
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: '../root.yaml#/components/schemas/MarkSiteDesignationLetterReportRequest'
+  responses:
+    '200':
+      description: Letter generated successfully
+      content:
+        application/pdf:
+          schema:
+            type: string
+            format: binary
+        application/vnd.ms-excel:
+          schema:
+            type: string
+            format: binary
+    '202':
+      description: Letter request accepted
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/ReportAckResponse'
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+    '500':
+      description: Server error
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+get:
+  tags:
+    - MarkSiteDesignation
+  summary: View mark site designation letter
+  description: Download the mark site designation letter report (legacy R011).
+  operationId: getMarkSiteDesignationLetter
+  parameters:
+    - in: path
+      name: authorizationId
+      required: true
+      schema:
+        type: integer
+        format: int64
+  responses:
+    '200':
+      description: Letter downloaded successfully
+      content:
+        application/pdf:
+          schema:
+            type: string
+            format: binary
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+    '500':
+      description: Server error
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'

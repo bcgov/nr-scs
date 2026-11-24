@@ -1,0 +1,72 @@
+get:
+  tags:
+    - Lov
+  summary: Get region/district rollup LOV rows
+  description: |
+    Retrieve region and district organizational units, including rollup metadata,
+    from the SCS system.
+    Based on `scs_reg_dist_all_lov_vw_pkg.search_recs`.
+
+    Notes:
+    * In the response, `code` is the same value as `orgUnitNo` from the underlying rollup view/package.
+    * `description` supports SQL LIKE semantics. Provide `%` yourself if you need wildcard behavior.
+    * `rollupRegionNo` filters districts within a region rollup.
+    * Results are ordered by `rollup_region_no`, `code desc`, `description`.
+  operationId: getRegionDistrictRollupLov
+  parameters:
+    - name: orgUnitNo
+      in: query
+      description: Organizational unit number (exact match)
+      required: false
+      schema:
+        type: integer
+        format: int64
+        example: 17
+
+    - name: description
+      in: query
+      description: Region/district description (SQL LIKE semantics)
+      required: false
+      schema:
+        type: string
+        maxLength: 100
+        example: "%Island%"
+
+    - name: rollupRegionNo
+      in: query
+      description: Region rollup number (exact match)
+      required: false
+      schema:
+        type: integer
+        format: int64
+        example: 1
+
+  responses:
+    '200':
+      description: Successful search operation
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: '../root.yaml#/components/schemas/RegionDistrictRollupLov'
+          example:
+            - code: 17
+              description: "Coast Region"
+              rollupRegionNo: 1
+              orgUnitCode: "RCO"
+            - code: 171
+              description: "South Island District"
+              rollupRegionNo: 1
+              orgUnitCode: "DSI"
+
+    '500':
+      description: Server error
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+          example:
+            code: "ORA-12345"
+            message: "Database connection error"
+

@@ -1,0 +1,76 @@
+parameters:
+  - name: riskQuestionnaireId
+    in: path
+    description: Risk questionnaire / assessment identifier
+    required: true
+    schema:
+      type: integer
+      format: int64
+      example: 12345
+
+get:
+  tags:
+    - ScalerRiskAssessment
+  summary: Get a scaler risk assessment by ID
+  description: |
+    Retrieve the full detail of a scaler risk assessment record.
+    Based on `scs_risk_scaler_vw_pkg.search_recs`.
+  operationId: getScalerRiskAssessment
+  responses:
+    '200':
+      description: Risk assessment record found
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/ScalerRiskAssessmentDetail'
+    '404':
+      description: Risk assessment not found
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+    '500':
+      description: Server error
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+
+put:
+  tags:
+    - ScalerRiskAssessment
+  summary: Update a scaler risk assessment
+  description: |
+    Save assessment field values for a scaler risk assessment record.
+  operationId: updateScalerRiskAssessment
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: '../root.yaml#/components/schemas/RiskAssessmentSaveRequest'
+  responses:
+    '200':
+      description: Risk assessment updated successfully
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/ScalerRiskAssessmentDetail'
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+    '404':
+      description: Risk assessment not found
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+    '500':
+      description: Server error
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'

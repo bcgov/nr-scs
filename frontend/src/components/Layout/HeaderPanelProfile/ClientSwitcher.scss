@@ -1,0 +1,8 @@
+@use '@carbon/react/scss/spacing' as *;
+
+.client-switcher {
+  margin-top: $spacing-05;
+  // The panel is dark; the default dropdown field would otherwise sit invisibly against it.
+  border-top: 1px solid var(--cds-border-subtle);
+  padding-top: $spacing-05;
+}

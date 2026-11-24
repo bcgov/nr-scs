@@ -1,0 +1,230 @@
+@use '@carbon/type';
+
+.templates {
+
+  // Section separator (horizontal rule look)
+  &__section {
+    padding: 1.25rem 0;
+    border-bottom: 1px solid #e0e0e0;
+    margin-bottom: 1rem;
+  }
+
+  // Filter layout (use Column/Grid like report pages)
+  .templates__filter-inline {
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
+    position: relative;
+    padding-bottom: 0.5rem;
+  }
+
+  .templates__filter-inline > div:last-child,
+  .templates__filter-inline > div > div {
+    display: inline-flex;
+    align-items: center;
+  }
+
+  .templates__filter-inline .cds--list-box .cds--list-box__field,
+  .templates__filter-inline .cds--text-input__field-wrapper > .cds--text-input {
+    display: flex !important;
+    align-items: center !important;
+  }
+
+  .templates__filter-inline > *:first-child { flex: 1 1 auto; min-width: 0; }
+  .templates__filter-inline > *:not(:first-child) { flex: 0 0 auto; display: flex; align-items: center; }
+
+  // ── Left panel (list) ────────────────────────────────────────────────────────
+  &__list-skeleton {
+    margin-top: 1rem;
+  }
+
+  &__list-table .table-resource table tbody tr {
+    cursor: pointer;
+  }
+
+  &__list-empty {
+    margin-top: 1rem;
+    color: #525252;
+    font-size: 0.875rem;
+  }
+
+
+  // ── Right panel (detail / form) ──────────────────────────────────────────────
+  &__hint {
+    margin-top: 0;
+    color: #525252;
+  }
+
+  &__section-heading {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #161616;
+    margin: 0 0 1rem;
+
+    & + & {
+      margin-top: 1.5rem;
+    }
+  }
+
+  // Definition-style details table (Template #, Name, Type, Reg/Dist)
+  &__details-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0 0.75rem;
+    margin-top: -0.75rem;
+    margin-bottom: 1.5rem;
+  }
+
+  &__detail-row {
+    th,
+    td {
+      padding: 0;
+      vertical-align: top;
+    }
+  }
+
+  &__field-label {
+    color: #161616;
+    font-size: 0.875rem;
+    font-weight: 600;
+    line-height: 1.5;
+    text-align: left;
+    width: 9rem;
+    min-width: 7rem;
+    padding-right: 1rem;
+    white-space: nowrap;
+  }
+
+  &__field-value {
+    color: #161616;
+    font-size: 0.875rem;
+    line-height: 1.5;
+    min-height: 1.25rem;
+    word-break: break-word;
+  }
+
+  // Conditions table wrapper — enables horizontal scroll on small screens
+  &__conditions-wrap {
+    overflow-x: auto;
+    margin-top: 0;
+  }
+
+  /* Adjust widths for the conditions TableResource inside the modal:
+     - Condition # and Mandatory? get fixed narrow columns
+     - Title gets a modest width
+     - Description takes remaining space and wraps */
+  .templates__conditions-wrap .table-resource table {
+    table-layout: fixed;
+    width: 100%;
+  }
+  .templates__conditions-wrap .table-resource__header-select,
+  .templates__conditions-wrap .table-resource__cell-select {
+    width: 10%;
+    max-width: 10%;
+    text-align: left;
+    white-space: nowrap;
+  }
+
+  .templates__conditions-wrap .table-resource__header-conditionNo,
+  .templates__conditions-wrap .table-resource__cell-conditionNo {
+    width: 8%;
+    max-width: 8%;
+    white-space: nowrap;
+    text-align: left;
+  }
+
+  .templates__conditions-wrap .table-resource__header-mandatory,
+  .templates__conditions-wrap .table-resource__cell-mandatory {
+    width: 8%;
+    max-width: 8%;
+    text-align: left;
+    white-space: nowrap;
+  }
+
+  .templates__conditions-wrap .table-resource__header-title,
+  .templates__conditions-wrap .table-resource__cell-title {
+    width: 18%;
+    text-align: left;
+  }
+
+  .templates__conditions-wrap .table-resource__header-description,
+  .templates__conditions-wrap .table-resource__cell-description {
+    /* take remaining space */
+    width: 56%;
+    white-space: normal;
+    word-break: break-word;
+    text-align: left;
+  }
+
+  // ── Action row (Edit + Delete) ────────────────────────────────────────────────
+  &__detail-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 1.5rem;
+  }
+
+  // ── Responsive ────────────────────────────────────────────────────────────────
+  @media (max-width: 768px) {
+    &__panel {
+      height: auto;
+      margin-bottom: 1rem;
+    }
+
+    &__details-table,
+    &__details-table tbody,
+    &__detail-row,
+    &__field-label,
+    &__field-value {
+      display: block;
+      width: 100%;
+    }
+
+    &__details-table {
+      border-spacing: 0;
+      margin-top: 0;
+    }
+
+    &__detail-row {
+      margin-bottom: 0.75rem;
+    }
+
+    &__field-label {
+      min-width: 0;
+      padding-right: 0;
+      padding-bottom: 0.25rem;
+    }
+
+    &__form {
+      max-width: 100%;
+    }
+  }
+
+  .templates__modal {
+    .cds--modal-header {
+      overflow: visible !important;
+      max-block-size: none !important;
+    }
+
+    /* Align form controls inside the Templates modal form grid */
+    .scs__form__grid {
+      .bx--form-item {
+        display: flex !important;
+        flex-direction: column !important;
+        justify-content: flex-end !important;
+        margin-bottom: 0 !important;
+      }
+
+      .templates__align-col {
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
+      }
+
+      .templates__align-col .cds--form-item__label,
+      .templates__align-col .cds--label {
+        margin-bottom: 0.25rem;
+      }
+    }
+  }
+}

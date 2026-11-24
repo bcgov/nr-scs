@@ -1,0 +1,21 @@
+type: object
+description: |
+  A scaling software product/version used to submit returns at a scale site, as shown on the legacy
+  Software tab of the scale site record. Read-only; sourced from `scs_site_software_vw_pkg.search_recs`.
+properties:
+  scalingProgram:
+    type: string
+  version:
+    type: string
+  revision:
+    type: string
+  returnType:
+    type: string
+  returnCount:
+    type: integer
+    format: int64
+    description: Count of returns submitted with this software product/version.
+  lastUsedDate:
+    type: string
+    format: date
+    description: Most recent date this software product/version was used to submit a return.

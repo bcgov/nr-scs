@@ -1,0 +1,36 @@
+type: object
+description: |
+  Request payload for updating an existing Scale Site inspection from the modern edit page.
+  This request intentionally contains only the legacy edit-mode writable inspection fields and the
+  submitted question responses. Read-only inspection context fields remain on the GET payload only.
+required:
+  - inspectionDate
+  - inspector
+  - siteOperatorPresentInd
+  - questionResponses
+properties:
+  inspectionDate:
+    type: string
+    format: date
+    description: Inspection date.
+    example: "2026-03-11"
+  inspector:
+    type: string
+    description: Inspector identifier.
+    example: "A1B2C3D4-E5F6-7890-1234-56789ABCDEF0"
+  siteOperatorPresentInd:
+    type: string
+    enum: [Y, N]
+    description: Indicates whether the site operator was present during the inspection.
+    example: "Y"
+  comments:
+    type: string
+    maxLength: 2000
+    nullable: true
+    description: General inspection comments.
+  questionResponses:
+    type: array
+    minItems: 1
+    description: Submitted question response rows for the inspection.
+    items:
+      $ref: './ScaleSiteInspectionQuestionResponseInput.yaml'

@@ -1,0 +1,133 @@
+parameters:
+  - name: scaleSiteIdNmbr
+    in: path
+    description: Scale site number
+    required: true
+    schema:
+      type: string
+      maxLength: 8
+      example: "SITE001"
+  - name: inspectionTypeCode
+    in: query
+    description: Selected inspection type code from the stage-1 create flow.
+    required: true
+    schema:
+      type: string
+      maxLength: 4
+      example: "COM"
+  - name: siteTypeCodes
+    in: query
+    description: Selected inspected scaling method / site type codes from the stage-1 create flow.
+    required: true
+    schema:
+      type: array
+      minItems: 1
+      items:
+        type: string
+        maxLength: 1
+        example: "W"
+    style: form
+    explode: true
+
+get:
+  tags:
+    - ScaleSiteInspection
+  summary: Get scale site inspection create-init payload
+  description: |
+    Retrieve the aggregated payload used to render the main Scale Site inspection create form
+    after the user has selected an inspection type and one or more site types.
+
+    This endpoint is distinct from:
+    * `GET /scale-sites/{scaleSiteIdNmbr}/inspections`, which returns the inspection summary rows
+      for the scale-site `Inspections` tab.
+    * `GET /scale-sites/inspection/{inspectionId}/edit`, which returns the edit payload for an
+      existing inspection.
+
+    The create-init payload preserves the legacy staged create behavior:
+    1. The user selects `inspectionTypeCode` and `siteTypeCodes`.
+    2. The backend rebuilds the applicable question-holder set and loads the scale-site context,
+       recipient options, and edit-style answer metadata needed by the main create form.
+  operationId: getScaleSiteInspectionCreateInit
+  responses:
+    '200':
+      description: Successful inspection create-init payload retrieval
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/ScaleSiteInspectionCreateInitView'
+          example:
+            scaleSiteIdNmbr: "SITE001"
+            siteName: "MAIN YARD"
+            siteLocation: "Nanaimo"
+            siteOwnerName: "ACME FOREST PRODUCTS LTD."
+            inspectionTypeCode: "COM"
+            inspectionTypeDescription: "Compliance"
+            siteTypeCodes: ["W", "P"]
+            siteTypeDisplay: "Weight Scale, Piece Scale"
+            recipientOptions:
+              - value: "1001"
+                label: "Jordan Smith"
+              - value: "1002"
+                label: "Robin Chen"
+            recipient: null
+            siteOperatorPresentInd: null
+            inspector: "A1B2C3D4-E5F6-7890-1234-56789ABCDEF0"
+            inspectionDate: null
+            previousInspectionId: null
+            comments: null
+            questionResponses:
+              - inspectionQuestionId: 501
+                questionText: "Was the scale head sealed?"
+                inspectionAnswerCode: null
+                inspectionAnswerDescription: null
+                answerOptions:
+                  - code: "Y"
+                    description: "Yes"
+                  - code: "N"
+                    description: "No"
+                  - code: "NA"
+                    description: "N/A"
+                commentsText: null
+                followUpRequiredInd: "N"
+                followUpRequiredDescription: "No"
+                followUpActionText: null
+                followUpDueDate: null
+                followUpCompletedInd: null
+                followUpCompletedDescription: null
+    '400':
+      description: Bad request — missing or invalid create-init inputs
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+          example:
+            code: "BAD_REQUEST"
+            message: "inspectionTypeCode is required."
+    '404':
+      description: Scale site not found
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+          example:
+            code: "NOT_FOUND"
+            message: "No scale site found with scale site number SITE001"
+    '422':
+      description: The selected create context cannot produce a valid inspection create payload
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+          example:
+            code: "UNPROCESSABLE_ENTITY"
+            message: "Automated inspections must use Weight Scale as the site type."
+    '500':
+      description: Server error
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+          example:
+            code: "ORA-12345"
+            message: "Database connection error"
+

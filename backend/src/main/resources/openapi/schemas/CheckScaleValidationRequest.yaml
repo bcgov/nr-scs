@@ -1,0 +1,44 @@
+type: object
+description: |
+  Inputs for the validate-before-create step of the HBCS check scale
+  flow (step 1 / legacy P075 → P076 transition). The caller populates
+  exactly one Log Tally pair OR one Sample Log Tally pair in each
+  direction (Check + Original). The backend enforces that rule and
+  looks up the referenced documents in HBS.
+properties:
+  chkLogTallyDocNo:
+    type: string
+    maxLength: 13
+    nullable: true
+    description: Check log tally document number (Log Tally flavor).
+  chkLogTallyVer:
+    type: integer
+    nullable: true
+    description: Check log tally version (Log Tally flavor).
+  chkSampleLogTallyDocNo:
+    type: string
+    maxLength: 13
+    nullable: true
+    description: Check sample log tally document number (Sample Log Tally flavor).
+  chkSampleLogTallyVer:
+    type: integer
+    nullable: true
+    description: Check sample log tally version (Sample Log Tally flavor).
+  orgLogTallyDocNo:
+    type: string
+    maxLength: 13
+    nullable: true
+    description: Original log tally document number (Log Tally flavor).
+  orgLogTallyVer:
+    type: integer
+    nullable: true
+    description: Original log tally version (Log Tally flavor).
+  orgSampleLogTallyDocNo:
+    type: string
+    maxLength: 13
+    nullable: true
+    description: Original sample log tally document number (Sample Log Tally flavor).
+  orgSampleLogTallyVer:
+    type: integer
+    nullable: true
+    description: Original sample log tally version (Sample Log Tally flavor).

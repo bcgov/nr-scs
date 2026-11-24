@@ -1,0 +1,55 @@
+parameters:
+  - name: scaleSiteIdNmbr
+    in: path
+    description: Scale site id number
+    required: true
+    schema:
+      type: string
+      example: "A12345"
+
+get:
+  tags:
+    - ScaleSiteAuthorizedScaler
+  summary: List authorized scalers for a scale site
+  description: |
+    Retrieve every scaler authorized at a scale site, for the legacy Authorized Scalers tab on the
+    scale site view page. Read-only; each row carries the scaler's authorization, licence, name,
+    appointment types, dates, district-wide flag, and a computed status.
+    Based on `scs_authorized_scalers_vw_pkg.search_recs` (search by `scale_site_id_nmbr`).
+  operationId: getScaleSiteAuthorizedScalers
+  responses:
+    '200':
+      description: Authorized scaler list found
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: '../root.yaml#/components/schemas/AuthorizedScalerSummary'
+          example:
+            - scalerAuthorizationId: 4001
+              scalerLicenceNo: "1234"
+              clientName: "DOE, JANE"
+              status: "Active"
+              scalerAppointmentTypes: "Owner, Acting"
+              authorizationEffectiveDate: "2025-01-15"
+              authorizationExpiryDate: "2027-01-15"
+              districtWideInd: "N"
+    '404':
+      description: Scale site not found
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+          example:
+            code: "NOT_FOUND"
+            message: "No scale site found with number A12345"
+    '500':
+      description: Server error
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+          example:
+            code: "ORA-12345"
+            message: "Database connection error"

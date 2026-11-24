@@ -1,0 +1,73 @@
+parameters:
+  - name: scaleSiteIdNmbr
+    in: path
+    description: Scale site number
+    required: true
+    schema:
+      type: string
+      maxLength: 8
+      example: "SITE001"
+
+get:
+  tags:
+    - CheckScale
+  summary: Get the check scale summary list for the Scale Site Check Scales tab
+  description: |
+    Retrieve the rows used to render the `Check Scales` tab on the Scale Site view page
+    (legacy screen P057, `scaleSiteCheckScaleList.jsp`).
+
+    The list is based on `scs_cs_site_summry_vw_pkg.search_recs`, filtered by the scale site
+    number and an optional check scale type code, using the legacy tab sort order. An omitted
+    `checkScaleTypeCode` returns all check scales for the site (legacy `All` filter option).
+  operationId: getScaleSiteCheckScales
+  parameters:
+    - name: checkScaleTypeCode
+      in: query
+      description: Check scale type code filter; omitted means all types.
+      required: false
+      schema:
+        type: string
+        maxLength: 10
+        example: "FIRST"
+  responses:
+    '200':
+      description: Check scale tab data found
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/ScaleSiteCheckScaleTabResult'
+          example:
+            checkScales:
+              - checkScaleId: 146943
+                scaleSiteIdNmbr: "SITE001"
+                primCheckLicenceNo: "1234"
+                secCheckLicenceNo: null
+                primOrigLicenceNo: "5678"
+                secOrigLicenceNo: null
+                origScaleDate: "2026-05-01"
+                checkScaleDate: "2026-05-03"
+                pieceDiff: 2
+                volumeVariance: 1.5
+                valueVariance: 0.8
+                replacedInd: "N"
+                checkScaleTypeCode: "FIRST"
+                followedGoodPracticeInd: "Y"
+                originalWithinStandardInd: "Y"
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+          example:
+            code: "BAD_REQUEST"
+            message: "Scale site number is required."
+    '500':
+      description: Server error
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+          example:
+            code: "ORA-12345"
+            message: "Database connection error"

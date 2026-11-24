@@ -1,0 +1,222 @@
+parameters:
+  - name: scalerLicenceNo
+    in: path
+    description: Scaler licence number
+    required: true
+    schema:
+      type: string
+      maxLength: 4
+      example: "1234"
+
+get:
+  tags:
+    - Scaler
+  summary: Get a scaler by licence number
+  description: |
+    Retrieve a single scaler record and its associated appointment or exam.
+    Based on `scs_scaler_pkg.read_rec`, `SCS_SCALER_LICENCE_ATTRIBT_PKG.search_recs`,
+    `scs_scaler_training_pkg.search_recs`, and `scs_slct_slcd_lov_vw_pkg.search_recs`.
+  operationId: getScaler
+  responses:
+    '200':
+      description: Scaler record found
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/ScalerDetail'
+          example:
+            scalerLicenceNo: "1234"
+            clientNumber: "12345678"
+            orgUnitNo: 1234
+            issuedDate: "2025-01-15"
+            expiryDate: null
+            oathTakenInd: "Y"
+            licenceCancelledDate: null
+            licenceTypes: ["SCS"]
+            appointment:
+              scalerLicenceAttributeId: 5001
+              scalerLicenceNo: "1234"
+              scalerAppointmentType: "FORS"
+              scaleGradingSystemCode: "BC"
+              provinceWideInd: "Y"
+              issuedDate: "2025-01-15"
+              expiryDate: null
+              cancellationDate: null
+              cancellationReasonTxt: null
+            exam: null
+            entryTimestamp: "2025-01-15T10:30:00Z"
+            entryUserid: "JSMITH"
+            updateTimestamp: "2025-01-15T10:30:00Z"
+            updateUserid: "JSMITH"
+            revisionCount: 1
+    '404':
+      description: Scaler not found
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+          example:
+            code: "NOT_FOUND"
+            message: "No scaler found with licence number 1234"
+    '500':
+      description: Server error
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+          example:
+            code: "ORA-12345"
+            message: "Database connection error"
+
+delete:
+  tags:
+    - Scaler
+  summary: Delete a scaler record
+  description: |
+    Delete a scaler record and its intrinsic sub-records. This matches the legacy scaler
+    Delete Record flow (`ScalerDelegate.deleteScaler`), which runs an explicit app-side cascade
+    in one transaction (there is no DB `ON DELETE CASCADE`):
+    1. Remove the assigned licence-type rows the scaler holds — `SCS` and/or `WA`
+       (`SCS_SCALER_ASSIGND_LIC_TYP_PKG`).
+    2. Delete the appointment if one is present (`SCS_SCALER_LICENCE_ATTRIBT_PKG`).
+    3. Delete the exam/training if one is present (`scs_scaler_training_pkg`).
+    4. Delete the core scaler row (`scs_scaler_pkg.delete_rec`).
+
+    A scaler that still has dependent records the cascade does not clear (authorizations,
+    performance remarks, risk questionnaires) cannot be deleted — the core delete raises an
+    Oracle child-record constraint and the request is rejected with `400`.
+  operationId: deleteScaler
+  responses:
+    '204':
+      description: Scaler deleted successfully
+    '400':
+      description: |
+        The scaler cannot be deleted because dependent records still reference it
+        (Oracle child-record constraint).
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+          example:
+            code: "BAD_REQUEST"
+            message: "Database Exception: The record can not be deleted because there are associated records that exist."
+    '404':
+      description: Scaler not found
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+          example:
+            code: "NOT_FOUND"
+            message: "No scaler found with licence number 1234"
+    '500':
+      description: Server error
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+          example:
+            code: "ORA-12345"
+            message: "Database connection error"
+
+put:
+  tags:
+    - Scaler
+  summary: Update a scaler record
+  description: |
+    Update an existing scaler record and its associated licence types, appointment, or exam.
+    Based on `scs_scaler_pkg.update_rec`.
+
+    The update operation:
+    1. Updates the core scaler row (`scs_scaler_pkg`).
+    2. Reconciles assigned licence types — adds any in `licenceTypes` that don't exist,
+       removes any that have been unchecked (`SCS_SCALER_ASSIGND_LIC_TYP_PKG`).
+    3. If `SCS` is in `licenceTypes` and no appointment or exam already exists on the record,
+       exactly one of `appointment` or `exam` must be provided.
+
+    Business rules enforced server-side:
+    * `clientNumber` is read-only on update — it must equal the persisted value (scaler identity
+      is fixed once created).
+    * `expiryDate` is required when `WA` is in `licenceTypes`.
+    * `expiryDate` must be after `issuedDate` when both are provided.
+    * `licenceCancelledDate` is read-only on update — the persisted value is always carried
+      forward; a different value is rejected. Cancellation is managed via the dedicated
+      licence-cancelled-date operation (`updateScalerLicenceCancelledDate`).
+  operationId: updateScaler
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: '../root.yaml#/components/schemas/ScalerCreate'
+        example:
+          clientNumber: "12345678"
+          orgUnitNo: 1234
+          issuedDate: "2025-01-15"
+          expiryDate: "2027-01-15"
+          oathTakenInd: "Y"
+          licenceTypes: ["SCS", "WA"]
+          appointment:
+            scalerAppointmentType: "FORS"
+            scaleGradingSystemCode: "BC"
+            provinceWideInd: "Y"
+            issuedDate: "2025-01-15"
+            expiryDate: "2027-01-15"
+  responses:
+    '200':
+      description: Scaler updated successfully
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/ScalerDetail'
+          example:
+            scalerLicenceNo: "1234"
+            clientNumber: "12345678"
+            orgUnitNo: 1234
+            issuedDate: "2025-01-15"
+            expiryDate: "2027-01-15"
+            oathTakenInd: "Y"
+            licenceCancelledDate: null
+            licenceTypes: ["SCS", "WA"]
+            appointment:
+              scalerLicenceAttributeId: 5001
+              scalerLicenceNo: "1234"
+              scalerAppointmentType: "FORS"
+              scaleGradingSystemCode: "BC"
+              provinceWideInd: "Y"
+              issuedDate: "2025-01-15"
+              expiryDate: "2027-01-15"
+            exam: null
+            entryTimestamp: "2025-01-15T10:30:00Z"
+            entryUserid: "JSMITH"
+            updateTimestamp: "2026-02-24T08:00:00Z"
+            updateUserid: "BJONES"
+            revisionCount: 2
+    '400':
+      description: Bad request — validation failure
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+          example:
+            code: "VALIDATION_ERROR"
+            message: "expiryDate is required when WA licence type is selected"
+    '404':
+      description: Scaler not found
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+          example:
+            code: "NOT_FOUND"
+            message: "No scaler found with licence number 1234"
+    '500':
+      description: Server error
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+          example:
+            code: "ORA-12345"
+            message: "Database connection error"
+

@@ -1,0 +1,17 @@
+type: object
+required:
+  - scaleMethodTypeCode
+  - scalerAuthorizationClause
+  - effectiveDate
+properties:
+  scaleMethodTypeCode:
+    type: string
+  scalerAuthorizationClause:
+    type: string
+    maxLength: 200
+  effectiveDate:
+    type: string
+    format: date
+  expiryDate:
+    type: string
+    format: date

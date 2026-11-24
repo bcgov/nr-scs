@@ -1,0 +1,57 @@
+@use '../../../styles/variables' as vars;
+@use '@carbon/react/scss/spacing' as *;
+@use '@carbon/react/scss/type' as *;
+@use '@carbon/react/scss/breakpoint' as *;
+@use '@carbon/react/scss/theme' as *;
+@use '@bcgov-nr/nr-theme/design-tokens/colors.scss' as colors;
+@use '@carbon/type';
+
+.cds--side-nav__link-text {
+
+  svg {
+    margin-inline-end: 0.75rem;
+    fill: var(--#{vars.$bcgov-prefix}-link-primary);
+  }
+
+}
+
+// Tighten the icon-to-title gap (Carbon default is 1.5rem)
+.cds--side-nav .cds--side-nav__icon:not(.cds--side-nav__submenu-chevron) {
+  margin-inline-end: 0.75rem;
+}
+
+// Indentation: the parent group's title text starts at 2.75rem
+// (1rem row padding + 1rem icon + 0.75rem gap); each child level steps
+// in a further 0.5rem from there.
+// Group children (e.g. Queries > Clients, Scalers, ...)
+.cds--side-nav .cds--side-nav__item--icon .cds--side-nav__menu a.cds--side-nav__link {
+  padding-inline-start: 3.25rem;
+}
+
+// Nested SideNavMenu rows (e.g. Administration > Maintenance) align with
+// their sibling items. Carbon uses .cds--side-nav__submenu as the group row.
+.cds--side-nav .nested-group > .cds--side-nav__submenu {
+  padding-inline-start: 3.25rem;
+}
+
+// Children of a nested group step in once more
+.cds--side-nav .nested-group .cds--side-nav__menu a.cds--side-nav__link {
+  padding-inline-start: 3.75rem;
+}
+
+// Long labels wrap onto extra lines instead of clipping.
+// Rows keep the 48px minimum but may grow; scoped under .cds--side-nav to
+// out-rank Carbon's nowrap/ellipsis rule and the global 3rem height pin.
+.cds--side-nav .cds--side-nav__menu .cds--side-nav__menu-item a.cds--side-nav__link,
+.cds--side-nav button.cds--side-nav__submenu,
+.cds--side-nav a.cds--side-nav__link {
+  height: auto;
+  min-height: 3rem;
+}
+
+.cds--side-nav a.cds--side-nav__link > .cds--side-nav__link-text,
+.cds--side-nav .cds--side-nav__submenu-title {
+  white-space: normal;
+  line-height: 1.25;
+  padding-block: 0.5rem;
+}

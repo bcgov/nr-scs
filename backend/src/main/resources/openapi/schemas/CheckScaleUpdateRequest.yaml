@@ -1,0 +1,44 @@
+type: object
+description: |
+  Request body for `PUT /api/check-scales/{checkScaleId}` — the editable
+  fields of an existing HBCS check scale (legacy P077 update). The DDN/version
+  refs are immutable and are preserved server-side from the stored row, so
+  they are not part of this request. The persisted row's `cksc_type` stays
+  `HBCS`.
+required:
+  - checkScaleTypeCode
+  - followedGoodPracticeInd
+  - originalWithinStandardInd
+  - originalScaleNetValue
+  - checkScaleNetValue
+properties:
+  checkScaleTypeCode:
+    type: string
+    maxLength: 4
+    description: |
+      Code from the LOV keyed `CHECK_SCALE_TYPE_CODE` (load via
+      `/api/static-lov?tableKey=CHECK_SCALE_TYPE_CODE`). Stored verbatim on
+      the persisted row; the LOV provides the user-facing description.
+  followedGoodPracticeInd:
+    type: string
+    enum: [Y, N]
+    description: Whether the original scaler followed good practices.
+  originalWithinStandardInd:
+    type: string
+    enum: [Y, N]
+    description: Whether the original scale was within standard.
+  chkScalerCommentTxt:
+    type: string
+    maxLength: 4000
+    nullable: true
+    description: Free-text comment by the check scaler.
+  originalScaleNetValue:
+    type: number
+    format: double
+    description: Original scale net value (precision 8.2).
+    example: 1234.56
+  checkScaleNetValue:
+    type: number
+    format: double
+    description: Check scale net value (precision 8.2).
+    example: 1233.45

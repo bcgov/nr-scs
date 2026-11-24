@@ -1,0 +1,110 @@
+get:
+  tags:
+    - ScaleSiteAuthorization
+  summary: Get scale site authorization
+  description: Get a scale site authorization record by id.
+  operationId: getScaleSiteAuthorization
+  parameters:
+    - in: path
+      name: scaleSiteAuthorizationId
+      required: true
+      schema:
+        type: integer
+        format: int64
+  responses:
+    '200':
+      description: Scale site authorization found
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/ScaleSiteAuthorizationDetail'
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+    '500':
+      description: Server error
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+put:
+  tags:
+    - ScaleSiteAuthorization
+  summary: Update scale site authorization
+  description: Update an existing scale site authorization record.
+  operationId: updateScaleSiteAuthorization
+  parameters:
+    - in: path
+      name: scaleSiteAuthorizationId
+      required: true
+      schema:
+        type: integer
+        format: int64
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: '../root.yaml#/components/schemas/ScaleSiteAuthorizationSaveRequest'
+  responses:
+    '200':
+      description: Scale site authorization updated successfully
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/ScaleSiteAuthorizationDetail'
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+    '500':
+      description: Server error
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+delete:
+  tags:
+    - ScaleSiteAuthorization
+  summary: Delete scale site authorization
+  description: Delete a scale site authorization record by id.
+  operationId: deleteScaleSiteAuthorization
+  parameters:
+    - in: path
+      name: scaleSiteAuthorizationId
+      required: true
+      schema:
+        type: integer
+        format: int64
+  responses:
+    '204':
+      description: Scale site authorization deleted successfully
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+    '500':
+      description: Server error
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'

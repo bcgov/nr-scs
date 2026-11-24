@@ -1,0 +1,204 @@
+get:
+  tags:
+    - Client
+  summary: Search for clients
+  description: |
+    Search for clients in the SCS system using various criteria.
+    Results are limited by the system maximum (MAXR setting).
+
+    All text search fields support partial matching (LIKE wildcards).
+    Multiple criteria are combined with AND logic.
+  operationId: searchClients
+  parameters:
+    - name: client
+      in: query
+      description: Full client identifier (Client Number / Client Location Code)
+      required: false
+      schema:
+        type: string
+        example: "12345678/00"
+
+    - name: companyName
+      in: query
+      description: Company name (partial match supported)
+      required: false
+      schema:
+        type: string
+        maxLength: 60
+        example: "ABC Logging"
+
+    - name: lastName
+      in: query
+      description: Last name (partial match supported)
+      required: false
+      schema:
+        type: string
+        maxLength: 30
+        example: "Smith"
+
+    - name: firstName
+      in: query
+      description: First name (partial match supported)
+      required: false
+      schema:
+        type: string
+        maxLength: 30
+        example: "John"
+
+    - name: city
+      in: query
+      description: City name (partial match supported)
+      required: false
+      schema:
+        type: string
+        maxLength: 50
+        example: "Vancouver"
+
+    - name: businessPhone
+      in: query
+      description: Business phone number
+      required: false
+      schema:
+        type: string
+        maxLength: 20
+        example: "250-555-1234"
+
+    - name: cellPhone
+      in: query
+      description: Cell phone number
+      required: false
+      schema:
+        type: string
+        maxLength: 20
+        example: "778-555-5678"
+
+    - name: emailAddress
+      in: query
+      description: Email address
+      required: false
+      schema:
+        type: string
+        format: email
+        maxLength: 254
+        example: "john.smith@example.com"
+
+    - name: clientNumber
+      in: query
+      description: >-
+        Client number (typically 8 digits). Digits and the `%` (multi-character) and `_`
+        (single-character) wildcards are accepted, matching the legacy free-text search field.
+        Values without `%` are zero-padded to 8 (a `_` occupies one character, so a padded value
+        such as `000025_0` still aligns to the stored 8-digit number); values containing `%` pass
+        through raw to the package's LIKE for partial matching.
+      required: false
+      schema:
+        type: string
+        pattern: '^[0-9%_]{1,8}$'
+        maxLength: 8
+        example: "12345678"
+
+    - name: clientLocnCode
+      in: query
+      description: >-
+        Client location code (1-2 digits). Digits and the `%` (multi-character) and `_`
+        (single-character) wildcards are accepted, matching the legacy free-text search field; the
+        value goes to the package's LIKE unchanged.
+      required: false
+      schema:
+        type: string
+        pattern: '^[0-9%_]{1,2}$'
+        maxLength: 2
+        example: "00"
+
+    - name: primarySort
+      in: query
+      description: |
+        Primary sort field:
+        * `1` - Client
+        * `2` - Company Name
+        * `3` - Last Name
+        * `4` - First Name
+        * `5` - City
+        * `6` - Business Phone
+        * `7` - Cell Phone
+        * `8` - Email Address
+        * `9` - Client Number
+        * `10` - Client Location Code
+      required: false
+      schema:
+        type: integer
+        enum: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+        default: 1
+
+    - name: secondarySort
+      in: query
+      description: |
+        Secondary sort field (same values as primarySort):
+        * `0` - No secondary sort
+        * `1` - Client
+        * `2` - Company Name
+        * `3` - Last Name
+        * `4` - First Name
+        * `5` - City
+        * `6` - Business Phone
+        * `7` - Cell Phone
+        * `8` - Email Address
+        * `9` - Client Number
+        * `10` - Client Location Code
+      required: false
+      schema:
+        type: integer
+        enum: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+        default: 0
+
+  responses:
+    '200':
+      description: Successful search operation
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: '../root.yaml#/components/schemas/Client'
+          example:
+            - client: "12345678/00"
+              companyName: "ABC Logging Ltd."
+              lastName: "Smith"
+              firstName: "John"
+              city: "Vancouver"
+              businessPhone: "250-555-1234"
+              cellPhone: "778-555-5678"
+              emailAddress: "john.smith@abclogging.com"
+              clientNumber: "12345678"
+              clientLocnCode: "00"
+            - client: "87654321/00"
+              companyName: "XYZ Timber Co."
+              lastName: "Johnson"
+              firstName: "Jane"
+              city: "Victoria"
+              businessPhone: null
+              cellPhone: null
+              emailAddress: null
+              clientNumber: "87654321"
+              clientLocnCode: "00"
+
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+          example:
+            code: "INVALID_PARAMETER"
+            message: "Invalid primarySort value"
+
+    '500':
+      description: Server error
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+          example:
+            code: "ORA-12345"
+            message: "Database connection error"
+

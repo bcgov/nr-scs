@@ -1,0 +1,35 @@
+type: object
+description: Species / product / grade summary row used by the CheckScale view.
+properties:
+  speciesCode:
+    type: string
+    nullable: true
+  speciesGrade:
+    type: string
+    nullable: true
+  productCode:
+    type: string
+    nullable: true
+  orgPieces:
+    type: integer
+    nullable: true
+  orgNetVolume:
+    type: number
+    format: double
+    nullable: true
+  orgNetValue:
+    type: number
+    format: double
+    nullable: true
+  chkPieces:
+    type: integer
+    nullable: true
+  chkNetVolume:
+    type: number
+    format: double
+    nullable: true
+  chkNetValue:
+    type: number
+    format: double
+    nullable: true
+

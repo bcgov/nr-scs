@@ -1,0 +1,94 @@
+parameters:
+  - name: settingKey
+    in: path
+    description: System setting key.
+    required: true
+    schema:
+      type: string
+      minLength: 1
+      example: "WMSG"
+
+get:
+  tags:
+    - SystemSetting
+  summary: Get system setting
+  description: Returns the system setting record for the provided key.
+  operationId: getSystemSetting
+  responses:
+    '200':
+      description: System setting record
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/SystemSetting'
+          example:
+            settingKey: "WMSG"
+            description: "Current News - Welcome Message for SCS Home Page"
+            systemSettingValue: "<p>System maintenance scheduled for April 30.</p>"
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+          example:
+            code: "BAD_REQUEST"
+            message: "System setting key is required."
+    '404':
+      description: Setting not found
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+          example:
+            code: "NOT_FOUND"
+            message: "No system setting found for key WMSG"
+    '500':
+      description: Server error
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+          example:
+            code: "ORA-12345"
+            message: "Database connection error"
+
+put:
+  tags:
+    - SystemSetting
+  summary: Update system setting
+  description: Updates the system setting value for the provided key.
+  operationId: updateSystemSetting
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: '../root.yaml#/components/schemas/SystemSettingUpdateRequest'
+        example:
+          systemSettingValue: "<p>System maintenance scheduled for April 30.</p>"
+  responses:
+    '200':
+      description: System setting updated
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/SystemSetting'
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+          example:
+            code: "BAD_REQUEST"
+            message: "System setting key is required."
+    '500':
+      description: Server error
+      content:
+        application/json:
+          schema:
+            $ref: '../root.yaml#/components/schemas/Error'
+          example:
+            code: "ORA-12345"
+            message: "Database connection error"

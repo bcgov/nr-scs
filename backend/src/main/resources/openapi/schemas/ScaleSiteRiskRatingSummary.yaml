@@ -1,0 +1,58 @@
+type: object
+description: |
+  A single risk-assessment summary row for the scale site record's read-only "Risk Rating" tab.
+  Sourced from `scs_risk_summary_vw_pkg.search_recs` filtered by scale site id number, mirroring the
+  scaler Risk Rating tab (the same view serves scaler, scale site, cruise, and waste assessments).
+properties:
+  riskQuestionnaireId:
+    type: integer
+    format: int64
+    nullable: true
+    description: Risk questionnaire / assessment identifier — legacy "Assessment ID" column.
+    example: 12345
+  entryTimestamp:
+    type: string
+    format: date-time
+    nullable: true
+    description: |
+      When the assessment was created (`RISK_QUESTIONNAIRE.ENTRY_TIMESTAMP`) — legacy
+      "Date Created" column, displayed to the second.
+    example: "2025-01-10T10:30:00Z"
+  riskRating:
+    type: number
+    nullable: true
+    description: Calculated risk rating total — legacy "Rating" column.
+    example: 24
+  riskTypeCode:
+    type: string
+    nullable: true
+    description: Risk level code (drives the level pill styling).
+    example: "H"
+  codeDescription:
+    type: string
+    nullable: true
+    description: Display description of the risk level — legacy "Level" column.
+    example: "High"
+  rangeLowValue:
+    type: integer
+    nullable: true
+    description: Low bound of the risk-level range.
+    example: 20
+  rangeHighValue:
+    type: integer
+    nullable: true
+    description: High bound of the risk-level range.
+    example: 30
+  ratingDescription:
+    type: string
+    nullable: true
+    description: |
+      Outcome text tied to the risk level (e.g. the check frequency, "2 checks every 12 months")
+      — legacy "Outcome" column.
+    example: "2 checks every 12 months"
+  versionNo:
+    type: integer
+    format: int64
+    nullable: true
+    description: Risk questionnaire template version — legacy "Template Version" column.
+    example: 3

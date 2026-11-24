@@ -1,0 +1,20 @@
+type: object
+description: |
+  A mark site designation row returned by the general timber-mark query (Queries > Mark Site
+  Designations). Unlike the workbench search, this is not limited to expiring records.
+  Sourced from `scs_haul_mark_auth_srch_vw_pkg.search_recs`.
+properties:
+  haulingMarkAuthorizationId:
+    type: integer
+    format: int64
+  timberMark:
+    type: string
+  effectiveDate:
+    type: string
+    format: date
+  expiryDate:
+    type: string
+    format: date
+  orgUnitName:
+    type: string
+    description: Designated district (org unit) name.

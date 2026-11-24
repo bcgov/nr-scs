@@ -1,0 +1,7 @@
+type: object
+properties:
+  scaleConditionClassCode:
+    type: string
+  scaleAuthConditionId:
+    type: integer
+    format: int64
