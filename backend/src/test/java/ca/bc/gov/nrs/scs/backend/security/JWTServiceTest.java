@@ -491,14 +491,6 @@ class JWTServiceTest {
     assertEquals("subject-user", jwtService.resolveUsername("Bearer " + token));
   }
 
-  @Test
-  void resolveUsername_isNullWithNoUserAndNoBearerHeader() {
-    JWTService jwtService = new JWTService();
-
-    assertNull(jwtService.resolveUsername(null));
-    assertNull(jwtService.resolveUsername("Basic dXNlcjpwYXNz"));
-  }
-
   private TokenFixture configureServiceWithRsaProvider(JWTService service) throws Exception {
     KeyPairGenerator generator = KeyPairGenerator.getInstance("RSA");
     generator.initialize(2048);

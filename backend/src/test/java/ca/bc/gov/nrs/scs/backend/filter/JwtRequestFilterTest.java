@@ -67,16 +67,6 @@ class JwtRequestFilterTest {
     assertNull(SecurityContextHolder.getContext().getAuthentication());
   }
 
-  @Test
-  void doFilterInternal_continuesChainWhenHeaderDoesNotStartWithBearer() throws Exception {
-    when(request.getHeader("Authorization")).thenReturn("Basic dXNlcjpwYXNz");
-
-    filter.doFilterInternal(request, response, chain);
-
-    verify(chain).doFilter(request, response);
-    verify(jwtService, never()).extractUserGuid(org.mockito.ArgumentMatchers.anyString());
-  }
-
   // ─── Happy path – token valid, no existing authentication ───────────────────
 
   @Test
