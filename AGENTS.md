@@ -47,6 +47,7 @@ The rest of this file is the technical overview carried over from `bcgov-c/nr-sc
 - DB writes commonly pass the authenticated user from `SecurityContextHolder`; see `ScalerRepository.currentUserId()`.
 - Keep API errors in the OpenAPI shape `{ code, message }` via `backend/src/main/java/.../exception/GlobalApiExceptionHandler.java`.
 - `backend/generated/` is disposable generator output and should not be committed; if you promote a generated class into `src/main/java`, add it to `backend/generated/.openapi-generator-ignore`.
+- `ScsApiApplication.main` calls `OracleTlsCompatibility.allowRsaKeyExchange()` before Spring starts: the shared Oracle database accepts only `TLS_RSA_WITH_AES_256_CBC_SHA`, which Java 21.0.12+ disables. Without it every connection fails with `ORA-17967 ... handshake_failure`. Keep the runtime on Java 21 (pinned in `renovate.json`) until the database offers ECDHE ciphers.
 - Declare any `BeanPostProcessor` `@Bean` method `static` (see `WebConfig.methodValidationPostProcessor`). A non-static one instantiates its config class early, and whatever that class injects is created before the auto-proxy creators exist, losing `@Transactional` and method-security proxies. Startup logs `BeanPostProcessorChecker` warnings when this happens; there should be none.
 
 ### Backend workflow

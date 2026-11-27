@@ -274,4 +274,17 @@ class WarmUpServiceCoverageTest {
 
     assertDoesNotThrow(service::warmUp);
   }
+
+  @Test
+  void describeCauses_reportsTheWholeChainDownToTheRootCause() {
+    Exception root = new java.net.ConnectException("Connection refused");
+    Exception oracle = new java.sql.SQLRecoverableException("IO Error: The Network Adapter could not establish the connection", root);
+    Exception spring = new RuntimeException("Failed to obtain JDBC Connection", oracle);
+
+    org.junit.jupiter.api.Assertions.assertEquals(
+        "RuntimeException: Failed to obtain JDBC Connection"
+            + " <- SQLRecoverableException: IO Error: The Network Adapter could not establish the connection"
+            + " <- ConnectException: Connection refused",
+        WarmUpService.describeCauses(spring));
+  }
 }
