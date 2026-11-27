@@ -1,10 +1,8 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { Amplify } from 'aws-amplify';
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 
 import '@/styles/index.scss';
-import { getAmplifyConfig } from '@/amplify-initializer';
 import App from '@/App.tsx';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { queryClientConfig } from '@/config/react-query/config';
@@ -18,8 +16,6 @@ import updateSW from '@/registerServiceWorker';
 import { validateEnv } from '@/utils/validateEnv';
 
 validateEnv();
-
-Amplify.configure(getAmplifyConfig());
 
 const queryClient = new QueryClient(queryClientConfig);
 

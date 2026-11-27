@@ -95,8 +95,10 @@ jobs:
           # Off on purpose: debug logs the processed Template, including the Secret's stringData.
           debug: false
           overwrite: true
-          # JWT_ISSUER_JWKS_URI is derived from the Cognito pool, and JWT_AUDIENCE is the same
-          # variable the frontend uses as its client id, so the two sides cannot drift apart.
+          # KEYCLOAK_ISSUER_URI / KEYCLOAK_CLIENT_ID are the SAME two GitHub variables the frontend job
+          # passes as VITE_KEYCLOAK_URL / VITE_KEYCLOAK_CLIENT_ID, so the two sides cannot drift apart
+          # (a mismatch only shows after sign-in, as every API call 401ing). Left bare on purpose:
+          # both templates mark them required, so an unset variable fails the deploy.
           # Keep comments out of the multi-line `parameters` scalar: a '#' line ends it.
           parameters:
             -p ZONE="${{ inputs.target }}"
@@ -108,8 +110,8 @@ jobs:
             -p DATABASE_USER="$DATABASE_USER"
             -p DATABASE_PASSWORD="$DATABASE_PASSWORD"
             -p KEYSTORE_SECRET="$KEYSTORE_SECRET"
-            -p JWT_ISSUER_JWKS_URI="${{ vars.COGNITO_USER_POOL_ID != '' && format('https://cognito-idp.{0}.amazonaws.com/{1}/.well-known/jwks.json', vars.COGNITO_REGION || 'ca-central-1', vars.COGNITO_USER_POOL_ID) || '' }}"
-            -p JWT_AUDIENCE="${{ vars.COGNITO_USER_POOL_CLIENT_ID }}"
+            -p KEYCLOAK_ISSUER_URI="${{ vars.KEYCLOAK_ISSUER_URI }}"
+            -p KEYCLOAK_CLIENT_ID="${{ vars.KEYCLOAK_CLIENT_ID }}"
             -p JASPER_SERVER_LOGIN_URL="${{ vars.JASPER_SERVER_LOGIN_URL }}"
             -p JASPER_SERVER_FETCH_URL="${{ vars.JASPER_SERVER_FETCH_URL }}"
             -p JASPER_SERVER_USERNAME="$JASPER_SERVER_USERNAME"
@@ -144,9 +146,7 @@ jobs:
             -p ZONE="${{ inputs.target }}"
             -p NAME="${{ github.event.repository.name }}"
             -p IMAGE_TAG="${{ inputs.tag }}"
-            -p APP_ENV="${{ inputs.target == 'prod' && 'prod' || inputs.target == 'test' && 'test' || 'dev' }}"
-            -p COGNITO_REGION="${{ vars.COGNITO_REGION || 'ca-central-1' }}"
-            -p COGNITO_USER_POOL_ID="${{ vars.COGNITO_USER_POOL_ID }}"
-            -p COGNITO_USER_POOL_CLIENT_ID="${{ vars.COGNITO_USER_POOL_CLIENT_ID }}"
-            -p COGNITO_OAUTH_DOMAIN="${{ vars.COGNITO_OAUTH_DOMAIN }}"
+            -p VITE_KEYCLOAK_URL="${{ vars.KEYCLOAK_ISSUER_URI }}"
+            -p VITE_KEYCLOAK_CLIENT_ID="${{ vars.KEYCLOAK_CLIENT_ID }}"
+            -p VITE_ZONE="${{ inputs.target == 'prod' && 'prod' || inputs.target == 'test' && 'test' || 'dev' }}"
           triggers: ${{ inputs.triggers }}

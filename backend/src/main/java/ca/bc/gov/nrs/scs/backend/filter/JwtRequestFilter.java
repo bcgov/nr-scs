@@ -51,8 +51,8 @@ public class JwtRequestFilter extends OncePerRequestFilter {
         String userId = null;
 
         try {
-            // Principal = the federated IdP user GUID (custom:idp_user_id — IDIR euser GUID for IDIR, BCeID
-            // GUID for BCeID); details = idp_username for audit.
+            // Principal = the federated IdP user GUID (idir_user_guid for IDIR, bceid_user_guid for
+            // BCeID); details = the IdP username for audit.
             userGuid = jwtService.extractUserGuid(jwt);
             userId = jwtService.extractUserId(jwt);
 
@@ -91,14 +91,15 @@ public class JwtRequestFilter extends OncePerRequestFilter {
                 authToken.setDetails(userId);
                 SecurityContextHolder.getContext().setAuthentication(authToken);
             } else if (userGuid == null) {
-                // The token parsed and passed issuer/audience checks, but carries no custom:idp_user_id — so
-                // no principal is set and the request falls through as unauthenticated, surfacing downstream
+                // The token parsed and passed the issuer/azp checks, but carries no IdP user GUID — so no
+                // principal is set and the request falls through as unauthenticated, surfacing downstream
                 // as an opaque 401/403. Log it: this is the one non-exception path that leaves nothing to
-                // grep for, and it means the Cognito attribute mapping isn't populating the claim for this
-                // IdP (verified present for IDIR and BCeID Business — check any newly-added IdP here).
-                LOGGER.warn("Valid JWT for idp_username '{}' carried no 'custom:idp_user_id' claim; no "
-                    + "principal set — request treated as unauthenticated. Check the Cognito attribute "
-                    + "mapping for this IdP.", sanitizeForLog(userId));
+                // grep for, and it means the CSS integration isn't mapping the GUID claims into the
+                // access token for this IdP.
+                LOGGER.warn("Valid JWT for user '{}' carried no IdP user GUID (idir_user_guid / "
+                    + "bceid_user_guid / preferred_username); no principal set — request treated as "
+                    + "unauthenticated. Check the CSS integration's access-token mappers.",
+                    sanitizeForLog(userId));
             }
         } catch (JwtSigningKeyException e) {
             LOGGER.error("JWT Error: Failed to resolve signing key.", e);

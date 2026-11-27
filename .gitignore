@@ -416,10 +416,8 @@ backend/generated/*
 backend/src/main/resources/application.properties
 backend/src/main/resources/application-local.yml
 
-# SCS frontend: build output, and the runtime auth config (generated locally by
-# `npm run generate-amplify-config`, and at container start by docker-entrypoint.sh)
+# SCS frontend: build output (public/config.js is committed; the container rewrites it at start)
 frontend/build/
-frontend/public/amplify-config.js
 
 # SCS E2E suite outputs, and the legacy app kept locally for reference (see AGENTS.md)
 frontend/e2e/.features-gen/

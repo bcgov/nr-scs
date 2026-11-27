@@ -28,57 +28,70 @@ import java.net.URI;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
+import java.util.stream.Stream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Validates BC Gov SSO (Keycloak, standard realm) <strong>access tokens</strong> and reads the caller's
+ * identity and roles from them. Follows the nr-cbr migration (its {@code Oauth2SecurityCustomizer} and
+ * {@code JwtPrincipalUtil}), kept inside SCS's own filter so {@code RolePermissions} and the
+ * forest-client scoping layer are unchanged.
+ *
+ * <h3>Why {@code azp}, not {@code aud}</h3>
+ * The standard realm is shared by many BC Gov applications: all their tokens share this issuer and
+ * verify against this JWKS, so signature + issuer alone do not prove a token was minted for SCS. The
+ * {@code azp} (authorized party) check refuses tokens issued to another integration. Keycloak access
+ * tokens carry {@code aud: "account"} (or nothing useful), so the Cognito-era audience check cannot
+ * be kept.
+ */
 @Component
 public class JWTService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JWTService.class);
 
-    static final String IDP_USERNAME_CLAIM = "custom:idp_username";
-    // The IDIR euser GUID — not the Cognito `sub` (a different UUID that must not stand in as identity).
-    static final String IDP_USER_GUID_CLAIM = "custom:idp_user_id";
-    private static final String JWKS_PATH_SUFFIX = "/.well-known/jwks.json";
+    /** The IdP usernames — the audit user id. Verbatim, never a GUID (see {@link #extractUserId}). */
+    static final List<String> USERNAME_CLAIMS = List.of("idir_username", "bceid_username");
+    /** The IdP user GUIDs — the identity used as principal. */
+    static final List<String> USER_GUID_CLAIMS = List.of("idir_user_guid", "bceid_user_guid");
+    /** CSS realm mappers put the integration's roles here. */
+    static final String CLIENT_ROLES_CLAIM = "client_roles";
+    /** Stock-Keycloak location for the same roles: {@code resource_access.<azp>.roles}. */
+    static final String RESOURCE_ACCESS_CLAIM = "resource_access";
+    /** FAM's per-grant expiry bookkeeping ({@code FAM:EXPIRES:...}) rides with the roles; never a role. */
+    private static final String FAM_BOOKKEEPING_PREFIX = "FAM:";
+    private static final String CERTS_PATH = "/protocol/openid-connect/certs";
 
-    @Value("${jwt.issuer.jwks-uri:}")
-    private String jwksUri;
+    /** Realm issuer, e.g. {@code https://dev.loginproxy.gov.bc.ca/auth/realms/standard}. */
+    @Value("${keycloak.issuer-uri:}")
+    private String issuerUri;
 
-    /**
-     * Expected token issuer ({@code iss}). When blank it is derived from the JWKS URI (Cognito's
-     * issuer is the JWKS base URL), so issuer validation is always active whenever JWT auth is on.
-     */
-    @Value("${jwt.issuer:}")
-    private String configuredIssuer;
-
-    /** Expected token audience ({@code aud}) — the Cognito app client id. Enforced when set. */
-    @Value("${jwt.audience:}")
-    private String audience;
+    /** The CSS integration's client id, required as the token's {@code azp}. */
+    @Value("${keycloak.client-id:}")
+    private String clientId;
 
     // The JwkProvider will handle caching of public keys for us.
     private JwkProvider provider;
 
     @PostConstruct
     public void init() throws MalformedURLException {
-        if (jwksUri == null || jwksUri.trim().isEmpty() || jwksUri.startsWith("${")) {
-            LOGGER.warn("JWT JWKS URI is not configured. JWTService warmup skipped.");
+        if (expectedIssuer() == null) {
+            LOGGER.warn("Keycloak issuer URI is not configured. JWTService warmup skipped.");
             return;
         }
-
-        if (expectedIssuer() == null) {
-            LOGGER.warn("JWT issuer validation is DISABLED: neither 'jwt.issuer' nor a derivable "
-                + "issuer from 'jwt.issuer.jwks-uri' is available. Tokens will not be checked against "
-                + "an expected issuer.");
-        }
-        if (trimToNull(audience) == null) {
-            LOGGER.warn("JWT audience validation is DISABLED: 'jwt.audience' is not set. Tokens minted "
-                + "for a different app client (same user pool) will be accepted. Set 'jwt.audience' to "
-                + "the Cognito app client id.");
+        if (expectedClientId() == null) {
+            // Fail closed: without it any token the shared realm signs, for any application, would pass.
+            throw new IllegalStateException("keycloak.client-id (KEYCLOAK_CLIENT_ID) must be set when "
+                + "keycloak.issuer-uri is configured: it is checked as the token's azp, and without it "
+                + "tokens issued to any other application on the shared realm would be accepted.");
         }
 
         long start = System.currentTimeMillis();
@@ -95,7 +108,7 @@ public class JWTService {
                 LOGGER.info("Successfully reached JWKS endpoint in {}ms", System.currentTimeMillis() - start);
             }
 
-            // 2. Initialize the JwkProvider using the configured jwt.issuer.jwks-uri.
+            // 2. Initialize the JwkProvider against the realm JWKS (<issuer>/protocol/openid-connect/certs).
             // The provider handles fetching, caching, and rate limiting.
             this.provider = new JwkProviderBuilder(url).build();
 
@@ -112,7 +125,12 @@ public class JWTService {
     }
 
     private URL toJwksUrl() throws MalformedURLException {
-        return URI.create(jwksUri).toURL();
+        return URI.create(jwksUri()).toURL();
+    }
+
+    /** The realm's JWKS endpoint, derived from the issuer (Keycloak publishes keys under /certs). */
+    String jwksUri() {
+        return expectedIssuer() + CERTS_PATH;
     }
 
     private void warmUpProviderFetch() {
@@ -125,8 +143,8 @@ public class JWTService {
     }
 
     /**
-     * The Cognito {@code sub} — a per-user-pool UUID, NOT the user's identity. Named {@code extractSubject}
-     * (not {@code extractUsername}) deliberately: reading identity from {@code sub} was the original bug.
+     * The token {@code sub} — a realm-internal id, NOT the user's identity. Named {@code extractSubject}
+     * (not {@code extractUsername}) deliberately: reading identity from {@code sub} was an earlier bug.
      * Use {@link #extractUserGuid} for identity and {@link #extractUserId} for the audit username.
      */
     public String extractSubject(String token) {
@@ -138,26 +156,51 @@ public class JWTService {
         return extractUserId(claims);
     }
 
+    /**
+     * The audit user id: {@code idir_username} or {@code bceid_username}, verbatim. Deliberately no GUID
+     * fallback (unlike nr-cbr): SCS's audit columns hold usernames, and a GUID there would silently stop
+     * matching rows written by the legacy application. {@code null} when neither claim is present — which
+     * means the CSS integration is not adding the username mappers to the <em>access</em> token.
+     */
     String extractUserId(Claims claims) {
-        Object value = claims.get(IDP_USERNAME_CLAIM);
-        if (value == null) {
-            return null;
-        }
-        String text = String.valueOf(value).trim();
-        return text.isEmpty() ? null : text;
+        return USERNAME_CLAIMS.stream()
+            .map(name -> claimText(claims, name))
+            .filter(value -> value != null)
+            .findFirst()
+            .orElse(null);
     }
 
     /**
-     * The federated IdP user GUID ({@code custom:idp_user_id}) — the user's identity, not the Cognito
-     * {@code sub}. The IDIR euser GUID for IDIR users; the BCeID GUID for BCeID users. Cognito's attribute
-     * mapping populates it per IdP (confirmed for IDIR and BCeID Business); {@code null} if absent.
+     * The federated IdP user GUID — the user's identity, not the token {@code sub}: {@code idir_user_guid}
+     * or {@code bceid_user_guid}, else the GUID the standard realm puts before the {@code @} in
+     * {@code preferred_username} ({@code <guid>@azureidir}). Upper-cased: the two sources can differ in
+     * case within one token, and the legacy tables store the GUID upper-case. {@code null} if absent.
      */
     public String extractUserGuid(String token) {
         return extractUserGuid(extractAllClaims(token));
     }
 
     String extractUserGuid(Claims claims) {
-        Object value = claims.get(IDP_USER_GUID_CLAIM);
+        return Stream.concat(
+                USER_GUID_CLAIMS.stream().map(name -> claimText(claims, name)),
+                Stream.of(guidFromPreferredUsername(claims)))
+            .filter(value -> value != null)
+            .map(value -> value.toUpperCase(Locale.ROOT))
+            .findFirst()
+            .orElse(null);
+    }
+
+    private static String guidFromPreferredUsername(Claims claims) {
+        String preferred = claimText(claims, "preferred_username");
+        if (preferred == null) {
+            return null;
+        }
+        int at = preferred.indexOf('@');
+        return at > 0 ? preferred.substring(0, at) : null;
+    }
+
+    private static String claimText(Claims claims, String name) {
+        Object value = claims.get(name);
         if (value == null) {
             return null;
         }
@@ -177,7 +220,7 @@ public class JWTService {
     private Claims extractAllClaims(String token) {
         if (provider == null) {
             throw new JwtSigningKeyException(
-                "JWKS provider is not initialized. Check jwt.issuer.jwks-uri configuration.",
+                "JWKS provider is not initialized. Check keycloak.issuer-uri configuration.",
                 new IllegalStateException("JWTService has not been initialized with a JWKS provider.")
             );
         }
@@ -193,39 +236,44 @@ public class JWTService {
                     }
                 });
 
-        // Reject tokens minted for a different Cognito user pool (issuer) or app client (audience),
-        // even if they are signed with a key this JWKS endpoint trusts.
+        // Reject tokens minted by another realm (issuer), even if signed with a key this JWKS trusts.
         String expectedIssuer = expectedIssuer();
         if (expectedIssuer != null) {
             parserBuilder.requireIssuer(expectedIssuer);
         }
-        String expectedAudience = trimToNull(audience);
-        if (expectedAudience != null) {
-            parserBuilder.requireAudience(expectedAudience);
-        }
 
-        return parserBuilder
+        Claims claims = parserBuilder
                 .build()
                 .parseSignedClaims(token)
                 .getPayload();
+
+        // ...and tokens the shared realm issued to another application (authorized party).
+        String expectedClientId = expectedClientId();
+        String authorizedParty = claimText(claims, "azp");
+        if (expectedClientId == null || !expectedClientId.equals(authorizedParty)) {
+            throw new io.jsonwebtoken.JwtException(
+                "Token was not issued to this application (azp=" + authorizedParty + ")");
+        }
+        return claims;
     }
 
     /**
-     * The issuer to require on incoming tokens: the explicitly configured {@code jwt.issuer} if set,
-     * otherwise the JWKS URI with its {@code /.well-known/jwks.json} suffix stripped (the Cognito
-     * issuer). Returns {@code null} when neither is available, in which case issuer validation is
-     * skipped (logged as a warning at startup).
+     * The realm issuer to require ({@code keycloak.issuer-uri}), with all whitespace and any trailing
+     * slash removed. Whitespace matters: the JWKS URI is composed from it, so a trailing space on the
+     * variable would land mid-URI and take the API down (nr-cbr hit exactly this). {@code null} when
+     * not configured.
      */
     String expectedIssuer() {
-        String explicit = trimToNull(configuredIssuer);
-        if (explicit != null) {
-            return explicit;
+        String uri = trimToNull(issuerUri);
+        if (uri == null || uri.startsWith("${")) {
+            return null;
         }
-        String uri = trimToNull(jwksUri);
-        if (uri != null && uri.endsWith(JWKS_PATH_SUFFIX)) {
-            return uri.substring(0, uri.length() - JWKS_PATH_SUFFIX.length());
-        }
-        return null;
+        String compact = uri.replaceAll("\\s+", "");
+        return compact.endsWith("/") ? compact.substring(0, compact.length() - 1) : compact;
+    }
+
+    String expectedClientId() {
+        return trimToNull(clientId);
     }
 
     public Boolean isTokenExpired(String token) {
@@ -237,15 +285,14 @@ public class JWTService {
         return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
     }
 
-    @SuppressWarnings("unchecked")
     public List<GrantedAuthority> extractAuthorities(String token) {
         final Claims claims = extractAllClaims(token);
         final List<GrantedAuthority> authorities = new ArrayList<>();
 
-        final List<String> groups = claims.get("cognito:groups", List.class);
-        LOGGER.debug("User with token has groups: {}", groups == null ? "null" : groups.toString());
+        final List<String> groups = extractRoleClaims(claims);
+        LOGGER.debug("User with token has roles: {}", groups);
 
-        if (groups != null) {
+        if (!groups.isEmpty()) {
             // Map every defined role present in the token to a granted authority, using the canonical
             // role name so downstream authorization rules match it exactly. Matching is case-insensitive
             // and exact, except external roles which FAM delivers client-scoped as <role>_<clientNumber>
@@ -264,7 +311,7 @@ public class JWTService {
     }
 
     /**
-     * True when a Cognito group grants the given role: an exact (case-insensitive) match, or — for an
+     * True when a role claim grants the given role: an exact (case-insensitive) match, or — for an
      * external role FAM delivers client-scoped as {@code <role>_<clientNumber>} — the prefixed form
      * with an all-digits client suffix (e.g. {@code SCS_OWNER_00001074} grants {@code SCS_OWNER}).
      */
@@ -284,7 +331,7 @@ public class JWTService {
 
     /**
      * Extracts the set of forest client numbers that scope an external (BCeID) user's data access.
-     * Reads the same {@code cognito:groups} claim as {@link #extractAuthorities}, but is additive and
+     * Reads the same role claims as {@link #extractAuthorities}, but is additive and
      * independent: the FAM forest-client-scoped groups have the shape {@code <role>_<clientNumber>}
      * (e.g. {@code SCS_OWNER_00001074}), so a group whose prefix is a recognised external role
      * contributes its (padded) numeric client-number suffix. Returns an empty set for internal users
@@ -295,10 +342,9 @@ public class JWTService {
         return extractForestClientNumbers(extractAllClaims(token));
     }
 
-    @SuppressWarnings("unchecked")
     Set<String> extractForestClientNumbers(Claims claims) {
-        final List<String> groups = claims.get("cognito:groups", List.class);
-        if (groups == null || groups.isEmpty()) {
+        final List<String> groups = extractRoleClaims(claims);
+        if (groups.isEmpty()) {
             return Set.of();
         }
         final Set<String> clientNumbers = new LinkedHashSet<>();
@@ -309,6 +355,37 @@ public class JWTService {
             }
         }
         return clientNumbers;
+    }
+
+    /**
+     * The caller's role strings: {@code client_roles} (CSS realm mappers) plus
+     * {@code resource_access.<client-id>.roles} (stock Keycloak), trimmed, de-duplicated, with FAM's
+     * {@code FAM:} bookkeeping entries dropped. Both locations are read because which one is populated
+     * depends on how the integration is configured, and a switch would otherwise silently leave every
+     * user with no roles. FAM delivers external roles client-scoped ({@code SCS_OWNER_00001074}) in the
+     * same list; {@link #extractAuthorities} and {@link #extractForestClientNumbers} parse them as before.
+     */
+    List<String> extractRoleClaims(Claims claims) {
+        List<String> roles = new ArrayList<>(asStringList(claims.get(CLIENT_ROLES_CLAIM)));
+        Object resourceAccess = claims.get(RESOURCE_ACCESS_CLAIM);
+        String expectedClientId = expectedClientId();
+        if (resourceAccess instanceof Map<?, ?> byClient && expectedClientId != null
+                && byClient.get(expectedClientId) instanceof Map<?, ?> forThisClient) {
+            roles.addAll(asStringList(forThisClient.get("roles")));
+        }
+        return roles.stream()
+            .filter(role -> role != null && !role.isBlank())
+            .map(String::trim)
+            .filter(role -> !role.toUpperCase(Locale.ROOT).startsWith(FAM_BOOKKEEPING_PREFIX))
+            .distinct()
+            .toList();
+    }
+
+    private static List<String> asStringList(Object claim) {
+        if (!(claim instanceof Collection<?> values)) {
+            return List.of();
+        }
+        return values.stream().filter(String.class::isInstance).map(String.class::cast).toList();
     }
 
     /**

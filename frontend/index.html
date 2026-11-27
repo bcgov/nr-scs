@@ -4,11 +4,13 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="%BASE_URL%icon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <!-- Load Amplify config before React app (templated at deploy time).
+    <!-- Runtime config (window.config: Keycloak issuer/client id, zone) loaded before the app.
+         In the container, docker-entrypoint.sh writes it from the Deployment's env vars, so one
+         image serves every zone; in local dev it is the placeholder in public/config.js.
          Must be base-absolute (%BASE_URL%), not relative: a relative src resolves against the
-         current route, so refreshing a deep link (e.g. /pub/scs/scalers/view/123) would request
-         .../scalers/view/amplify-config.js and 404, crashing the app before Amplify initializes. -->
-    <script src="%BASE_URL%amplify-config.js"></script>
+         current route, so refreshing a deep link (e.g. /scalers/view/123) would request
+         .../scalers/view/config.js and 404. -->
+    <script src="%BASE_URL%config.js"></script>
     <title>SCS</title>
   </head>
   <body>

@@ -52,6 +52,7 @@ export const testAuthContext = (user: FamLoginUser | undefined): AuthContextType
   isLoading: false,
   login: vi.fn(),
   logout: vi.fn(),
+  completeSignIn: vi.fn().mockResolvedValue(undefined),
   userToken: vi.fn().mockResolvedValue('test-token'),
 });
 

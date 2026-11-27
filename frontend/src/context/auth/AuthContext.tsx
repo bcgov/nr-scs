@@ -8,6 +8,8 @@ export type AuthContextType = {
   isLoading: boolean;
   login: (provider: IdpProviderType) => void;
   logout: () => void;
+  /** Completes the OAuth authorization-code exchange on `/authCallback`. No-op in mock mode. */
+  completeSignIn: () => Promise<void>;
   userToken: () => Promise<string | undefined>;
 };
 

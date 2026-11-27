@@ -67,6 +67,7 @@ import ExamUpgradesAdminPage from '@/pages/Administration/Maintenance/ExamUpgrad
 import QuestionsAdminPage from '@/pages/Administration/Maintenance/Questions';
 import SystemAdminPage from '@/pages/Administration/Maintenance/System';
 import ValidLicenceAttributesAdminPage from '@/pages/Administration/Maintenance/ValidLicenceAttributes';
+import AuthCallbackPage from '@/pages/AuthCallback';
 import ProtectedRoute from './ProtectedRoute';
 
 /**
@@ -93,6 +94,15 @@ export const APP_ROUTES: AppRoute[] = [
     path: '/',
     id: 'RootRedirect',
     element: <Navigate to="/welcome" replace />,
+  },
+
+  // OAuth redirect target (Keycloak). Public — the session does not exist until AuthCallbackPage
+  // performs the authorization-code exchange — and must stay above the '*' catch-all, which would
+  // otherwise render Not Found for /authCallback?code=…&state= before the code could be spent.
+  {
+    path: '/authCallback',
+    id: 'AuthCallback',
+    element: <AuthCallbackPage />,
   },
 
   // Main application pages

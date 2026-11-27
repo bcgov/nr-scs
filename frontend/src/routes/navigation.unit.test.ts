@@ -174,9 +174,10 @@ describe('navigation', () => {
    * reach without ever touching the menu, so they need the check more, not less.
    */
   it('requires a permission on every route except the deliberately open ones', () => {
-    // The five routes that must stay open: the entry/redirect pair, the two error pages (a user sent
-    // to /unauthorized must be able to render it), and the catch-all.
-    const openByDesign = new Set(['/', '/welcome', '/unauthorized', '/error', '*']);
+    // The six routes that must stay open: the entry/redirect pair, the OAuth sign-in callback (the
+    // session does not exist until it runs), the two error pages (a user sent to /unauthorized must
+    // be able to render it), and the catch-all.
+    const openByDesign = new Set(['/', '/welcome', '/authCallback', '/unauthorized', '/error', '*']);
 
     const routePermissions = routePermissionsByPath();
     expect(routePermissions.size).toBeGreaterThan(50);
@@ -228,7 +229,7 @@ describe('navigation', () => {
     // Keeps the allowlist honest: a route that gains a permission must leave `openByDesign`, or the
     // exemption silently outlives its reason and would wave through a later regression on that path.
     const routePermissions = routePermissionsByPath();
-    const stale = ['/', '/welcome', '/unauthorized', '/error', '*'].filter(
+    const stale = ['/', '/welcome', '/authCallback', '/unauthorized', '/error', '*'].filter(
       (path) => routePermissions.get(path) !== undefined,
     );
 

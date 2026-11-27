@@ -41,8 +41,11 @@ spring:
         javax.net.ssl.trustStorePassword: ${KEYSTORE_SECRET:}
 
 # --- Authentication -------------------------------------------------------------------------------
-# FAM/Cognito JWT validation, carried over unchanged from the WAR. Keycloak replaces this in a
-# follow-up. Mock auth (security.jwt.enabled=false) is refused at startup unless
+# BC Gov SSO (Keycloak, standard realm) access tokens, validated by JWTService: signature against the
+# realm JWKS (<issuer>/protocol/openid-connect/certs), issuer, and azp == client id. The frontend takes
+# the SAME two values as VITE_KEYCLOAK_URL / VITE_KEYCLOAK_CLIENT_ID; a mismatch fails only after a
+# successful sign-in (every API call 401s).
+# Mock auth (security.jwt.enabled=false, or no issuer) is refused at startup unless
 # scs.app.environment is LOCAL or DEV — see SecurityConfig.
 security:
   jwt:
@@ -50,11 +53,11 @@ security:
   mock:
     user-name: ${SECURITY_MOCK_USER_NAME:MOCK_CLERICAL}
     user-guid: ${SECURITY_MOCK_USER_GUID:}
-jwt:
-  issuer:
-    jwks-uri: ${JWT_ISSUER_JWKS_URI:}
-  # Expected audience (Cognito app client id). Tokens minted for another client are rejected.
-  audience: ${JWT_AUDIENCE:}
+keycloak:
+  # e.g. https://dev.loginproxy.gov.bc.ca/auth/realms/standard
+  issuer-uri: ${KEYCLOAK_ISSUER_URI:}
+  # The CSS integration's client id, required as the token's azp.
+  client-id: ${KEYCLOAK_CLIENT_ID:}
 
 # Comma-separated. Leave blank when the frontend is served same-origin (Caddy proxies /api).
 cors:

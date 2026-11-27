@@ -73,14 +73,15 @@ parameters:
     description: Passphrase for the Oracle TCPS trust store built by the init container
     required: true
 
-  # --- Authentication (FAM/Cognito JWT validation; replaced by Keycloak in a follow-up) ---
-  # Required: with no JWKS URI the backend would fall back to mock auth, which SecurityConfig refuses
-  # outside LOCAL/DEV, so the pod would not start. Failing here gives the clearer error.
-  - name: JWT_ISSUER_JWKS_URI
-    description: https://cognito-idp.<region>.amazonaws.com/<user-pool-id>/.well-known/jwks.json
+  # --- Authentication: BC Gov SSO (Keycloak, standard realm) ---
+  # Required: with no issuer the backend would fall back to mock auth, which SecurityConfig refuses
+  # outside LOCAL/DEV, and with no client id JWTService refuses to start (it is checked as the token's
+  # azp). Failing here gives the clearer error. The frontend takes the SAME two values.
+  - name: KEYCLOAK_ISSUER_URI
+    description: Realm issuer URI (https://<env>.loginproxy.gov.bc.ca/auth/realms/standard)
     required: true
-  - name: JWT_AUDIENCE
-    description: Expected token audience (the Cognito app client id)
+  - name: KEYCLOAK_CLIENT_ID
+    description: The CSS integration's client id, validated as the token's azp
     required: true
 
   # --- JasperReports Server ---
@@ -196,10 +197,10 @@ objects:
                   value: ${APP_LOG_LEVEL}
                 - name: SECURITY_JWT_ENABLED
                   value: "true"
-                - name: JWT_ISSUER_JWKS_URI
-                  value: ${JWT_ISSUER_JWKS_URI}
-                - name: JWT_AUDIENCE
-                  value: ${JWT_AUDIENCE}
+                - name: KEYCLOAK_ISSUER_URI
+                  value: ${KEYCLOAK_ISSUER_URI}
+                - name: KEYCLOAK_CLIENT_ID
+                  value: ${KEYCLOAK_CLIENT_ID}
                 - name: DATABASE_HOST
                   value: ${DATABASE_HOST}
                 - name: DATABASE_SERVICE_NAME
@@ -404,7 +405,7 @@ objects:
       policyTypes:
         - Ingress
 
-  # Egress: explicit permit-all (Oracle, JasperReports Server, CHES, FAM/Cognito JWKS). Documents
+  # Egress: explicit permit-all (Oracle, JasperReports Server, CHES, the Keycloak realm JWKS). Documents
   # intent; it does not restrict anything the namespace default allows.
   - apiVersion: networking.k8s.io/v1
     kind: NetworkPolicy

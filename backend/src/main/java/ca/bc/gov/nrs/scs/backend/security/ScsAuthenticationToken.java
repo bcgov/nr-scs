@@ -9,11 +9,11 @@ import org.springframework.security.core.GrantedAuthority;
  * {@link UserAccessScope} (data-scoping / L4), kept deliberately separate from authorities (role
  * gating / RBAC — owned by a different effort).
  *
- * <p>Principal = the federated IdP user GUID ({@code custom:idp_user_id} — the IDIR euser GUID for IDIR,
- * the BCeID GUID for BCeID), so {@code getName()} returns it; details = the audit {@code idp_username}.
+ * <p>Principal = the federated IdP user GUID ({@code idir_user_guid} — the IDIR euser GUID for IDIR;
+ * {@code bceid_user_guid} for BCeID), so {@code getName()} returns it; details = the audit IdP username.
  * This is the contract {@code SecurityContextUtils.currentUserGuidOrNull()} depends on — the principal is
- * the identity GUID, NOT the Cognito {@code sub}. (It previously was the subject; resolving identity from
- * {@code sub} was the bug this token's principal now fixes — keep principal = idp_user_id.) The scope is
+ * the identity GUID, NOT the token {@code sub}. (It previously was the subject; resolving identity from
+ * {@code sub} was the bug this token's principal now fixes — keep principal = the IdP GUID.) The scope is
  * purely additive.
  */
 public class ScsAuthenticationToken extends AbstractAuthenticationToken {

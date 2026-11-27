@@ -109,7 +109,7 @@ if it is genuinely domain-agnostic.
    code LOVs and create calls 500. (Also: start the DB *before* the backend — the backend's Spring
    context fails to initialize if the Oracle listener isn't up yet, and then every `/api` route 404s.)
 3. **Frontend** (`nr-scs/frontend`) on `:3000` with `VITE_MOCK_USER=true` (`npm start`).
-   Mock auth auto-logs-in an `SCS_SYS_ADMIN` user — no Cognito/login flow needed.
+   Mock auth auto-logs-in an `SCS_SYS_ADMIN` user — no Keycloak/login flow needed.
 
 ## Seeded database image — how it's built and refreshed
 

@@ -16,7 +16,7 @@ function toPublicUrl(raw?: string): string {
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '');
 
-  // Fail closed: mock auth bypasses FAM/Cognito and grants a SYS_ADMIN user, so it must never be
+  // Fail closed: mock auth bypasses BC Gov SSO (Keycloak) and grants a SYS_ADMIN user, so it must never be
   // compiled into anything but the local dev server. Refuse the build rather than ship a bypass.
   if (mode !== 'development' && env.VITE_MOCK_USER === 'true') {
     throw new Error(
@@ -54,6 +54,9 @@ export default defineConfig(({ mode }) => {
         },
         workbox: {
           maximumFileSizeToCacheInBytes: 6 * 1024 * 1024,
+          // config.js is rewritten at container start (Keycloak issuer/client id); precaching it
+          // would serve a stale copy after a redeploy changes those values.
+          globIgnores: ['**/config.js'],
         },
       }),
     ],

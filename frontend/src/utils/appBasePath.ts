@@ -1,24 +1,17 @@
 /**
  * Determines the application's base path for routing and API calls.
- * 
- * In development mode (Vite dev server), it defaults to '/'.
- * In production builds, it's typically set during the build process
- * via the 'base' property in vite.config.ts, which is exposed as 
- * import.meta.env.BASE_URL.
+ *
+ * In development mode (Vite dev server), it is always '/'. In production builds it is the Vite
+ * `base` (`import.meta.env.BASE_URL`, from `PUBLIC_URL` at build time) — '/' on OpenShift, where
+ * the app is served from the root of its route and Caddy proxies `/api` to the backend.
  */
-
 export const getAppBasePath = (): string => {
   // Always use '/' for local development with the Vite dev server.
   if (import.meta.env.DEV) {
     return '/';
   }
 
-  // Use the context provided in the runtime Amplify config if available,
-  // falling back to the build-time BASE_URL.
-  const context = window.amplifyConfig?.Auth?.Cognito?.context;
-  const baseUrl = import.meta.env.BASE_URL || '/';
-
-  let path = (context && context.trim() !== '') ? context : baseUrl;
+  let path = (import.meta.env.BASE_URL || '/').trim() || '/';
 
   // Ensure it starts with '/' and does not end with '/'
   if (!path.startsWith('/')) {

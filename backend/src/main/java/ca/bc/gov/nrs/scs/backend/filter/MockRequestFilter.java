@@ -105,7 +105,7 @@ public class MockRequestFilter extends OncePerRequestFilter {
             }
 
             // Mirror JwtRequestFilter: principal = user GUID (like the token subject), details = the
-            // username for audit fields (like custom:idp_username). X-Mock-Client stands in for the
+            // username for audit fields (like idir_username). X-Mock-Client stands in for the
             // token's entitled set, and the same resolver narrows it to one active client — so the
             // switcher can be exercised locally by giving the mock several clients.
             UserAccessScope scope;

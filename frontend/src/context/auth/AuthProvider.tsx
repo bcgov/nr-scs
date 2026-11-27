@@ -5,7 +5,7 @@ import { MockAuthProvider } from './MockAuthProvider';
 import { type AuthProviderProps } from './AuthContext';
 
 /**
- * High-level AuthProvider that toggles between real FAM/Amplify integration
+ * High-level AuthProvider that toggles between real BC Gov SSO (Keycloak)
  * and a local mock clerical user based on environment configuration.
  */
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
