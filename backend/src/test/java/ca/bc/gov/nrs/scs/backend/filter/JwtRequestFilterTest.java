@@ -71,8 +71,8 @@ class JwtRequestFilterTest {
 
   @Test
   void doFilterInternal_setsPrincipalToUserGuidAndDetailsToIdpUsername() throws Exception {
-    // Principal must be the federated IdP user GUID (custom:idp_user_id — IDIR euser GUID or BCeID GUID),
-    // NOT the Cognito sub; details is the idp_username used for audit fields.
+    // Principal must be the federated IdP user GUID (idir_user_guid — IDIR euser GUID — or bceid_user_guid),
+    // NOT the token sub; details is the IdP username used for audit fields.
     when(request.getHeader("Authorization")).thenReturn("Bearer valid.token");
     when(jwtService.extractUserGuid("valid.token")).thenReturn("F5E59074276C40558FF6A17CF1AB3EC2");
     when(jwtService.extractUserId("valid.token")).thenReturn("JSMITH");

@@ -41,9 +41,11 @@
 		Cache-Control "no-store, no-cache, must-revalidate, proxy-revalidate"
 		X-Content-Type-Options "nosniff"
 		Strict-Transport-Security "max-age=31536000"
-		# Same policy the WAR served (backend csp.policy). connect-src/form-action allow FAM/Cognito,
-		# which Amplify signs in through; img-src blob: is for report previews. Revisit with Keycloak.
-		Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self' https://*.amazoncognito.com https://cognito-idp.ca-central-1.amazonaws.com; frame-ancestors 'none'; form-action 'self' https://*.amazoncognito.com; object-src 'none'; base-uri 'self';"
+		# The policy the WAR served (backend csp.policy), with Cognito swapped for BC Gov SSO:
+		# oidc-client-ts fetches the realm's discovery document, JWKS and token endpoint from
+		# *.loginproxy.gov.bc.ca. Sign-in and sign-out are top-level navigations, which CSP does not
+		# restrict. img-src blob: is for report previews.
+		Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self' https://loginproxy.gov.bc.ca https://*.loginproxy.gov.bc.ca; frame-ancestors 'none'; form-action 'self'; object-src 'none'; base-uri 'self';"
 		Referrer-Policy "same-origin"
 		Permissions-Policy "fullscreen=(self), camera=(), microphone=()"
 		Cross-Origin-Resource-Policy "same-origin"

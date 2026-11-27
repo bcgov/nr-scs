@@ -11,12 +11,10 @@ vi.mock('@/env', () => ({
 
 import { validateEnv } from './validateEnv';
 
-const win = window as unknown as { amplifyConfig?: unknown };
 let consoleError: ReturnType<typeof vi.spyOn>;
 
 beforeEach(() => {
   env.current = {};
-  delete win.amplifyConfig;
   consoleError = vi.spyOn(console, 'error').mockImplementation(() => undefined);
 });
 afterEach(() => consoleError.mockRestore());
@@ -30,35 +28,34 @@ describe('validateEnv', () => {
     expect(consoleError).not.toHaveBeenCalled();
   });
 
-  it('accepts a runtime amplify configuration', () => {
-    win.amplifyConfig = { Auth: {} };
+  it('accepts the Keycloak issuer and client id', () => {
+    env.current = {
+      VITE_KEYCLOAK_URL: ' https://dev.loginproxy.gov.bc.ca/auth/realms/standard ',
+      VITE_KEYCLOAK_CLIENT_ID: 'scs-client',
+    };
 
     validateEnv();
 
     expect(consoleError).not.toHaveBeenCalled();
   });
 
-  it('accepts build-time user pool variables', () => {
-    env.current = { VITE_USER_POOLS_ID: ' pool ', VITE_USER_POOLS_WEB_CLIENT_ID: 'client' };
+  it('complains when neither is present, including blank values', () => {
+    env.current = { VITE_KEYCLOAK_URL: '  ', VITE_KEYCLOAK_CLIENT_ID: '' };
 
     validateEnv();
 
-    expect(consoleError).not.toHaveBeenCalled();
+    expect(consoleError).toHaveBeenCalledWith(
+      expect.stringContaining('VITE_KEYCLOAK_URL and VITE_KEYCLOAK_CLIENT_ID not set'),
+    );
   });
 
-  it('complains when neither source is present, including blank variables', () => {
-    env.current = { VITE_USER_POOLS_ID: '  ', VITE_USER_POOLS_WEB_CLIENT_ID: '' };
+  it('complains when only one of the two is set', () => {
+    env.current = { VITE_KEYCLOAK_URL: 'https://issuer' };
 
     validateEnv();
 
-    expect(consoleError).toHaveBeenCalledWith(expect.stringContaining('No Cognito auth configuration found'));
-  });
-
-  it('complains when only one of the two build-time variables is set', () => {
-    env.current = { VITE_USER_POOLS_ID: 'pool' };
-
-    validateEnv();
-
-    expect(consoleError).toHaveBeenCalledTimes(1);
+    expect(consoleError).toHaveBeenCalledWith(
+      expect.stringContaining('VITE_KEYCLOAK_CLIENT_ID not set'),
+    );
   });
 });

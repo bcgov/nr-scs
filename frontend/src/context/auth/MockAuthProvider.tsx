@@ -87,6 +87,9 @@ export const MockAuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     return 'mock-jwt-token';
   };
 
+  // There is no redirect in mock mode, so there is no code to exchange.
+  const completeSignIn = async () => {};
+
   // Derive the mock user from the current provider + developer-selected roles/client so switching
   // them live-updates authorization and client scoping (e.g. dropping SCS_SYS_ADMIN redirects to
   // /unauthorized; picking a client locks the search filter — exactly as real auth would).
@@ -116,6 +119,7 @@ export const MockAuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       isLoading: false,
       login,
       logout,
+      completeSignIn,
       userToken,
     }),
     [user],

@@ -1,5 +1,4 @@
 import axios from 'axios';
-import { fetchAuthSession, signOut } from 'aws-amplify/auth';
 import { notify } from '@/context/notification/notificationBridge';
 import { CheckScalesService } from '@/services/checkScales.service';
 import { SummaryCheckScalesService } from '@/services/summaryCheckScales.service';
@@ -25,6 +24,7 @@ import { ScaleSitesService } from '@/services/scaleSites.service';
 import { ScalerRiskAssessmentsService } from '@/services/scalerRiskAssessments.service';
 import { SignatureBlocksService } from '@/services/signatureBlocks.service';
 import { WelcomeService } from '@/services/welcome.service';
+import { clearLocalSession, ensureFreshUser } from '@/services/keycloak';
 import { getApiBasePath } from '@/utils/appBasePath';
 
 import type { APIConfig } from '@/config/api/types';
@@ -44,10 +44,12 @@ export const BackendApiConfig: APIConfig = {
   VERSION: '0',
   WITH_CREDENTIALS: true,
   CREDENTIALS: 'include',
+  // The Keycloak ACCESS token (renewed first if near expiry): the API validates its issuer and
+  // that it was issued to this integration (azp), and reads the roles from it.
   TOKEN: async () => {
     try {
-      const session = await fetchAuthSession();
-      return session.tokens?.idToken?.toString() ?? '';
+      const current = await ensureFreshUser();
+      return current?.access_token ?? '';
     } catch {
       return '';
     }
@@ -86,7 +88,7 @@ axios.interceptors.response.use(
       if (hasAuthHeader && !isAlreadyOnWelcome && !isSigningOut) {
         isSigningOut = true;
         try {
-          await signOut({ global: true }).catch(() => {});
+          await clearLocalSession();
         } finally {
           if (isWindowAvailable) {
             window.location.replace('/welcome');

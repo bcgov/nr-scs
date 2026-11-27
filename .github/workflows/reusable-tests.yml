@@ -49,5 +49,5 @@ jobs:
           # Deep link: Caddy must fall back to index.html for client-side routes.
           curl -fsS "${BASE_URL}/scalers" | grep -q '<div id="root">'
           # Generated at container start by frontend/docker-entrypoint.sh.
-          curl -fsS "${BASE_URL}/amplify-config.js" | grep -q 'window.amplifyConfig'
+          curl -fsS "${BASE_URL}/config.js" | grep -q 'VITE_KEYCLOAK_URL'
           echo "Frontend OK."

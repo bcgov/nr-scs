@@ -6,7 +6,9 @@
 #
 # Day-to-day development is still `mvn spring-boot:run` (backend) + `npm start` (frontend, Vite on
 # :3000 with mock auth); see README.md. The frontend image is a production build, so it signs in
-# through FAM/Cognito and cannot use the mock user.
+# through BC Gov SSO (Keycloak) and cannot use the mock user. To sign in locally, register
+# http://localhost:3000/authCallback on the CSS integration and set the two KEYCLOAK values below
+# (and KEYCLOAK_ISSUER_URI / KEYCLOAK_CLIENT_ID in backend/.env).
 services:
   backend:
     build: ./backend
@@ -27,6 +29,8 @@ services:
     environment:
       BACKEND_URL: http://backend:8080
       LOG_LEVEL: info
-      APP_URL: http://localhost:3000
+      VITE_KEYCLOAK_URL: ${KEYCLOAK_ISSUER_URI:-}
+      VITE_KEYCLOAK_CLIENT_ID: ${KEYCLOAK_CLIENT_ID:-}
+      VITE_ZONE: dev
     ports:
       - "3000:3000"

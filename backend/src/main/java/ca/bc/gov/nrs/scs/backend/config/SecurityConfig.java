@@ -65,8 +65,8 @@ public class SecurityConfig {
     @Value("${cors.allowed-origins:}")
     private String corsAllowedOrigins;
 
-    @Value("${jwt.issuer.jwks-uri:}")
-    private String jwksUri;
+    @Value("${keycloak.issuer-uri:}")
+    private String issuerUri;
 
     @Value("${security.mock.user-name:MOCK_CLERICAL}")
     private String mockUserName;
@@ -90,7 +90,7 @@ public class SecurityConfig {
     /**
      * Generic, environment-agnostic Content-Security-Policy used only as a fallback when
      * {@code csp.policy} is not configured, so CSP is never silently absent. It is intentionally
-     * same-origin only — the operational, environment-specific policy (e.g. allowing Cognito auth
+     * same-origin only — the operational, environment-specific policy (e.g. allowing the SSO auth
      * endpoints) lives in the {@code csp.policy} property / deployment template, which is the single
      * source of truth and overrides this baseline.
      */
@@ -125,7 +125,7 @@ public class SecurityConfig {
     }
 
     private boolean isJwtEffectivelyEnabled() {
-        return jwtEnabled && jwksUri != null && !jwksUri.trim().isEmpty() && !jwksUri.startsWith("${");
+        return jwtEnabled && issuerUri != null && !issuerUri.trim().isEmpty() && !issuerUri.startsWith("${");
     }
 
     /** True when {@code scs.app.environment} denotes a local/dev environment (see {@link #MOCK_PERMITTED_ENVIRONMENTS}). */
@@ -148,9 +148,9 @@ public class SecurityConfig {
         if (!MOCK_PERMITTED_ENVIRONMENTS.contains(normalized)) {
             throw new IllegalStateException(String.format(
                 "FATAL: mock authentication mode is active (security.jwt.enabled=false or "
-                + "jwt.issuer.jwks-uri is unset) but scs.app.environment='%s' is not one of %s. "
+                + "keycloak.issuer-uri is unset) but scs.app.environment='%s' is not one of %s. "
                 + "Refusing to start because mock mode grants unauthenticated %s access to every "
-                + "request. Set security.jwt.enabled=true and a valid jwt.issuer.jwks-uri for any "
+                + "request. Set security.jwt.enabled=true and a valid keycloak.issuer-uri for any "
                 + "non-local environment.",
                 env, MOCK_PERMITTED_ENVIRONMENTS, Roles.SCS_SYS_ADMIN));
         }
@@ -180,7 +180,7 @@ public class SecurityConfig {
             JWTService jwtService = jwtServiceProvider.getIfAvailable();
             if (jwtService == null) {
                 throw new IllegalStateException(
-                    "JWT security is enabled but JWTService is unavailable. Check jwt.issuer.jwks-uri configuration."
+                    "JWT security is enabled but JWTService is unavailable. Check keycloak.issuer-uri configuration."
                 );
             }
             http.addFilterBefore(new JwtRequestFilter(jwtService), UsernamePasswordAuthenticationFilter.class);

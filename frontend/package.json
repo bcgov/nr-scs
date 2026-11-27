@@ -7,9 +7,6 @@
     "node": ">=22.15.0"
   },
   "scripts": {
-    "generate-amplify-config": "node scripts/generate-amplify-config.cjs",
-    "prestart": "npm run generate-amplify-config",
-    "prebuild": "npm run generate-amplify-config",
     "start": "vite",
     "build": "cross-env CI=false vite build",
     "lint": "eslint .",
@@ -46,11 +43,11 @@
     "@carbon/pictograms-react": "^11.83.0",
     "@carbon/react": "^1.104.1",
     "@tanstack/react-query": "^5.84.1",
-    "aws-amplify": "^6.16.2",
     "axios": "^1.13.5",
     "dompurify": "^3.4.13",
     "idb": "^8.0.3",
     "luxon": "^3.7.1",
+    "oidc-client-ts": "^3.5.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "react-router-dom": "^7.18.2"

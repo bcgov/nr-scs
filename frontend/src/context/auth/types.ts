@@ -1,6 +1,5 @@
-import type { JWT as AmplifyJWT } from '@aws-amplify/core';
-
-export type JWT = AmplifyJWT;
+/** Decoded claims of a Keycloak (BC Gov SSO) token. */
+export type JwtClaims = Record<string, unknown>;
 
 /**
  * The system administrator role. Currently the only role that grants access to
@@ -29,7 +28,7 @@ export const AVAILABLE_ROLES = [
 
 export type ROLE_TYPE = (typeof AVAILABLE_ROLES)[number];
 
-/** External FAM roles delivered as forest-client-scoped groups (`<role>_<clientNumber>`). */
+/** External FAM roles delivered forest-client-scoped, as `<role>_<clientNumber>` client roles. */
 export const EXTERNAL_CLIENT_ROLES = ['SCS_INDUSTRY_SCALER', 'SCS_OWNER'] as const;
 
 /**

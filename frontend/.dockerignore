@@ -15,8 +15,7 @@ build
 dist
 node_modules
 
-# Local-only runtime config and env files (the image's amplify-config.js is generated at start)
-public/amplify-config.js
+# Local-only env files (public/config.js IS shipped; docker-entrypoint.sh rewrites it at start)
 .env
 .env.*
 !.env.example

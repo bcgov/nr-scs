@@ -5,82 +5,90 @@ import {
   EXTERNAL_CLIENT_ROLES,
   isClientScopedRole,
   SYS_ADMIN_ROLE,
-  validIdpProviders,
   type FamLoginUser,
   type IdpProviderType,
-  type JWT,
+  type JwtClaims,
   type ROLE_TYPE,
   type USER_PRIVILEGE_TYPE,
 } from './types';
 
-/**
- * Retrieves the value of a cookie by name.
- * @param {string} name - The name of the cookie to retrieve.
- * @returns {string} The cookie value, or an empty string if not found.
- */
-export const getCookie = (name: string): string => {
-  const cookie = document.cookie
-    .split(';')
-    .find((cookieValue) => cookieValue.trim().startsWith(name));
-  return cookie ? (cookie.split('=')[1] ?? '') : '';
+const asString = (claims: JwtClaims | undefined, name: string): string => {
+  const value = claims?.[name];
+  return typeof value === 'string' ? value : '';
 };
 
 /**
- * Retrieves the Cognito idToken for the current user from cookies.
- * @returns {string | undefined} The idToken string, or undefined if not found.
+ * Normalises the realm's `identity_provider` alias to SCS's provider type. A CSS integration using
+ * IDIR - MFA reports `azureidir`, not `idir`; every IDIR alias folds to `IDIR`, and any BCeID alias
+ * to `BCEIDBUSINESS`. Unrecognised providers are `undefined` rather than guessed at.
+ * @param {string | undefined} raw - The `identity_provider` claim.
+ * @returns {IdpProviderType | undefined} The normalised provider.
  */
-export const getUserTokenFromCookie = (): string | undefined => {
-  const baseCookieName = `CognitoIdentityServiceProvider.${env.VITE_USER_POOLS_WEB_CLIENT_ID}`;
-  const userId = encodeURIComponent(getCookie(`${baseCookieName}.LastAuthUser`));
-  if (userId) {
-    return getCookie(`${baseCookieName}.${userId}.idToken`);
-  } else {
+export const normalizeProvider = (raw: string | undefined): IdpProviderType | undefined => {
+  const alias = raw?.trim().toLowerCase();
+  if (!alias) {
     return undefined;
   }
+  if (alias === 'idir' || alias === 'azureidir' || alias === 'azure-idir') {
+    return 'IDIR';
+  }
+  if (alias.startsWith('bceid')) {
+    return 'BCEIDBUSINESS';
+  }
+  return undefined;
 };
 
 /**
- * Parses a JWT token and returns a FamLoginUser object if valid.
- * @param {JWT | undefined} idToken - The JWT token to parse.
- * @returns {FamLoginUser | undefined} The parsed user object, or undefined if invalid.
+ * The username without provider prefix: `idir_username` / `bceid_username` verbatim, otherwise the
+ * GUID (from `preferred_username` `<guid>@<idp>`, then `idir_user_guid` / `bceid_user_guid`),
+ * upper-cased — a GUID's hex spelling carries no meaning and arrives in mixed case. Mirrors the
+ * backend's `JWTService`.
+ * @param {JwtClaims} claims - The decoded access-token claims.
+ * @returns {string} The username, or an empty string.
  */
-export const parseToken = (idToken: JWT | undefined): FamLoginUser | undefined => {
-  if (!idToken) {
+const resolveUsername = (claims: JwtClaims): string => {
+  const named = asString(claims, 'idir_username') || asString(claims, 'bceid_username');
+  if (named) {
+    return named;
+  }
+
+  const preferred = asString(claims, 'preferred_username');
+  const at = preferred.indexOf('@');
+  const guid =
+    at > 0
+      ? preferred.slice(0, at)
+      : asString(claims, 'idir_user_guid') || asString(claims, 'bceid_user_guid');
+  return guid.toUpperCase();
+};
+
+/**
+ * Builds the signed-in user from a decoded Keycloak (BC Gov SSO) access token.
+ * @param {JwtClaims | undefined} claims - The decoded access-token claims.
+ * @returns {FamLoginUser | undefined} The parsed user object, or undefined if there are no claims.
+ */
+export const parseToken = (claims: JwtClaims | undefined): FamLoginUser | undefined => {
+  if (!claims) {
     return undefined;
   }
-  const decodedIdToken = idToken?.payload;
-  // Debug: print decoded token to help identify which claim contains roles
-  try {
-    if (env.NODE_ENV !== 'production') {
-      // eslint-disable-next-line no-console
-      console.log('authUtils.parseToken decodedIdToken:', decodedIdToken);
-    }
-  } catch {
-    // ignore logging errors
-  }
-  const displayName = (decodedIdToken?.['custom:idp_display_name'] as string) || '';
-  const idpProvider = validIdpProviders.includes(
-    (decodedIdToken?.['custom:idp_name'] as string)?.toUpperCase() as IdpProviderType,
-  )
-    ? ((decodedIdToken?.['custom:idp_name'] as string).toUpperCase() as IdpProviderType)
-    : undefined;
+  const displayName = asString(claims, 'display_name') || asString(claims, 'name');
+  const idpProvider = normalizeProvider(asString(claims, 'identity_provider'));
   const hasComma = displayName.includes(',');
   let [lastName, firstName] = hasComma ? displayName.split(', ') : displayName.split(' ');
   if (!hasComma) {
     [lastName, firstName] = [firstName, lastName];
   }
   const sanitizedFirstName = hasComma ? firstName?.split(' ')[0]?.trim() : firstName || '';
-  const userName = (decodedIdToken?.['custom:idp_username'] as string) || '';
-  const email = (decodedIdToken?.['email'] as string) || '';
-  const cognitoGroups = extractGroups(decodedIdToken);
-  const clientNumbers = extractForestClientNumbers(cognitoGroups);
+  const userName = resolveUsername(claims);
+  const email = asString(claims, 'email');
+  const clientRoles = extractClientRoles(claims);
+  const clientNumbers = extractForestClientNumbers(clientRoles);
   return {
     userName,
     displayName,
     email,
     idpProvider,
-    privileges: parsePrivileges(cognitoGroups),
-    roles: extractRoles(cognitoGroups),
+    privileges: parsePrivileges(clientRoles),
+    roles: extractRoles(clientRoles),
     firstName: sanitizedFirstName,
     lastName,
     providerUsername: `${idpProvider}\\${userName}`,
@@ -89,13 +97,49 @@ export const parseToken = (idToken: JWT | undefined): FamLoginUser | undefined =
   };
 };
 
+/** FAM bookkeeping roles (e.g. `FAM:EXPIRES:2026-09-30:SCS_CLERICAL`) that ride the token. */
+const FAM_BOOKKEEPING_PREFIX = 'FAM:';
 
 /**
- * Maps a Cognito group to the canonical SCS role it grants: an exact (case-insensitive) match, or an
+ * The raw client-role strings in the token, before any SCS mapping. Reads both places Keycloak can
+ * put them — CSS's flat `client_roles` claim and stock Keycloak's `resource_access.<clientId>.roles`
+ * (only this integration's entry; the realm also adds `account`) — de-duplicated and trimmed, with
+ * FAM bookkeeping entries dropped. These are what {@link roleFromGroup} and
+ * {@link extractForestClientNumbers} interpret, including client-scoped `<role>_<clientNumber>`.
+ * @param {JwtClaims | undefined} claims - The decoded access-token claims.
+ * @returns {string[]} The client-role strings.
+ */
+export function extractClientRoles(claims: JwtClaims | undefined): string[] {
+  if (!claims) {
+    return [];
+  }
+
+  const direct = Array.isArray(claims.client_roles) ? (claims.client_roles as unknown[]) : [];
+
+  const resourceAccess = claims.resource_access;
+  const forThisClient =
+    resourceAccess && typeof resourceAccess === 'object'
+      ? (resourceAccess as Record<string, unknown>)[(env.VITE_KEYCLOAK_CLIENT_ID ?? '').trim()]
+      : undefined;
+  const nested: unknown[] =
+    forThisClient &&
+    typeof forThisClient === 'object' &&
+    Array.isArray((forThisClient as { roles?: unknown }).roles)
+      ? (forThisClient as { roles: unknown[] }).roles
+      : [];
+
+  return [...new Set([...direct, ...nested])]
+    .filter((role): role is string => typeof role === 'string' && role.trim().length > 0)
+    .map((role) => role.trim())
+    .filter((role) => !role.toUpperCase().startsWith(FAM_BOOKKEEPING_PREFIX));
+}
+
+/**
+ * Maps a client role to the canonical SCS role it grants: an exact (case-insensitive) match, or an
  * external role FAM delivers client-scoped as `<role>_<clientNumber>` mapped to its base role
  * (e.g. SCS_OWNER_00001074 → SCS_OWNER). Returns undefined otherwise. The client number itself is
  * data scope, read by extractForestClientNumbers.
- * @param {string} group - A single Cognito group string.
+ * @param {string} group - A single client-role string.
  * @returns {ROLE_TYPE | undefined} The canonical role, or undefined if the group grants none.
  */
 export function roleFromGroup(group: string): ROLE_TYPE | undefined {
@@ -114,9 +158,9 @@ export function roleFromGroup(group: string): ROLE_TYPE | undefined {
 }
 
 /**
- * Parses Cognito group strings into a user privilege object, keyed by canonical role
+ * Parses client-role strings into a user privilege object, keyed by canonical role
  * (see {@link roleFromGroup} — recognises exact and client-scoped external groups).
- * @param {string[]} input - Array of group strings from Cognito.
+ * @param {string[]} input - Client-role strings from the token.
  * @returns {USER_PRIVILEGE_TYPE} The parsed privilege object.
  */
 export function parsePrivileges(input: string[]): USER_PRIVILEGE_TYPE {
@@ -131,26 +175,11 @@ export function parsePrivileges(input: string[]): USER_PRIVILEGE_TYPE {
 }
 
 /**
- * Extracts Cognito groups from a decoded JWT payload.
- * @param {object | undefined} decodedIdToken - The decoded JWT payload.
- * @returns {string[]} Array of group strings, or empty array if none found.
- */
-export function extractGroups(decodedIdToken: object | undefined): string[] {
-  if (!decodedIdToken) {
-    return [];
-  }
-  if ('cognito:groups' in decodedIdToken) {
-    return decodedIdToken['cognito:groups'] as string[];
-  }
-  return [];
-}
-
-/**
  * Extracts the forest client number(s) from the `SCS_INDUSTRY_SCALER_*` / `SCS_OWNER_*` groups FAM
  * delivers (shape `<role>_<clientNumber>`, e.g. `SCS_OWNER_00001074`). A group contributes its suffix
  * only when it follows a recognised external-role prefix and is all digits — so a longer role sharing
  * the prefix is not mistaken for a client. Mirrors the backend parse.
- * @param {string[]} groups - The Cognito group strings from the token.
+ * @param {string[]} groups - The client-role strings from the token.
  * @returns {string[]} The de-duplicated client numbers, or empty for internal users.
  */
 export function extractForestClientNumbers(groups: string[]): string[] {
@@ -175,9 +204,9 @@ export function extractForestClientNumbers(groups: string[]): string[] {
 }
 
 /**
- * Extracts the recognized canonical role names from Cognito groups (see {@link roleFromGroup} —
+ * Extracts the recognized canonical role names from client roles (see {@link roleFromGroup} —
  * recognises exact and client-scoped external groups).
- * @param {string[]} groups - The Cognito group strings from the token.
+ * @param {string[]} groups - The client-role strings from the token.
  * @returns {string[]} The de-duplicated list of recognized roles.
  */
 export function extractRoles(groups: string[]): string[] {

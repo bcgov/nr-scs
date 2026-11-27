@@ -2,8 +2,7 @@
 FROM node:24-slim AS static
 
 # Copy, build static files; see .dockerignore for exclusions.
-# `npm run build` runs `prebuild` (generate-amplify-config), which writes a localhost placeholder
-# public/amplify-config.js; docker-entrypoint.sh replaces it at container start.
+# public/config.js is a placeholder; docker-entrypoint.sh replaces it at container start.
 WORKDIR /app
 COPY . ./
 RUN npm ci && npm run build
@@ -30,11 +29,11 @@ COPY Caddyfile /etc/caddy/Caddyfile
 COPY coraza.conf /etc/caddy/coraza.conf
 COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 
-# OpenShift uses random UIDs in the root group (GID 0). /srv/amplify-config.js is rewritten at start
-# by the entrypoint, so it is group-writable; on OpenShift /srv is an emptyDir seeded from the image.
+# OpenShift uses random UIDs in the root group (GID 0). /srv/config.js is rewritten at start by the
+# entrypoint, so it is group-writable; on OpenShift /srv is an emptyDir seeded from the image.
 RUN chown -R 1001:0 /srv && \
     chmod -R 755 /srv && \
-    chmod g+w /srv /srv/amplify-config.js && \
+    chmod g+w /srv /srv/config.js && \
     chmod 755 /usr/local/bin/docker-entrypoint.sh
 
 # Create directories for Coraza WAF with restricted permissions

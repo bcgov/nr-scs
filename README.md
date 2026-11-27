@@ -18,8 +18,8 @@ Tomcat by the Polaris pipeline.
   `JdbcTemplate` calls to Oracle PL/SQL packages.
 - **Database**: the shared ministry Oracle database (no database is deployed by this repo),
   reached over TCPS.
-- **Integrations**: JasperReports Server (reports), CHES (email), FAM/Cognito (sign-in; moving to
-  BC Gov SSO Keycloak).
+- **Integrations**: JasperReports Server (reports), CHES (email), BC Gov SSO / Keycloak (sign-in,
+  with roles from FAM).
 - **End-to-end tests** (`frontend/e2e/`): a BDD browser suite (Gherkin + Playwright) that drives a
   running stack against a seeded Oracle.
 
@@ -93,7 +93,7 @@ values is in the [quickstart-openshift README](https://github.com/bcgov/quicksta
 | Variable | Purpose |
 |---|---|
 | `oc_server` | OpenShift API server |
-| `COGNITO_USER_POOL_ID`, `COGNITO_USER_POOL_CLIENT_ID`, `COGNITO_OAUTH_DOMAIN`, `COGNITO_REGION` | FAM/Cognito sign-in. The backend validates tokens against the same pool and client id. Temporary: being replaced by Keycloak |
+| `KEYCLOAK_ISSUER_URI`, `KEYCLOAK_CLIENT_ID` | BC Gov SSO (Keycloak, standard realm) issuer, e.g. `https://dev.loginproxy.gov.bc.ca/auth/realms/standard`, and the CSS integration's client id. Used by both the backend (token validation, `azp` check) and the frontend (sign-in). Each zone's `<route>/authCallback` must be registered on the integration |
 | `JASPER_SERVER_LOGIN_URL`, `JASPER_SERVER_FETCH_URL` | JasperReports Server REST endpoints |
 | `MAIL_ENABLED`, `CHES_EMAIL_URL`, `CHES_TOKEN_URL`, `CHES_FROM_EMAIL` | Email delivery (off unless `MAIL_ENABLED=true`) |
 | `SONAR_PROJECT_KEY_BACKEND`, `SONAR_PROJECT_KEY_FRONTEND` | SonarCloud project keys (optional) |

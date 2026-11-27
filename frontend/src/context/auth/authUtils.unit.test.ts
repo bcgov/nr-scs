@@ -1,91 +1,39 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 
 import {
-  getCookie,
-  getUserTokenFromCookie,
   parseToken,
   parsePrivileges,
-  extractGroups,
+  extractClientRoles,
   extractForestClientNumbers,
   extractRoles,
+  normalizeProvider,
   isSystemAdministrator,
   hasWelcomeAccess,
 } from './authUtils';
 import type { FamLoginUser } from './types';
 
-// Mock env
 vi.mock('@/env', () => ({
   env: {
-    VITE_USER_POOLS_WEB_CLIENT_ID: 'test-client-id',
+    VITE_KEYCLOAK_CLIENT_ID: 'scs-client',
     NODE_ENV: 'test',
   },
 }));
 
 describe('authUtils', () => {
-  describe('getCookie', () => {
-    let originalCookie: string;
-    beforeEach(() => {
-      originalCookie = globalThis.document?.cookie;
-      Object.defineProperty(document, 'cookie', {
-        writable: true,
-        value:
-          'foo=bar; CognitoIdentityServiceProvider.test-client-id.LastAuthUser=theuser; CognitoIdentityServiceProvider.test-client-id.theuser.idToken=thetoken',
-      });
-    });
-    afterEach(() => {
-      Object.defineProperty(document, 'cookie', {
-        writable: true,
-        value: originalCookie,
-      });
-    });
-    it('returns the correct cookie value', () => {
-      expect(getCookie('foo')).toBe('bar');
-      expect(getCookie('CognitoIdentityServiceProvider.test-client-id.LastAuthUser')).toBe(
-        'theuser',
-      );
-    });
-    it('returns empty string if cookie not found', () => {
-      expect(getCookie('notfound')).toBe('');
-    });
-  });
-
-  describe('getUserTokenFromCookie', () => {
-    beforeEach(() => {
-      Object.defineProperty(document, 'cookie', {
-        writable: true,
-        value:
-          'CognitoIdentityServiceProvider.test-client-id.LastAuthUser=theuser; CognitoIdentityServiceProvider.test-client-id.theuser.idToken=thetoken',
-      });
-    });
-    it('returns the idToken from cookies', () => {
-      expect(getUserTokenFromCookie()).toBe('thetoken');
-    });
-    it('returns undefined if no userId', () => {
-      Object.defineProperty(document, 'cookie', {
-        writable: true,
-        value: '',
-      });
-      expect(getUserTokenFromCookie()).toBeUndefined();
-    });
-  });
-
   describe('parseToken', () => {
-    it('returns undefined if no token', () => {
+    it('returns undefined if no claims', () => {
       expect(parseToken(undefined)).toBeUndefined();
     });
-    it('parses a valid JWT payload', () => {
-      const jwt = {
-        payload: {
-          'custom:idp_display_name': 'Doe, John',
-          'custom:idp_name': 'idir',
-          'custom:idp_username': 'jdoe',
-          'email': 'john@example.com',
-          'cognito:groups': ['SCS_SYS_ADMIN', 'SomeOtherGroup'],
-        },
-      };
-      const user = parseToken(jwt);
+    it('parses an IDIR (azureidir) access token', () => {
+      const user = parseToken({
+        display_name: 'Doe, John',
+        identity_provider: 'azureidir',
+        idir_username: 'JDOE',
+        email: 'john@example.com',
+        client_roles: ['SCS_SYS_ADMIN', 'SomeOtherRole'],
+      });
       expect(user).toMatchObject({
-        userName: 'jdoe',
+        userName: 'JDOE',
         displayName: 'Doe, John',
         email: 'john@example.com',
         idpProvider: 'IDIR',
@@ -93,20 +41,17 @@ describe('authUtils', () => {
         roles: ['SCS_SYS_ADMIN'],
         firstName: 'John',
         lastName: 'Doe',
-        providerUsername: 'IDIR\\jdoe',
+        providerUsername: 'IDIR\\JDOE',
         clientNumbers: [],
         isClientRestricted: false,
       });
     });
     it('parses forest client numbers and isClientRestricted for an external user', () => {
-      const jwt = {
-        payload: {
-          'custom:idp_username': 'bceiduser',
-          'custom:idp_name': 'bceidbusiness',
-          'cognito:groups': ['SCS_INDUSTRY_SCALER_00001074'],
-        },
-      };
-      const user = parseToken(jwt);
+      const user = parseToken({
+        bceid_username: 'bceiduser',
+        identity_provider: 'bceidbusiness',
+        client_roles: ['SCS_INDUSTRY_SCALER_00001074'],
+      });
       expect(user).toMatchObject({
         userName: 'bceiduser',
         idpProvider: 'BCEIDBUSINESS',
@@ -115,6 +60,57 @@ describe('authUtils', () => {
         clientNumbers: ['00001074'],
         isClientRestricted: true,
       });
+    });
+    it('falls back to the upper-cased GUID when no username claim is mapped', () => {
+      expect(
+        parseToken({ preferred_username: 'abc123def@azureidir', identity_provider: 'azureidir' })
+          ?.userName,
+      ).toBe('ABC123DEF');
+      expect(parseToken({ idir_user_guid: 'ff00aa', identity_provider: 'idir' })?.userName).toBe(
+        'FF00AA',
+      );
+    });
+    it('uses name when display_name is absent', () => {
+      expect(parseToken({ name: 'Jane Smith' })?.displayName).toBe('Jane Smith');
+    });
+  });
+
+  describe('normalizeProvider', () => {
+    it('folds every IDIR alias to IDIR', () => {
+      expect(normalizeProvider('azureidir')).toBe('IDIR');
+      expect(normalizeProvider('IDIR')).toBe('IDIR');
+      expect(normalizeProvider('azure-idir')).toBe('IDIR');
+    });
+    it('folds BCeID aliases to BCEIDBUSINESS', () => {
+      expect(normalizeProvider('bceidbusiness')).toBe('BCEIDBUSINESS');
+    });
+    it('returns undefined for unknown or missing providers', () => {
+      expect(normalizeProvider('github')).toBeUndefined();
+      expect(normalizeProvider(undefined)).toBeUndefined();
+    });
+  });
+
+  describe('extractClientRoles', () => {
+    it('reads CSS client_roles and this client\'s resource_access roles, de-duplicated', () => {
+      expect(
+        extractClientRoles({
+          client_roles: ['SCS_CLERICAL', ' SCS_OWNER_00001074 '],
+          resource_access: {
+            'scs-client': { roles: ['SCS_CLERICAL', 'SCS_CHECK_SCALER'] },
+            account: { roles: ['manage-account'] },
+          },
+        }),
+      ).toEqual(['SCS_CLERICAL', 'SCS_OWNER_00001074', 'SCS_CHECK_SCALER']);
+    });
+    it('drops FAM bookkeeping roles', () => {
+      expect(
+        extractClientRoles({ client_roles: ['FAM:EXPIRES:2026-09-30:SCS_CLERICAL', 'SCS_CLERICAL'] }),
+      ).toEqual(['SCS_CLERICAL']);
+    });
+    it('tolerates missing or malformed claims', () => {
+      expect(extractClientRoles(undefined)).toEqual([]);
+      expect(extractClientRoles({})).toEqual([]);
+      expect(extractClientRoles({ client_roles: 'SCS_CLERICAL', resource_access: [] })).toEqual([]);
     });
   });
 
@@ -175,16 +171,6 @@ describe('authUtils', () => {
     });
     it('returns an empty array for no groups', () => {
       expect(extractRoles([])).toEqual([]);
-    });
-  });
-
-  describe('extractGroups', () => {
-    it('returns groups from token', () => {
-      expect(extractGroups({ 'cognito:groups': ['ADMIN', 'USER'] })).toEqual(['ADMIN', 'USER']);
-    });
-    it('returns empty array if no groups', () => {
-      expect(extractGroups({})).toEqual([]);
-      expect(extractGroups(undefined)).toEqual([]);
     });
   });
 

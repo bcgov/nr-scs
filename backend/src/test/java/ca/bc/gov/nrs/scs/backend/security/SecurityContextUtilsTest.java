@@ -18,7 +18,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 
 class SecurityContextUtilsTest {
 
-  // A representative Cognito GUID (the JWT `sub` claim) and the idp_username it maps to.
+  // A representative IdP user GUID and the IdP username it maps to.
   private static final String GUID = "1a2b3c4d-5e6f-7a8b-9c0d-1e2f3a4b5c6d";
   private static final String IDP_USERNAME = "JSMITH";
 
