@@ -7,9 +7,23 @@
   "packageRules": [
     {
       "description": "Cap Mockito at 5.22.0: 5.23.0's inline mock maker fails to instrument classes returning generated model.* types, poisoning the surefire JVM and cascading into ~120 unrelated test errors.",
-      "matchManagers": ["maven"],
-      "matchPackageNames": ["org.mockito:**"],
+      "matchManagers": [
+        "maven"
+      ],
+      "matchPackageNames": [
+        "org.mockito:**"
+      ],
       "allowedVersions": "<=5.22.0"
+    },
+    {
+      "description": "Stay on Java 21: Java 22+ fails the Oracle TCPS handshake (the database accepts only TLS_RSA_WITH_AES_256_CBC_SHA; TLS_RSA_* is disabled by default, JDK-8245545; see OracleTlsCompatibility). Lift once the DB listener offers ECDHE ciphers, moving the runtime image, the Maven build image and <java.version> in pom.xml together.",
+      "matchDatasources": [
+        "docker"
+      ],
+      "matchPackageNames": [
+        "eclipse-temurin"
+      ],
+      "allowedVersions": "<22"
     }
   ]
 }
